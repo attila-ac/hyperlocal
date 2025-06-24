@@ -1,0 +1,9 @@
+trigonometric_exponential_constants.vo trigonometric_exponential_constants.glob trigonometric_exponential_constants.v.beautified trigonometric_exponential_constants.required_vo: trigonometric_exponential_constants.v define_complex.vo
+trigonometric_exponential_constants.vio: trigonometric_exponential_constants.v define_complex.vio
+trigonometric_exponential_constants.vos trigonometric_exponential_constants.vok trigonometric_exponential_constants.required_vos: trigonometric_exponential_constants.v define_complex.vos
+define_complex.vo define_complex.glob define_complex.v.beautified define_complex.required_vo: define_complex.v 
+define_complex.vio: define_complex.v 
+define_complex.vos define_complex.vok define_complex.required_vos: define_complex.v 
+shadow_function_degree.vo shadow_function_degree.glob shadow_function_degree.v.beautified shadow_function_degree.required_vo: shadow_function_degree.v 
+shadow_function_degree.vio: shadow_function_degree.v 
+shadow_function_degree.vos shadow_function_degree.vok shadow_function_degree.required_vos: shadow_function_degree.v 

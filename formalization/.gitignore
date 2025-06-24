@@ -1,0 +1,7 @@
+# Ignore Coq compiled files
+*.vo
+*.vok
+*.vos
+*.glob
+hadamard_term*
+
