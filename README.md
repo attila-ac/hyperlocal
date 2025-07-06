@@ -15,7 +15,7 @@ This repository contains the manuscript and a one-page summary of a proof of the
 ---
 
 * **`hyperlocal_RH_proof_ACs_v2.1_06072025.pdf`**: The full manuscript (latest version).
-* **`hyperlocal_one_pager_ACs_v1_26052025.pdf`**: A one-page summary of the proof's logical flow (based on v1).
+* **`hyperlocal_one_pager_ACs_v2_04072025.pdf`**: A one-page summary of the proof's logical flow (based on v2).
 
 
 ## Author
