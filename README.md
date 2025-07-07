@@ -4,6 +4,9 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
+* **Version 2.1.1 (Latest):**} '`hyperlocal_RH_proof_ACs_v2.1.1_07072025.pdf`' [GitHub](https://github.com/attila-ac/hyperlocal).
+    * *Change remark:* A minor textual refinement to further improve logical transparency. The justification for the function's order in the 'Growth Properties' section has been expanded to explicitly include the role of the Hadamard Factorization Theorem, making the non-circular nature of the argument more direct.
+
 * **Version 2.1 (Latest):** `hyperlocal_RH_proof_ACs_v2.1_06072025.pdf` available at [GitHub](https://github.com/attila-ac/hyperlocal).
     * *Change remark:* A minor update focused on improving clarity and logical rigor. The justifications for the growth properties have been enriched and their logical placement in the manuscript improved. Additionally, new explanatory remarks have been added to the Affine Forcing Engine to clarify its mechanism and robustness.
 
@@ -14,7 +17,7 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ---
 
-* **`hyperlocal_RH_proof_ACs_v2.1_06072025.pdf`**: The full manuscript (latest version).
+* **`hyperlocal_RH_proof_ACs_v2.1.1_07072025.pdf`**: The full manuscript (latest version).
 * **`hyperlocal_one_pager_ACs_v2_04072025.pdf`**: A one-page summary of the proof's logical flow (based on v2).
 
 
