@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- 
+
+    <!--
       =====================================================================
       METADATA FOR GOOGLE SCHOLAR
       The publication date is set to the original date to establish priority.
@@ -15,8 +15,8 @@
     <meta name="citation_author" content="Csordas, Attila">
     <meta name="citation_publication_date" content="2025/06/26">
     <meta name="citation_journal_title" content="Preprint">
-    <meta name="citation_pdf_url" content="https://attila-ac.github.io/hyperlocal/hyperlocal_RH_proof_ACs_v2.1.1_07072025.pdf">
-    
+    <meta name="citation_pdf_url" content="https://attila-ac.github.io/hyperlocal/hyperlocal_RH_proof_ACs_v3.0_17072025.pdf">
+
     <!-- Basic styling for better readability -->
     <style>
         body {
@@ -75,33 +75,45 @@
 <body>
     <div class="container">
         <h1>Off-Critical Riemann Zeta Zeros Cannot Seed Symmetric Entire Functions: A Hyperlocal Proof of Constructive Impossibility</h1>
-        
+
         <p>
             <strong>Author:</strong> Attila Csordas<br>
             <strong>Affiliation:</strong> AgeCurve Limited, Cambridge, UK<br>
             <strong>ORCID:</strong> <a href="https://orcid.org/0000-0003-3576-1793" target="_blank">0000-0003-3576-1793</a>
         </p>
-        
+
         <p>
             <strong>First Published:</strong> June 26, 2025<br>
-            <strong>Current Version (v2.1.1):</strong> July 7, 2025
+            <strong>Current Version (v3.0):</strong> July 17, 2025
         </p>
-        
+
         <h2>Abstract</h2>
         <p>
-            The Riemann Hypothesis posits that all non-trivial zeros of the Riemann zeta function ζ(s) lie on the critical line Re(s) = 1/2. This paper presents an unconditional proof of this hypothesis. The argument proceeds by reductio ad absurdum, demonstrating that the assumption of any hypothetical off-critical zero for an entire function H(s) sharing the key properties of the Riemann ξ-function—namely its symmetries (Functional Equation and Reality Condition) and its full class of growth constraints (finite order, vertical decay, and bounded horizontal growth)—leads to an unavoidable analytic contradiction, irrespective of the zero’s order. The proof utilizes a “constructive hyperlocal entirety test.” This involves applying the full force of theorems governing entire functions to the local analytic structure implied by a hypothetical off-critical zero. The core mechanism is an analytical engine that translates the function’s global symmetries and growth constraints into a fatal local constraint, rigorously proving that its derivative, H'(s), must be an affine polynomial. This conclusion is then shown to be impossible through two complete and independent lines of reasoning. The main proof refutes an off-critical zero of any order k ≥ 1 through a unified “Clash of Natures” argument, which proves that for a transcendental function, the necessary factorization around an off-critical zero is incompatible with its derivative being affine. A second, purely algebraic proof track, detailed in the appendix, confirms this result by showing that the affine structure is also directly incompatible with the Taylor series expansion of the derivative at an off-critical zero. Since the affine nature of the derivative is both necessary (by symmetry) and impossible (by structure), the existence of off-critical zeros is refuted. As the Riemann ξ(s) function is a member of this class, all of its non-trivial zeros must lie on the critical line. The Riemann Hypothesis therefore holds unconditionally.
+            The Riemann Hypothesis posits that all non-trivial zeros of the Riemann zeta function ζ(s) lie on the critical line Re(s) = 1/2. This paper presents an unconditional proof of this hypothesis. The argument proceeds by <i>reductio ad absurdum</i>, demonstrating that the assumption of any hypothetical off-critical zero for a transcendental entire function H(s) of finite exponential order 1 sharing the key symmetries of the Riemann ξ-function---namely the Functional Equation (FE) and the Reality Condition (RC)---leads to an unavoidable algebraic contradiction, irrespective of the zero's order.
         </p>
-        
+        <p>
+            The proof utilizes a "hyperlocal" framework. The assumption of an off-critical zero forces a factorization of the function, H(s) = R<sub>ρ',k</sub>(s) G(s), where R<sub>ρ',k</sub>(s) is a minimal polynomial encoding the zero's symmetric quartet, and the quotient G(s) must be an entire function inheriting the symmetries of H(s).
+        </p>
+        <p>
+            This factorization imposes a finite linear recurrence relation on the Taylor coefficients of the quotient function G(s). The recurrence is proven to be unstable for every hypothetical off-critical zero, which implies that for G(s) to be entire, its initial Taylor coefficients must satisfy a precise "Cancellation Condition" to prevent exponential growth.
+        </p>
+        <p>
+            The core of the refutation is proving this condition is impossible to satisfy. When the Cancellation Condition is enforced across the full symmetric quartet of zeros (as required by the function's symmetries), and combined with additional constraints from the function's derivative relations, it generates an overdetermined system of linear equations. This system is shown to admit only the trivial solution, which implies that G(s) must be zero at the off-critical point. This contradicts a necessary premise of the factorization (G(ρ') ≠ 0).
+        </p>
+        <p>
+            Since the assumption of an off-critical zero leads to an inescapable algebraic contradiction for any function with these symmetries, no such zeros can exist. As the Riemann ξ(s) is in this class, all its non-trivial zeros must lie on the critical line. The Riemann Hypothesis therefore holds unconditionally.
+        </p>
+
         <div class="download-links">
             <h2>Downloads</h2>
             <p>
-                <a href="hyperlocal_RH_proof_ACs_v2.1.1_07072025.pdf" download>
-                    <strong>Download Full Paper (v2.1.1) [PDF]</strong>
+                <a href="hyperlocal_RH_proof_ACs_v3.0_17072025.pdf" download>
+                    <strong>Download Full Paper (v3.0) [PDF]</strong>
                 </a>
             </p>
             <p>
-                <a href="hyperlocal_one_pager_ACs_v2_04072025.pdf" download>
-                    <strong>Download One-Page Summary [PDF]</strong>
+                <a href="hyperlocal_one_pager_ACs_v3_17072025.pdf" download>
+                    <strong>Download One-Page Summary (v3.0) [PDF]</strong>
                 </a>
             </p>
         </div>
@@ -109,6 +121,12 @@
         <div class="version-history">
             <h2>Versioning Information</h2>
             <ul>
+                <li>
+                    <strong>Version 3.0 (July 17, 2025):</strong>
+                    <div class="change-remark">
+                        This major revision corrects a flaw in the previous proof framework. The "Affine Forcing Engine" and other arguments based on complex growth conditions were found to be insufficient to produce a contradiction. This version works out fully the existing algebraic track, which is more aligned with the proof's hyperlocal spirit. The asymptotic proof of the recurrence's universal instability is a main part of the argument. The final logical gap—the possibility of a "fine-tuned cancellation"—is now closed with a rigorous algebraic proof. It demonstrates that the function's symmetries impose an overdetermined system of linear equations on the initial Taylor coefficients, leading to an inescapable contradiction. This final step is supported by a new appendix containing a verifiable computational proof of the system's rank.
+                    </div>
+                </li>
                 <li>
                     <strong>Version 2.1.1 (July 7, 2025):</strong>
                     <div class="change-remark">
@@ -124,7 +142,7 @@
                 <li>
                     <strong>Version 2 (July 4, 2025):</strong>
                     <div class="change-remark">
-                        This version introduces major structural and conceptual revisions. A flaw in the original "Line-To-Line Mapping Theorem" has been addressed by replacing it with a more rigorous Affine Forcing Engine, built upon a fully justified Boundedness Lemma. Furthermore, the paper has been substantially restructured: the "Clash of Natures" argument is now presented as the primary, unified proof in the main text, while the "Pure Algebraic" refutation has been moved to an appendix as a complete, alternative track.
+                        This version introduces major structural and conceptual revisions. A flaw in the original "Line-To-Line Mapping Theorem" has been addressed by replacing it with a more rigorous Affine Forcing Engine, built upon a fully justified Boundedness Lemma.
                     </div>
                 </li>
                  <li>
@@ -138,4 +156,3 @@
     </div>
 </body>
 </html>
-
