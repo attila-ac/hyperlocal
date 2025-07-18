@@ -4,7 +4,11 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
-* **Version 3.0 (Latest):** hyperlocal_RH_proof_ACs_v3.0_17072025.pdf available at GitHub.
+* **Version 3.1 (Latest):** hyperlocal_RH_proof_ACs_v3.1_18072025.pdf available at GitHub.
+
+* *Change remark:* This version enhances the rigor of the final proof. The computational verification appendix has been restructured into two parts: it now begins with a more elegant and efficient symbolic proof that formally demonstrates the initial system of equations is always underdetermined. This is followed by the numerical verification, which confirms the final, augmented system has full rank for generic cases and forces the contradiction. Additionally, a new remark on "Constructive Impossibility" has been added to the methodology section to better connect the proof's minimalist framework to its philosophical underpinnings.
+
+* **Version 3.0:** hyperlocal_RH_proof_ACs_v3.0_17072025.pdf available at GitHub.
 
 * *Change remark:* This major revision corrects a flaw in the previous proof framework. The "Affine Forcing Engine" and other arguments based on complex growth conditions were found to be insufficient to produce a contradiction. This version works out fully the existing algebraic track, which is more aligned with the proof's hyperlocal spirit. The asymptotic proof of the recurrence's universal instability is a main part of the argument. The final logical gap—the possibility of a "fine-tuned cancellation"—is now closed with a rigorous algebraic proof. It demonstrates that the function's symmetries impose an overdetermined system of linear equations on the initial Taylor coefficients, leading to an inescapable contradiction. This final step is supported by a new appendix containing a verifiable computational proof of the system's rank.
 
