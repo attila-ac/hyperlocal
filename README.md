@@ -4,7 +4,11 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
-* **Version 3.1 (Latest):** hyperlocal_RH_proof_ACs_v3.1_18072025.pdf available at GitHub.
+* **Version 3.2 (Latest):** hyperlocal_RH_proof_ACs_v3.2_24072025.pdf available at GitHub.
+
+* *Change remark:* This version corrects a logical gap in the final contradiction argument of v3.1. The previous numerical verification in Appendix D relied on placeholder constraints to achieve an overdetermined system. This version replaces that heuristic with a rigorous, formal derivation of the necessary additional constraints using a Taylor series truncation and null space analysis. The updated appendix now presents a complete and computationally verifiable proof that the full system of symmetry constraints is of rank 6, forcing the contradiction. The verification has also been strengthened by including additional test cases (e.g., near-degenerate points) to demonstrate the robustness of the result. This closes the gap in the algebraic proof.
+
+* **Version 3.1:** hyperlocal_RH_proof_ACs_v3.1_18072025.pdf available at GitHub.
 
 * *Change remark:* This version enhances the rigor of the final proof. The computational verification appendix has been restructured into two parts: it now begins with a more elegant and efficient symbolic proof that formally demonstrates the initial system of equations is always underdetermined. This is followed by the numerical verification, which confirms the final, augmented system has full rank for generic cases and forces the contradiction. Additionally, a new remark on "Constructive Impossibility" has been added to the methodology section to better connect the proof's minimalist framework to its philosophical underpinnings.
 
