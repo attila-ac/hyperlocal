@@ -4,7 +4,11 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
-* **Version 3.2 (Latest):** hyperlocal_RH_proof_ACs_v3.2_24072025.pdf available at GitHub.
+**Version 3.3 (Latest):** hyperlocal_RH_proof_ACs_v3.3_09082025.pdf available at GitHub.
+
+* *Change remark:* This significant update within the v3 algebraic track solidifies the proof's claim to full generality by extending the computational verification to cover multiple zeros. The previous verification was limited to simple zeros (k=1). This version overcomes that obstacle using a sophisticated analytical shortcut based on Faà di Bruno's formula, enabling the successful verification for the foundational double zero case (k=2). This demonstrated the same pattern of immediate and stable algebraic overdetermination, closing a key theoretical gap. To further enhance clarity, this version also introduces a new 'Boundary of Stability' analysis—which is strategically placed as a post-proof discussion to preserve the minimalist focus of the main argument—and adds a comprehensive summary table for the proof's core algebraic engine.
+
+* **Version 3.2:** hyperlocal_RH_proof_ACs_v3.2_24072025.pdf available at GitHub.
 
 * *Change remark:* This version corrects a logical gap in the final contradiction argument of v3.1. The previous numerical verification in Appendix D relied on placeholder constraints to achieve an overdetermined system. This version replaces that heuristic with a rigorous, formal derivation of the necessary additional constraints using a Taylor series truncation and null space analysis. The updated appendix now presents a complete and computationally verifiable proof that the full system of symmetry constraints is of rank 6, forcing the contradiction. The verification has also been strengthened by including additional test cases (e.g., near-degenerate points) to demonstrate the robustness of the result. This closes the gap in the algebraic proof.
 
