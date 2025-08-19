@@ -1,0 +1,14 @@
+---
+layout: default title: Research Blog
+---
+
+<h2>{{ page.title }}</h2>
+
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+      <p>{{ post.excerpt }}</p>
+    </li>
+  {% endfor %}
+</ul>
