@@ -1,0 +1,14 @@
+{
+  "name": "Lean 4 Project",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/leanprover/features/lean:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "leanprover.lean4"
+      ]
+    }
+  }
+}
