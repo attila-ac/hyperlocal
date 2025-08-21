@@ -1,9 +1,7 @@
 {
   "name": "Lean 4 Project",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-    "ghcr.io/leanprover/features/lean:1": {}
-  },
+  "image": "ghcr.io/leanprover/lean4:latest",
+  "postCreateCommand": "lake exe cache get",
   "customizations": {
     "vscode": {
       "extensions": [
