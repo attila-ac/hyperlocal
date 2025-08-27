@@ -36,6 +36,14 @@ This repository contains the manuscript and a one-page summary of a proof of the
 * **`hyperlocal_RH_proof_ACs_v2.1.1_07072025.pdf`**: The full manuscript (latest version).
 * **`hyperlocal_one_pager_ACs_v2_04072025.pdf`**: A one-page summary of the proof's logical flow (based on v2).
 
+## Build the formalisation
+
+1. Install `elan` (Lean version manager).
+2. Clone this repo and open it at the repo root.
+3. Run:
+lake update
+lake build
+4. Open `formalisation/Hyperlocal.lean` in VS Code and restart the Lean file.
 
 ## Author
 
