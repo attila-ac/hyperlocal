@@ -1,15 +1,15 @@
-/-
-  Minimal RC+FE quartet: from H ρ = 0, RC : H (⋆s) = ⋆(H s),
-  and FE : H s = H (1 - s), we get zeros at ρ, ⋆ρ, 1 - ρ, 1 - ⋆ρ.
--/
-
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.Star.Basic
 import Mathlib.Tactic
 
 namespace Hyperlocal
 
-/-- From `H ρ = 0` and `RC : ∀ s, H (⋆s) = ⋆(H s)` we get `H (⋆ρ) = 0`. -/
+open Complex
+
+/-- The affine involution `z ↦ 1 - z`. -/
+def oneMinus (z : ℂ) : ℂ := 1 - z
+
+/-- RC step: from `H ρ = 0` and `RC`, get `H (star ρ) = 0`. -/
 lemma zero_star_of_zero
     (H  : ℂ → ℂ)
     (RC : ∀ s : ℂ, H (star s) = star (H s))
@@ -17,33 +17,42 @@ lemma zero_star_of_zero
     H (star ρ) = 0 := by
   simpa [h] using RC ρ
 
-/-- The affine involution `z ↦ 1 - z`. -/
-def oneMinus (z : ℂ) : ℂ := 1 - z
-
-/-- From `H ρ = 0` and `FE : ∀ s, H s = H (1 - s)` we get `H (1 - ρ) = 0`. -/
+/-- FE step: from `H ρ = 0` and `FE`, get `H (oneMinus ρ) = 0`. -/
 lemma zero_oneMinus_of_zero
     (H  : ℂ → ℂ)
     (FE : ∀ s : ℂ, H s = H (oneMinus s))
     {ρ : ℂ} (h : H ρ = 0) :
     H (oneMinus ρ) = 0 := by
   have : 0 = H (oneMinus ρ) := by simpa [h] using FE ρ
-  simpa [eq_comm] using this
+  simpa using this.symm
 
-/-- Off-zero quartet: from one zero and the symmetries RC and FE,
-    all four points `ρ, ⋆ρ, 1 - ρ, 1 - ⋆ρ` are zeros of `H`. -/
-lemma zero_quartet_of_zero
+/-- Compose FE after RC: from `H ρ = 0`, get `H (oneMinus (star ρ)) = 0`. -/
+lemma zero_oneMinus_star_of_zero
     (H  : ℂ → ℂ)
-    (RC : ∀ s : ℂ, H (star s) = star (H s))
     (FE : ∀ s : ℂ, H s = H (oneMinus s))
+    (RC : ∀ s : ℂ, H (star s) = star (H s))
     {ρ : ℂ} (h : H ρ = 0) :
-    (H ρ = 0) ∧
-    (H (star ρ) = 0) ∧
-    (H (oneMinus ρ) = 0) ∧
-    (H (oneMinus (star ρ)) = 0) := by
-  have h_star : H (star ρ) = 0 := zero_star_of_zero H RC h
-  have h_one  : H (oneMinus ρ) = 0 := zero_oneMinus_of_zero H FE h
-  have h_one_star : H (oneMinus (star ρ)) = 0 :=
-    zero_oneMinus_of_zero H FE h_star
-  exact ⟨h, h_star, h_one, h_one_star⟩
+    H (oneMinus (star ρ)) = 0 := by
+  have hstar : H (star ρ) = 0 := zero_star_of_zero H RC h
+  exact zero_oneMinus_of_zero H FE (ρ := star ρ) hstar
+
+/-- Off-zero quartet: zeros at `ρ`, `star ρ`, `oneMinus ρ`, `oneMinus (star ρ)`. -/
+lemma zero_quartet
+    (H  : ℂ → ℂ)
+    (FE : ∀ s : ℂ, H s = H (oneMinus s))
+    (RC : ∀ s : ℂ, H (star s) = star (H s))
+    {ρ : ℂ} (h : H ρ = 0) :
+    H ρ = 0 ∧ H (star ρ) = 0 ∧ H (oneMinus ρ) = 0 ∧ H (oneMinus (star ρ)) = 0 := by
+  constructor
+  · -- Goal 1: H ρ = 0
+    exact h
+  · constructor
+    · -- Goal 2: H (star ρ) = 0
+      exact zero_star_of_zero H RC h
+    · constructor
+      · -- Goal 3: H (oneMinus ρ) = 0
+        exact zero_oneMinus_of_zero H FE h
+      · -- Goal 4: H (oneMinus (star ρ)) = 0
+        exact zero_oneMinus_star_of_zero H FE RC h
 
 end Hyperlocal
