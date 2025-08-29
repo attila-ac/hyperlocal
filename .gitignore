@@ -19,6 +19,7 @@
 *.swp
 
 /.lake/
+/.vscode/
 /build/
 *.olean
 *.trace
