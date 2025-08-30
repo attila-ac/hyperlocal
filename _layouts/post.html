@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>{{ page.title }}</title>
-  <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css"> <!-- Corrected baseurl -->
+  <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css">
 
   <!-- KaTeX CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3Qt1zcitBYeBJIxQ7UqVlGnwGITuyVOKly2btjUWZGbpwGoBB" crossorigin="anonymous">
@@ -18,11 +18,9 @@
     <h1>{{ page.title }}</h1>
     <p>By {{ page.author }}</p>
     <hr>
-
     <div class="post-content">
       {{ content }}
     </div>
-
   </div>
 
   <!-- This is the crucial configuration script. It runs after the page has loaded. -->
@@ -31,12 +29,13 @@
           renderMathInElement(document.body, {
               delimiters: [
                   {left: '$$', right: '$$', display: true},
-                  {left: '$', right: '$', display: false}
+                  {left: '\\[', right: '\\]', display: true}, // <-- ADDED THIS LINE
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false} // <-- ADDED THIS LINE
               ]
           });
       });
   </script>
-
 </body>
 </html>
 
