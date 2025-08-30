@@ -1,19 +1,17 @@
----
----
 <!DOCTYPE html>
 <html>
 <head>
   <title>{{ page.title }}</title>
-  <link rel="stylesheet" href="/hyperlocal/assets/css/style.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css"> <!-- Corrected baseurl -->
 
-  <!-- KaTeX support -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-wcIxkf4k558goNHmbUBqkOFkaK40XvpfnfoqrFUbIOBUStlCcoIQGHY7OCiY3U49" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPJpTadx5MyA2RT5I+_gA4JLBUsvMijpRnZBPlfnV/YI4wLVRGmyDGgLFwAbs" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-43gviWU0YVjaDtb/GtitreqcNFeFlNBAUQrbtAleEhIcv9IL
-goi1lFAhZflsFl_p" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-  <!-- End KaTeX support -->
+  <!-- KaTeX CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3Qt1zcitBYeBJIxQ7UqVlGnwGITuyVOKly2btjUWZGbpwGoBB" crossorigin="anonymous">
 
+  <!-- KaTeX JS -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlVjOTgjdwAmXUI2sO8jCXoYRdkihMOhpaAxvuVpnK95V-MVSciHMwG4WlB" crossorigin="anonymous"></script>
+
+  <!-- KaTeX auto-render extension -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax5AS+II2knWBxfWeEVxGXMLoc2TEKSB/3C" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="container">
@@ -26,6 +24,20 @@ goi1lFAhZflsFl_p" crossorigin="anonymous"
     </div>
 
   </div>
+
+  <!-- This is the crucial configuration script. It runs after the page has loaded. -->
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          renderMathInElement(document.body, {
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false}
+              ]
+          });
+      });
+  </script>
+
 </body>
 </html>
+
 
