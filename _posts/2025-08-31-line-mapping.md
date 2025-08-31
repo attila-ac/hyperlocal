@@ -1,9 +1,26 @@
 ---
 layout: post
-title: "A Deep Dive: The Line-to-Line Mapping Theorem"
+title: "Can you spot the Error in this proof of the 'standard' Line-to-Line Mapping Theorem"
 author: "Attila Csordas"
 ---
+In the tough journey of this research project, the strategy for the proof has evolved. The current, robust version of the proof relies on an algebraic refutation of a forced recurrence relation. However, an earlier version was built on a different, more purely analytical contradiction engine.
 
+The core of that earlier strategy is the powerful theorem presented below: the **Line-to-Line Mapping Theorem**. While this theorem and its proof are standard results in complex analysis, their application in the broader context of my RH proof contained a subtle but critical flaw.
+
+As an exercise for the reader, I am presenting the theorem and its proof here. The challenge is to find the error in how this otherwise correct theorem was applied in the now-superseded proof strategy. I will discuss the flaw in detail in a subsequent post. For now, let's examine the engine itself using the wording from the earlier manuscript.
+
+---
+
+### The Core Analytical Engine
+
+The proof presented in this paper establishes the Riemann Hypothesis by demonstrating, through a *reductio ad absurdum*, that the assumption of a hypothetical off-critical zero leads to a fundamental contradiction. The logical architecture is built around a single, powerful analytical engine whose components are applied in different ways to refute all possible cases.
+
+1.  **The Core Analytical Engine:** The proof's mechanism is the combination of two results.
+    * First, we establish that for any entire function $H(s)$ satisfying the Functional Equation (FE) and Reality Condition (RC), its derivative $H'(s)$ must be purely imaginary on the critical line (the Imaginary Derivative Condition, IDC).
+    * Second, we use the Line-to-Line Mapping Theorem, which states that any entire function mapping a line to another line must be an affine polynomial.
+
+This engine translates the global symmetries of $H(s)$ into a fatal local constraint on the structure of its derivative, $H'(s)$.
+ 
 We conclude our general setup with a formal proof of a theorem that is a linchpin of our main argument. This theorem constrains the structure of any entire function whose range is restricted to a line. The constraint it provides will ultimately prove fatal to the hypothesis of an off-critical zero.
 
 > ### Theorem (Line-to-Line Mapping for Entire Functions)
