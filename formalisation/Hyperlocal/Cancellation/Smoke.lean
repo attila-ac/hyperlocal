@@ -30,11 +30,5 @@ example : QCCfun A₀ t₀ (0 : Jet6) = 0 := by
   ext i
   simp [QCCfun]
 
-/-- (Very) trivial definitional checks that names resolve and types are right. -/
-#check TRCfun   -- ℝ → ℝ → Jet6 → Jet6
-#check QCCfun   -- ℝ → ℝ → Jet6 → Jet6
-#check A₀       -- ℝ
-#check t₀       -- ℝ
-
 end Cancellation
 end Hyperlocal
