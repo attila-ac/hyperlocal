@@ -1,77 +1,24 @@
--- formalisation/Hyperlocal/Cancellation/Recurrence.lean
 import Mathlib.Data.Complex.Basic
+import Mathlib.Data.Finset.Basic
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.BigOperators.Ring.Finset
 
-/-!
-# Linear recurrences for the `b`-sequence (no big-operators import)
-
-We model a homogeneous part of order `L` with coefficients `a 1, …, a L`
-(and a "leading" scalar `a0` multiplying `b n`) and an inhomogeneous term `h n`.
-
-The intended manuscript shape is (for n ≥ L):
-  a0 * b n = - ∑_{j=1..L} a j * b (n - j) + h n
-
-We avoid `∑` notation (which needs `BigOperators`) and define a tiny recursive
-finite-sum directly.
--/
-
--- Minimal finite-sum API (no BigOperators needed)
+open Finset
+open scoped BigOperators
 noncomputable section
-open Nat
 
-variable {α : Type*} [AddCommMonoid α]
-
-/-- Sum f(0) + f(1) + ... + f(n-1). -/
-def sumUpTo (n : ℕ) (f : ℕ → α) : α :=
-  Nat.rec (0 : α) (fun k acc => acc + f k) n
-
-@[simp] lemma sumUpTo_zero (f : ℕ → α) : sumUpTo 0 f = 0 := rfl
-@[simp] lemma sumUpTo_succ (n : ℕ) (f : ℕ → α) :
-    sumUpTo (n+1) f = sumUpTo n f + f n := rfl
-
-lemma sumUpTo_const_zero (n : ℕ) :
-    sumUpTo n (fun _ => (0 : α)) = 0 := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-      simp [sumUpTo_succ, ih]
-
-lemma sumUpTo_map_mul_right {R} [Semiring R] {f : ℕ → R} (c : R) (n : ℕ) :
-    sumUpTo n (fun k => c * f k) = c * sumUpTo n f := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-      simp [sumUpTo_succ, ih, mul_add, mul_comm, mul_left_comm, mul_assoc]
-
-
-noncomputable section
 namespace Hyperlocal
 namespace Cancellation
-
-open Complex
 
 /-- Complex sequences indexed by natural numbers. -/
 abbrev CSeq := ℕ → ℂ
 
-/-- Simple finite sum `∑_{k=0}^{n-1} f k`, defined by primitive recursion. -/
-def sumUpTo (n : ℕ) (f : ℕ → ℂ) : ℂ :=
-  Nat.rec (0 : ℂ) (fun k acc => acc + f k) n
+/--
+A recurrence specification:
 
-@[simp] lemma sumUpTo_zero (f : ℕ → ℂ) : sumUpTo 0 f = 0 := rfl
-
-@[simp] lemma sumUpTo_succ (n : ℕ) (f : ℕ → ℂ) :
-    sumUpTo (n+1) f = sumUpTo n f + f n := rfl
-
-/-- Shifted finite sum `∑_{j=lo}^{hi-1} f j` as `sumUpTo (hi-lo)` over `j = lo + k`. -/
-def sumRange (lo hi : ℕ) (f : ℕ → ℂ) : ℂ :=
-  sumUpTo (hi - lo) (fun k => f (lo + k))
-
-/-!
-We package the recurrence data in a tiny record:
-
-* `L` is the order (how many past terms enter).
-* `a0` is the leading scalar multiplying `b n`.
-* `a j` for `1 ≤ j ≤ L` are the shift-coefficients multiplying `b (n - j)`.
-  (Outside this range `a j` may be anything; we only ever use `j ∈ {1,…,L}`.)
+* `L`   – order of the homogeneous part (how many previous terms appear).
+* `a0`  – the leading scalar multiplying `b n`.
+* `a j` – the coefficient function for shifts; we only use values at `j = 1..L`.
 -/
 structure RecSpec where
   L  : ℕ
@@ -80,96 +27,76 @@ structure RecSpec where
 
 namespace RecSpec
 
-variable (R : RecSpec)
+variable {R : RecSpec}
 
-/-- Homogeneous right-hand side `- ∑_{j=1..L} a j * b (n - j)` without big-operator notation. -/
-def homRHS (b : CSeq) (n : ℕ) : ℂ :=
-  - sumRange 1 (R.L + 1) (fun j => R.a j * b (n - j))
+/-- Homogeneous RHS: `- ∑_{j=1..L} a(j) * b(n-j)` written with `Finset.range`. -/
+def homRHS (R : RecSpec) (b : CSeq) (n : ℕ) : ℂ :=
+  - (range R.L).sum (fun j => R.a (j+1) * b (n - (j+1)))
 
-/-- Full right-hand side: homogeneous part plus inhomogeneous term `h n`. -/
-def fullRHS (h b : CSeq) (n : ℕ) : ℂ :=
+/-- Full RHS: homogeneous part + inhomogeneity `h n`. -/
+def fullRHS (R : RecSpec) (h b : CSeq) (n : ℕ) : ℂ :=
   R.homRHS b n + h n
 
 /--
-The recurrence holds from a threshold `n0` if for all `n ≥ n0` we have
+The recurrence holds from a threshold `n0` if for all `n ≥ n0`:
 `a0 * b n = fullRHS h b n`.
 -/
-def HoldsFrom (h b : CSeq) (n0 : ℕ) : Prop :=
-  ∀ n, n ≥ n0 → R.a0 * b n = R.fullRHS h b n
+def HoldsFrom (R : RecSpec) (h b : CSeq) (n0 : ℕ) : Prop :=
+  ∀ ⦃n⦄, n ≥ n0 → R.a0 * b n = R.fullRHS h b n
 
-/-- By default we care from `n ≥ L` (so the shifts `n - j` never underflow). -/
-abbrev Holds (h b : CSeq) : Prop := R.HoldsFrom h b R.L
+/-- Default threshold is `n ≥ L`, so all shifts `n - (j+1)` are defined. -/
+abbrev Holds (R : RecSpec) (h b : CSeq) : Prop := R.HoldsFrom h b R.L
+
+/-- The homogeneous RHS vanishes if all `a(j)=0` on `j=1..L`. -/
+lemma homRHS_zero_of_a_zero
+    (R : RecSpec) (b : CSeq) (n : ℕ)
+    (h0 : ∀ j, 1 ≤ j ∧ j ≤ R.L → R.a j = 0) :
+    R.homRHS b n = 0 := by
+  classical
+  unfold homRHS
+  have : (range R.L).sum (fun j => R.a (j+1) * b (n - (j+1))) = 0 := by
+    refine Finset.sum_eq_zero ?hterm
+    intro j hj
+    have hlt : j < R.L := by simpa [Finset.mem_range] using hj
+    have h1 : 1 ≤ j+1 := Nat.succ_le_succ (Nat.zero_le _)
+    have h2 : j+1 ≤ R.L := Nat.succ_le_of_lt hlt
+    have hz : R.a (j+1) = 0 := h0 (j+1) ⟨h1, h2⟩
+    simp [hz]
+  simp [this]
 
 end RecSpec
 
 /-- Handy zero sequence. -/
 @[simp] def zeroSeq : CSeq := fun _ => (0 : ℂ)
+@[simp] lemma zeroSeq_eval (n : ℕ) : zeroSeq n = 0 := rfl
 
-@[simp] lemma zeroSeq_eval (n : ℕ) : zeroSeq n = (0 : ℂ) := rfl
-
-/-! ### Tiny smoke examples (compile-time sanity) -/
-
-/-- Simple finite sum `∑_{k=0}^{n-1} f k`, defined by primitive recursion. -/
-def sumUpTo (n : ℕ) (f : ℕ → ℂ) : ℂ :=
-  Nat.rec (0 : ℂ) (fun k acc => acc + f k) n
-
-@[simp] lemma sumUpTo_zero (f : ℕ → ℂ) : sumUpTo 0 f = 0 := rfl
-@[simp] lemma sumUpTo_succ (n : ℕ) (f : ℕ → ℂ) :
-    sumUpTo (n+1) f = sumUpTo n f + f n := rfl
-
-/-- Shifted finite sum `∑_{j=lo}^{hi-1} f j` as `sumUpTo (hi-lo)` over `j = lo + k`. -/
-def sumRange (lo hi : ℕ) (f : ℕ → ℂ) : ℂ :=
-  sumUpTo (hi - lo) (fun k => f (lo + k))
-
-/-- Sums of the zero function vanish. -/
-@[simp] lemma sumUpTo_zero_fun (n : ℕ) : sumUpTo n (fun _ => (0 : ℂ)) = 0 := by
-  induction n with
-  | zero => simp
-  | succ n ih => simpa [sumUpTo_succ, ih]
-
-@[simp] lemma sumRange_zero_fun (lo hi : ℕ) :
-    sumRange lo hi (fun _ => (0 : ℂ)) = 0 := by
-  unfold sumRange
-  simpa using (sumUpTo_zero_fun (n := hi - lo))
-
-/-! ### Tiny smoke examples (compile-time sanity) -/
-
+/-
+  Smokes (plain compile-time checks).
+-/
 section Smokes
 
-/-- A toy first-order recurrence with all coefficients zero is satisfied by the zero sequence. -/
-example :
-    (let R : RecSpec := ⟨1, (0 : ℂ), fun _ => (0 : ℂ)⟩;
-     R.Holds (zeroSeq) (zeroSeq)) := by
-  -- Evaluate the `let` so `simp` can see concrete fields.
-  change (⟨1, (0 : ℂ), fun _ => (0 : ℂ)⟩ : RecSpec).Holds (zeroSeq) (zeroSeq)
-  dsimp [RecSpec.Holds, RecSpec.HoldsFrom, RecSpec.fullRHS, RecSpec.homRHS,
-         zeroSeq, sumRange]
-  intro n hn
-  -- Show the summand is literally the zero function.
-  have hfun :
-      (fun k => (⟨1, (0:ℂ), fun _ => (0:ℂ)⟩ : RecSpec).a (1 + k) *
-                 (zeroSeq (n - (1 + k)))) = (fun _ => (0 : ℂ)) := by
-    funext k; simp
-  -- Now it's just 0 = -0 + 0.
-  simp [hfun]
+  /-- If `a0 = 0` and all `a(j)=0`, then any `b` solves the recurrence with `h ≡ 0`. -/
+  example (b : CSeq) :
+      (let R : RecSpec := ⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩;
+       R.Holds (zeroSeq) b) := by
+    classical
+    change (⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩ : RecSpec).Holds (zeroSeq) b
+    intro n hn
+    have hhom :
+        (⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩ : RecSpec).homRHS b n = 0 := by
+      refine RecSpec.homRHS_zero_of_a_zero
+        (R := ⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩) (b := b) (n := n) ?_
+      intro j hj; simp
+    simp [RecSpec.fullRHS, hhom, zeroSeq]
 
-/-- With `a0 = 0` and `a = 0`, any `b` satisfies the recurrence with zero inhomogeneity. -/
-example (b : CSeq) :
-    (let R : RecSpec := ⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩;
-     R.Holds (zeroSeq) b) := by
-  change (⟨2, (0 : ℂ), fun _ => (0 : ℂ)⟩ : RecSpec).Holds (zeroSeq) b
-  dsimp [RecSpec.Holds, RecSpec.HoldsFrom, RecSpec.fullRHS, RecSpec.homRHS,
-         zeroSeq, sumRange]
-  intro n hn
-  -- Summand is zero because all `a j = 0`.
-  have hfun :
-      (fun k => (⟨2, (0:ℂ), fun _ => (0:ℂ)⟩ : RecSpec).a (1 + k) *
-                 b (n - (1 + k))) = (fun _ => (0 : ℂ)) := by
-    funext k; simp
-  simp [hfun]
+  /-- With `b ≡ 0` and `h ≡ 0`, the recurrence holds for any `R`. -/
+  example (R : RecSpec) :
+      R.Holds (zeroSeq) (zeroSeq) := by
+    classical
+    intro n hn
+    simp [RecSpec.fullRHS, RecSpec.homRHS, zeroSeq]
 
 end Smokes
-
 
 end Cancellation
 end Hyperlocal

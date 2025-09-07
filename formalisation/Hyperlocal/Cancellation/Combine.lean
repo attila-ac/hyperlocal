@@ -61,6 +61,14 @@ theorem KerQcapT_eq_singleton : KerQcapT = ({0} : Set Jet6) := by
     -- Zero is in both kernels by `[simp]` lemmas already on `QCCfun_zero` / `TRCfun_zero`.
     subst hx; simp [KerQcapT]
 
+/-- The only jet satisfying both QCC and TRC at `(A₀,t₀)` is `0`. -/
+theorem combine_only_zero :
+    ∀ x : Jet6, (QCCfun A₀ t₀ x = 0 ∧ TRCfun A₀ t₀ x = 0) → x = 0 := by
+  intro x hx
+  -- Either constraint alone already forces `x = 0`; use QCC.
+  exact kernel_QCC_trivial_at_rho' hx.1
+
+
 -- Tiny smokes
 
 /-- Zero is in the intersection. -/
