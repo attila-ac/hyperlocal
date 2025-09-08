@@ -9,9 +9,6 @@ noncomputable section
 namespace Hyperlocal
 namespace Cancellation
 
-/-- Complex sequences (Taylor coefficients). -/
-abbrev CSeq := ℕ → ℂ
-
 /--
 Abstract hypothesis: the homogeneous recurrence of order `3k` at `(A,t)` has
 a characteristic root with modulus `> 1`. This is only a hook; `InstabilityK1/K2`
