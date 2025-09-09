@@ -7,6 +7,14 @@ namespace Hyperlocal
 /-- The affine involution `z ↦ 1 - z`. -/
 def oneMinus (z : ℂ) : ℂ := 1 - z
 
+@[simp]
+lemma oneMinus_oneMinus (z : ℂ) : oneMinus (oneMinus z) = z := by
+  simp [oneMinus]
+
+@[simp]
+lemma oneMinus_star (z : ℂ) : oneMinus (star z) = star (oneMinus z) := by
+  simp [oneMinus, star_one, star_sub]
+
 /-- RC step: from `H ρ = 0` and `RC`, get `H (star ρ) = 0`. -/
 lemma zero_star_of_zero
     (H  : ℂ → ℂ)
