@@ -9,6 +9,10 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic  -- for `ring` and `linarith`
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+
 
 import Hyperlocal.Core
 import Hyperlocal.MinimalModel
@@ -119,6 +123,28 @@ private lemma pow_mono_nonneg
     -- a^(k+1) = a^k * a, similarly for b
     by
       simpa [pow_succ, mul_assoc] using (le_trans h1 h2)
+
+/-- For any `z : ℂ`, we have `1 + ‖z‖ ≤ Real.exp ‖z‖`. -/
+private lemma one_add_norm_le_exp (z : ℂ) :
+    (1 + ‖z‖ : ℝ) ≤ Real.exp ‖z‖ := by
+  -- comes from the standard inequality `1 + x ≤ exp x`
+  simpa [add_comm] using Real.add_one_le_exp ‖z‖
+
+
+/-- Elementary envelope: for any `z : ℂ` and `N : ℕ`,
+`(1 + ‖z‖)^N ≤ exp (N * ‖z‖)`. -/
+private lemma poly_le_exp_norm (z : ℂ) (N : ℕ) :
+    (1 + ‖z‖ : ℝ) ^ N ≤ Real.exp ((N : ℝ) * ‖z‖) := by
+  -- `x + 1 ≤ exp x` for all real `x`
+  have base : (1 + ‖z‖ : ℝ) ≤ Real.exp ‖z‖ := by
+    simpa [add_comm] using Real.add_one_le_exp ‖z‖
+  have h0 : 0 ≤ (1 + ‖z‖ : ℝ) := by linarith [norm_nonneg z]
+  have h1 : 0 ≤ Real.exp ‖z‖ := (Real.exp_pos _).le
+  have step := pow_mono_nonneg h0 h1 base N
+  -- `(Real.exp ‖z‖)^N = Real.exp (N * ‖z‖)`
+  simpa [Real.exp_nat_mul] using step
+
+
 
 /-- Raise the previous bound to the k-th power:
     `‖(s - c)^k‖ ≤ ((1 + ‖s‖) * (1 + ‖c‖))^k`. -/
@@ -242,7 +268,7 @@ private lemma factor_bound_quartet
 
 /-- Subexp–poly bound for the quartet evaluation:
     `‖(Rρk ρ k).eval s‖ ≤ (Mρ ρ)^(4k) * (1 + ‖s‖)^(4k)`.
-    Packaged as a `SubExpPolyBound` with `B = 0`, `C = (Mρ ρ)^(4k)`, `N = 4k`. -/
+    Packaged as a `SubExpPolyBound` with `C = (Mρ ρ)^(4k)`, `B = 0`, `N = 4k`. -/
 def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
     SubExpPolyBound (fun s : ℂ => (Hyperlocal.Factorization.Rρk ρ k).eval s) := by
   classical
@@ -273,9 +299,9 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
       ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
         ≤ ‖f1 * f2‖ * ‖f3 * f4‖ := by
     simpa [hR] using norm_mul_le (f1 * f2) (f3 * f4)
+
   have h12 : ‖f1 * f2‖ ≤ ‖f1‖ * ‖f2‖ := norm_mul_le f1 f2
   have h34 : ‖f3 * f4‖ ≤ ‖f3‖ * ‖f4‖ := norm_mul_le f3 f4
-  -- side conditions for `mul_le_mul`
   have h_nonneg_c : 0 ≤ ‖f3 * f4‖ := norm_nonneg _
   have h_nonneg_b : 0 ≤ ‖f1‖ * ‖f2‖ :=
     mul_nonneg (norm_nonneg _) (norm_nonneg _)
@@ -288,12 +314,11 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
         ≤ (‖f1‖ * ‖f2‖) * (‖f3‖ * ‖f4‖) :=
     le_trans h_le₀ h_le₁
 
-  -- Set T := (Mρ ρ)^k * (1 + ‖s‖)^k
+  -- Set T := (Mρ ρ)^k * (1 + ‖s‖)^k and bound each factor by T
   set T : ℝ := (Mρ ρ) ^ k * (1 + ‖s‖) ^ k with hTdef
   have T_nonneg : 0 ≤ T :=
     mul_nonneg (pow_nonneg (Mρ_nonneg ρ) _) (pow_nonneg (by linarith [norm_nonneg s]) _)
 
-  -- Each factor ≤ T via the quartet factor lemma
   have hf1 : ‖f1‖ ≤ T := by
     simpa [hf1def, hTdef] using
       factor_bound_quartet ρ s ρ k (Or.inl rfl)
@@ -313,7 +338,7 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
   have h34' : ‖f3‖ * ‖f4‖ ≤ T * T :=
     mul_le_mul hf3 hf4 (norm_nonneg _) T_nonneg
 
-  -- Multiply the two bounds
+  -- Multiply those two bounds
   have hTT :
       (‖f1‖ * ‖f2‖) * (‖f3‖ * ‖f4‖) ≤ (T * T) * (T * T) :=
     mul_le_mul h12' h34'
@@ -325,45 +350,43 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
         ≤ (T * T) * (T * T) :=
     le_trans h_prod_norm hTT
 
-  -- Expand (T*T)*(T*T) as (Mρ ρ)^(4k) * (1+‖s‖)^(4k)
+  -- Write T = A*B with A=(Mρ ρ)^k and B=(1+‖s‖)^k, then expand (T*T)*(T*T)
   set A : ℝ := (Mρ ρ) ^ k
   set B : ℝ := (1 + ‖s‖) ^ k
   have T_def : T = A * B := by simpa [A, B, hTdef]
-  have TT : T * T = A^2 * B^2 := by
-    simp [T_def, pow_two, mul_pow, mul_comm, mul_left_comm, mul_assoc]
-
-  -- *** this is the injected little algebra block ***
-  -- Expand (T*T)*(T*T) as (Mρ ρ)^(4k) * (1+‖s‖)^(4k)
-  set A : ℝ := (Mρ ρ) ^ k
-  set B : ℝ := (1 + ‖s‖) ^ k
-  have T_def : T = A * B := by simpa [A, B, hTdef]
-  have TT : T * T = A^2 * B^2 := by
-    simp [T_def, pow_two, mul_pow, mul_comm, mul_left_comm, mul_assoc]
+  have TT : T * T = A ^ 2 * B ^ 2 := by
+    simp [T_def, pow_two, mul_comm, mul_left_comm, mul_assoc]
 
   have expandTT :
       (T * T) * (T * T) = A ^ 4 * B ^ 4 := by
-    have h4 : (4 : ℕ) = 2 + 2 := by decide
     calc
       (T * T) * (T * T)
-          = (A^2 * B^2) * (A^2 * B^2) := by simpa [TT]
-      _ = (A^2 * A^2) * (B^2 * B^2) := by
-        simp [mul_comm, mul_left_comm, mul_assoc]
-      _ = A^(2+2) * B^(2+2) := by
-        simp [pow_add, pow_two]
-      _ = A^4 * B^4 := by
-        simpa [h4]
+          = (A ^ 2 * B ^ 2) * (A ^ 2 * B ^ 2) := by simpa [TT]
+      _ = (A ^ 2 * A ^ 2) * (B ^ 2 * B ^ 2) := by
+        -- pure associativity/commutativity regrouping
+        ac_rfl
+      _ = (A ^ 2) ^ 2 * (B ^ 2) ^ 2 := by
+        simp [pow_two]
+      _ = A ^ 4 * B ^ 4 := by
+        -- (A^2)^2 = A^(2*2), same for B; then 2*2=4
+        have hA : (A ^ 2) ^ 2 = A ^ (2 * 2) := by
+          simpa using (pow_mul A 2 2).symm
+        have hB : (B ^ 2) ^ 2 = B ^ (2 * 2) := by
+          simpa using (pow_mul B 2 2).symm
+        have h2 : (2 * 2 : ℕ) = 4 := by decide
+        simpa [hA, hB, h2]
 
-  -- Use the expansion and then fold A^4, B^4 back to (4*k)
-  have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
-      ≤ A ^ 4 * B ^ 4 := by
+
+  -- Fold back to (4*k) exponents and package the bound
+  have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖ ≤ A ^ 4 * B ^ 4 := by
     simpa [expandTT] using hFinal
   have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
       ≤ (Mρ ρ) ^ (4 * k) * (1 + ‖s‖) ^ (4 * k) := by
-    -- (x^k)^4 = x^(4*k)
+    -- ( (Mρ)^k )^4 = (Mρ)^(k*4) = (Mρ)^(4*k); similarly for (1+‖s‖)^k
     simpa [A, B, pow_mul, Nat.mul_comm, Nat.mul_left_comm,
            mul_comm, mul_left_comm, mul_assoc] using this
 
-  -- Conclude in the SubExpPolyBound shape
+  -- Package with B=0  (so exp B = 1)
   simpa [Real.exp_zero]
 
 
