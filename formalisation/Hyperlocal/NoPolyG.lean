@@ -50,5 +50,74 @@ lemma deriv_sq_at (s : ℂ) :
   -- `deriv id s = 1`, so `(1)*s + s*(1) = s + s`.
   simpa [deriv_id'] using h
 
+/-- Pointwise product rule for the linear term: `d/ds (s * β) = β` at `s`. -/
+lemma deriv_linear_right_at (β s : ℂ) :
+    deriv (𝕜 := ℂ) (fun z : ℂ => z * β) s = β := by
+  -- make the `DifferentiableAt … s` facts explicit
+  have h₁ : DifferentiableAt ℂ (fun z : ℂ => z) s :=
+    differentiable_id.differentiableAt
+  have h₂ : DifferentiableAt ℂ (fun _ : ℂ => β) s :=
+    (differentiable_const β).differentiableAt
+  -- product rule at `s`
+  have h := deriv_mul (𝕜 := ℂ) h₁ h₂
+  -- `deriv id s = 1`, `deriv const s = 0`
+  simpa [deriv_id', deriv_const] using h
+
+-- keep your existing pointwise lemma:
+-- lemma deriv_sq_at (s : ℂ) : deriv (𝕜 := ℂ) (fun z => z * z) s = s + s := by ...
+
+-- add wrappers without introducing new names that collide:
+lemma deriv_linear_right (β : ℂ) :
+    deriv (𝕜 := ℂ) (fun s : ℂ => s * β) = (fun _ => β) := by
+  funext s
+  simpa using deriv_linear_right_at β s
+
+lemma deriv_sq :
+    deriv (𝕜 := ℂ) (fun s : ℂ => s * s) = (fun s => s + s) := by
+  funext s
+  simpa using deriv_sq_at s
+
+/-- Pointwise: `d/ds ((s*s)*(α/2) + s*β) = α*s + β` at `s`. -/
+lemma deriv_quad_affine_at (α β s : ℂ) :
+    deriv (𝕜 := ℂ) (fun z : ℂ => (z*z)*(α/2) + z*β) s = α*s + β := by
+  -- quadratic part: treat as (z*z) * const
+  have d_quad :
+      deriv (𝕜 := ℂ) (fun z : ℂ => (z*z)*(α/2)) s
+        = (s + s) * (α/2) := by
+    -- product rule for (z*z) * (α/2)
+    have h₁ : DifferentiableAt ℂ (fun z : ℂ => z*z) s :=
+      (differentiable_id.differentiableAt).mul (differentiable_id.differentiableAt)
+    have h₂ : DifferentiableAt ℂ (fun _ : ℂ => (α/2)) s :=
+      (differentiable_const (α/2)).differentiableAt
+    have h := deriv_mul (𝕜 := ℂ) h₁ h₂
+    -- `deriv (z*z) s = s+s` and `deriv const s = 0`
+    simpa [deriv_sq_at s, deriv_const] using h
+
+  -- linear part: your lemma
+  have d_lin : deriv (𝕜 := ℂ) (fun z : ℂ => z*β) s = β :=
+    deriv_linear_right_at β s
+
+  -- sum rule
+  have hsum :
+      deriv (𝕜 := ℂ) (fun z : ℂ => (z*z)*(α/2) + z*β) s
+        = (s + s) * (α/2) + β := by
+    -- `deriv_add` rewrites the derivative of a sum
+    simp [deriv_add, d_quad, d_lin]
+
+  -- arithmetic: (s+s)*(α/2) = α*s
+  have harr : (s + s) * (α/2) = α * s := by
+    -- commute once, distribute, then combine with `ring`
+    calc
+      (s + s) * (α / 2) = (α / 2) * (s + s) := by ac_rfl
+      _ = (α / 2) * s + (α / 2) * s := by simpa [mul_add]
+      _ = ((α / 2) + (α / 2)) * s := by ring
+      _ = α * s := by
+        have : (α / 2) + (α / 2) = α := by ring
+        simpa [this]
+
+  -- put it together
+  simpa [hsum, harr]
+
+
 end NoPolyG_DE
 end Hyperlocal
