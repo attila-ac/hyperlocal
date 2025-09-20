@@ -280,7 +280,6 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
       hB := le_of_eq rfl
       bound := ?_ }
   intro s
-
   -- Name the four factors
   set f1 : ℂ := (s - ρ) ^ k with hf1def
   set f2 : ℂ := (s - star ρ) ^ k with hf2def
@@ -299,7 +298,6 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
       ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
         ≤ ‖f1 * f2‖ * ‖f3 * f4‖ := by
     simpa [hR] using norm_mul_le (f1 * f2) (f3 * f4)
-
   have h12 : ‖f1 * f2‖ ≤ ‖f1‖ * ‖f2‖ := norm_mul_le f1 f2
   have h34 : ‖f3 * f4‖ ≤ ‖f3‖ * ‖f4‖ := norm_mul_le f3 f4
   have h_nonneg_c : 0 ≤ ‖f3 * f4‖ := norm_nonneg _
@@ -342,8 +340,8 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
   have hTT :
       (‖f1‖ * ‖f2‖) * (‖f3‖ * ‖f4‖) ≤ (T * T) * (T * T) :=
     mul_le_mul h12' h34'
-      (mul_nonneg (norm_nonneg _) (norm_nonneg _))  -- 0 ≤ ‖f3‖ * ‖f4‖
-      (mul_nonneg T_nonneg T_nonneg)                -- 0 ≤ T * T
+      (mul_nonneg (norm_nonneg _) (norm_nonneg _))
+      (mul_nonneg T_nonneg T_nonneg)
 
   have hFinal :
       ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
@@ -363,12 +361,10 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
       (T * T) * (T * T)
           = (A ^ 2 * B ^ 2) * (A ^ 2 * B ^ 2) := by simpa [TT]
       _ = (A ^ 2 * A ^ 2) * (B ^ 2 * B ^ 2) := by
-        -- pure associativity/commutativity regrouping
         ac_rfl
       _ = (A ^ 2) ^ 2 * (B ^ 2) ^ 2 := by
         simp [pow_two]
       _ = A ^ 4 * B ^ 4 := by
-        -- (A^2)^2 = A^(2*2), same for B; then 2*2=4
         have hA : (A ^ 2) ^ 2 = A ^ (2 * 2) := by
           simpa using (pow_mul A 2 2).symm
         have hB : (B ^ 2) ^ 2 = B ^ (2 * 2) := by
@@ -376,18 +372,120 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
         have h2 : (2 * 2 : ℕ) = 4 := by decide
         simpa [hA, hB, h2]
 
-
   -- Fold back to (4*k) exponents and package the bound
   have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖ ≤ A ^ 4 * B ^ 4 := by
     simpa [expandTT] using hFinal
   have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖
       ≤ (Mρ ρ) ^ (4 * k) * (1 + ‖s‖) ^ (4 * k) := by
-    -- ( (Mρ)^k )^4 = (Mρ)^(k*4) = (Mρ)^(4*k); similarly for (1+‖s‖)^k
     simpa [A, B, pow_mul, Nat.mul_comm, Nat.mul_left_comm,
            mul_comm, mul_left_comm, mul_assoc] using this
 
   -- Package with B=0  (so exp B = 1)
   simpa [Real.exp_zero]
+
+/-- Direct product: subexp×poly for `W` + order ≤ 1 for `G` ⇒ order ≤ 1 for `W⋅G`.
+    We avoid logs; we only use `C ≤ exp C` and `(1+‖z‖)^N ≤ exp (N‖z‖)`. -/
+def Order1Bound.mul_of_subExpPoly'
+    {W G : ℂ → ℂ} (hW : SubExpPolyBound W) (hG : Order1Bound G) :
+    Order1Bound (fun z => W z * G z) := by
+  classical
+  refine
+    { A := hG.A + (hW.N : ℝ)
+      B := hG.B + hW.B + hW.C
+      hA := add_nonneg hG.hA (by exact_mod_cast (Nat.zero_le hW.N))
+      hB := add_nonneg (add_nonneg hG.hB hW.hB) hW.hC
+      bound := ?_ }
+  intro z
+
+  -- hW.bound reshaped
+  have hW_bound :
+      ‖W z‖ ≤ hW.C * ((1 + ‖z‖) ^ hW.N * Real.exp hW.B) := by
+    simpa [mul_comm, mul_left_comm, mul_assoc] using (hW.bound z)
+
+  -- C ≤ exp C  and  (1+‖z‖)^N ≤ exp (N‖z‖)
+  have C_le_exp : (hW.C : ℝ) ≤ Real.exp hW.C := by
+    have : (hW.C : ℝ) ≤ 1 + hW.C := by linarith
+    exact this.trans (by simpa [add_comm] using Real.add_one_le_exp hW.C)
+  have poly_to_exp :
+      (1 + ‖z‖ : ℝ) ^ hW.N ≤ Real.exp ((hW.N : ℝ) * ‖z‖) :=
+    poly_le_exp_norm z hW.N
+
+  -- nonneg helpers
+  have nonneg_pow : 0 ≤ (1 + ‖z‖ : ℝ) ^ hW.N :=
+    pow_nonneg (by linarith [norm_nonneg z]) _
+  have nonneg_expB : 0 ≤ Real.exp hW.B := (Real.exp_pos _).le
+  have nonneg_expC : 0 ≤ Real.exp hW.C := (Real.exp_pos _).le
+
+  -- upgrade the RHS of hW.bound
+  have step₁ :
+      hW.C * ((1 + ‖z‖) ^ hW.N * Real.exp hW.B)
+        ≤ Real.exp hW.C * ((1 + ‖z‖) ^ hW.N * Real.exp hW.B) :=
+    mul_le_mul_of_nonneg_right C_le_exp (mul_nonneg nonneg_pow nonneg_expB)
+  have step₂ :
+      Real.exp hW.C * ((1 + ‖z‖) ^ hW.N * Real.exp hW.B)
+        ≤ Real.exp hW.C * (Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B) := by
+    have base :
+        (1 + ‖z‖) ^ hW.N * Real.exp hW.B
+          ≤ Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B :=
+      mul_le_mul_of_nonneg_right poly_to_exp nonneg_expB
+    exact mul_le_mul_of_nonneg_left base nonneg_expC
+
+  -- bound for ‖W z‖ in fully exponential form
+  have Wexp' :
+      ‖W z‖ ≤ Real.exp hW.C * Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B := by
+    have := le_trans hW_bound (le_trans step₁ step₂)
+    simpa [mul_comm, mul_left_comm, mul_assoc] using this
+
+  -- base product
+  have Hmul : ‖W z * G z‖ ≤ ‖W z‖ * ‖G z‖ := norm_mul_le _ _
+
+  -- *** FIX: prove the WHOLE RHS for W is ≥ 0 (not just `0 ≤ exp ...`) ***
+  have rhsW_nonneg :
+      0 ≤ Real.exp hW.C * Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B :=
+    mul_nonneg
+      (mul_nonneg (Real.exp_pos _).le (Real.exp_pos _).le)
+      (Real.exp_pos _).le
+
+  -- multiply bounds
+  have prod_le :
+      ‖W z‖ * ‖G z‖
+        ≤ (Real.exp hW.C * Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B)
+            * Real.exp (hG.A * ‖z‖ + hG.B) :=
+    mul_le_mul Wexp' (hG.bound z) (norm_nonneg _) rhsW_nonneg
+
+  -- merge exponentials
+  have merge :
+      (Real.exp hW.C * Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B)
+        * Real.exp (hG.A * ‖z‖ + hG.B)
+      = Real.exp ((hG.A + (hW.N : ℝ)) * ‖z‖ + (hG.B + hW.B + hW.C)) := by
+    calc
+      (Real.exp hW.C * Real.exp ((hW.N : ℝ) * ‖z‖) * Real.exp hW.B)
+        * Real.exp (hG.A * ‖z‖ + hG.B)
+        = Real.exp (hW.C + (hW.N : ℝ) * ‖z‖) * Real.exp hW.B
+            * Real.exp (hG.A * ‖z‖ + hG.B) := by
+          simp [Real.exp_add, mul_comm, mul_left_comm, mul_assoc]
+      _ = Real.exp ((hW.C + (hW.N : ℝ) * ‖z‖) + hW.B)
+            * Real.exp (hG.A * ‖z‖ + hG.B) := by
+          simp [Real.exp_add, mul_comm, mul_left_comm, mul_assoc]
+      _ = Real.exp (((hW.C + (hW.N : ℝ) * ‖z‖) + hW.B)
+            + (hG.A * ‖z‖ + hG.B)) := by
+          simp [Real.exp_add, mul_comm, mul_left_comm, mul_assoc]
+      _ = Real.exp ((hG.A + (hW.N : ℝ)) * ‖z‖ + (hG.B + hW.B + hW.C)) := by
+          ring
+
+  -- finish
+  have : ‖W z * G z‖
+        ≤ Real.exp ((hG.A + (hW.N : ℝ)) * ‖z‖ + (hG.B + hW.B + hW.C)) :=
+    le_trans Hmul (by simpa [merge] using prod_le)
+  exact this
+
+
+/-- Immediate corollary: if `G` has order ≤ 1 then
+    `H(s) = (R_{ρ,k} ρ k).eval s * G s` has order ≤ 1. -/
+def order1_for_H_of_order1_for_G
+    {G : ℂ → ℂ} (ρ : ℂ) (k : ℕ) (hG : Order1Bound G) :
+    Order1Bound (fun s => (Hyperlocal.Factorization.Rρk ρ k).eval s * G s) :=
+  Order1Bound.mul_of_subExpPoly' (subExpPoly_eval_Rρk ρ k) hG
 
 
 end GrowthOrder
