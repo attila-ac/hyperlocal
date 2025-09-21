@@ -370,7 +370,7 @@ def subExpPoly_eval_Rρk (ρ : ℂ) (k : ℕ) :
         have hB : (B ^ 2) ^ 2 = B ^ (2 * 2) := by
           simpa using (pow_mul B 2 2).symm
         have h2 : (2 * 2 : ℕ) = 4 := by decide
-        simpa [hA, hB, h2]
+        simp [hA, hB, h2]
 
   -- Fold back to (4*k) exponents and package the bound
   have : ‖(Hyperlocal.Factorization.Rρk ρ k).eval s‖ ≤ A ^ 4 * B ^ 4 := by
@@ -487,6 +487,68 @@ def order1_for_H_of_order1_for_G
     Order1Bound (fun s => (Hyperlocal.Factorization.Rρk ρ k).eval s * G s) :=
   Order1Bound.mul_of_subExpPoly' (subExpPoly_eval_Rρk ρ k) hG
 
+/-- Tiny helper: for all real `x`, one has `x ≤ exp x`.
+This combines `x ≤ 1 + x` with `Real.add_one_le_exp x`. -/
+lemma le_exp_self (x : ℝ) : x ≤ Real.exp x := by
+  have hx : x ≤ 1 + x := by linarith
+  exact hx.trans (by simpa [add_comm] using Real.add_one_le_exp x)
+
+/-- Public helper (ℂ): `1 + ‖z‖ ≤ exp ‖z‖`. -/
+lemma oneAddNorm_le_exp (z : ℂ) :
+    (1 + ‖z‖ : ℝ) ≤ Real.exp ‖z‖ := by
+  simpa [add_comm] using Real.add_one_le_exp ‖z‖
+
+/-- Public helper (ℂ): for any `z : ℂ` and `N : ℕ`,
+`(1 + ‖z‖)^N ≤ exp (N * ‖z‖)`.  Useful to absorb a polynomial
+factor into an exponential envelope in order≤1 proofs. -/
+lemma polyPow_le_exp_norm (z : ℂ) (N : ℕ) :
+    (1 + ‖z‖ : ℝ) ^ N ≤ Real.exp ((N : ℝ) * ‖z‖) := by
+  -- `1 + ‖z‖ ≤ exp ‖z‖`, then monotonicity of `(^ N)` on `ℝ_{\ge 0}`
+  have base : (1 + ‖z‖ : ℝ) ≤ Real.exp ‖z‖ := oneAddNorm_le_exp z
+  have h0 : 0 ≤ (1 + ‖z‖ : ℝ) := by linarith [norm_nonneg z]
+  have h1 : 0 ≤ Real.exp ‖z‖ := (Real.exp_pos _).le
+  have step := pow_mono_nonneg h0 h1 base N
+  -- `(Real.exp ‖z‖)^N = Real.exp (N * ‖z‖)`
+  simpa [Real.exp_nat_mul] using step
+
+/-- One-shot “absorb subexp–poly” gadget often handy in product bounds:
+`C * (1+‖z‖)^N * exp B ≤ exp C * exp(N‖z‖) * exp B`. -/
+lemma absorb_subExpPoly (z : ℂ) (C B : ℝ) (N : ℕ) :
+    C * ((1 + ‖z‖) ^ N) * Real.exp B
+      ≤ Real.exp C * Real.exp ((N : ℝ) * ‖z‖) * Real.exp B := by
+  -- use `C ≤ exp C` and `(1+‖z‖)^N ≤ exp(N‖z‖)`
+  have C_le_exp : C ≤ Real.exp C := le_exp_self C
+  have poly_to_exp : (1 + ‖z‖ : ℝ) ^ N ≤ Real.exp ((N : ℝ) * ‖z‖) :=
+    polyPow_le_exp_norm z N
+  have nonneg_pow : 0 ≤ (1 + ‖z‖ : ℝ) ^ N :=
+    pow_nonneg (by linarith [norm_nonneg z]) _
+  have nonneg_expB : 0 ≤ Real.exp B := (Real.exp_pos _).le
+  have nonneg_expC : 0 ≤ Real.exp C := (Real.exp_pos _).le
+  have step₁ :
+      C * ((1 + ‖z‖) ^ N * Real.exp B)
+        ≤ Real.exp C * ((1 + ‖z‖) ^ N * Real.exp B) :=
+    mul_le_mul_of_nonneg_right C_le_exp (mul_nonneg nonneg_pow nonneg_expB)
+  have step₂ :
+      Real.exp C * ((1 + ‖z‖) ^ N * Real.exp B)
+        ≤ Real.exp C * (Real.exp ((N : ℝ) * ‖z‖) * Real.exp B) := by
+    have base :
+        (1 + ‖z‖) ^ N * Real.exp B
+          ≤ Real.exp ((N : ℝ) * ‖z‖) * Real.exp B :=
+      mul_le_mul_of_nonneg_right poly_to_exp nonneg_expB
+    exact mul_le_mul_of_nonneg_left base nonneg_expC
+  have := (le_trans step₁ step₂)
+  simpa [mul_comm, mul_left_comm, mul_assoc] using this
+
+/-- Prop-level wrapper (instability bridge shape):
+if `G` has order ≤ 1, then so does `H(s) = (R_{rho,k}).eval s * G s`. -/
+lemma orderLEOne_for_H_of_orderLEOne_for_G
+    {G : ℂ → ℂ} (rho : ℂ) (k : ℕ) (hG : OrderLEOne G) :
+    OrderLEOne (fun s => (Hyperlocal.Factorization.Rρk rho k).eval s * G s) := by
+  -- unpack the Prop-level witnesses for `G` …
+  rcases hG with ⟨A, B, hA, hB, hbound⟩
+  -- … repack as a bundled `Order1Bound`, push through your finisher, and coerce back to `Prop`.
+  have hG_bundled : Order1Bound G := ⟨A, B, hA, hB, hbound⟩
+  exact (order1_for_H_of_order1_for_G rho k hG_bundled).to_OrderLEOne
 
 end GrowthOrder
 end Hyperlocal
