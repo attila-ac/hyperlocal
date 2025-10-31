@@ -4,6 +4,21 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
+**Version 4.0 (Sketch & Response to Reviewer Peter Varju):** `v4.0_sketch_response_to_reviewer_Varju.pdf` available at GitHub.
+
+*SHA-256:*  
+`e1d6bedc9233eea3bc4e5295cb0909a345c391176b72b434ecd923df557f942b  v4.0_sketch_response_to_reviewer_Varju.pdf`
+
+*Change remark:* This sketch records the structural revisions that shape the forthcoming full v4.0 write-up. Three decisive changes:
+1. **Scope restriction to \(\xi\)**: The ad absurdum runs on \(\xi\) only (FE+RC order-1 ambient class removed), eliminating artificial counterexamples and sharpening the claim.
+2. **Centered recurrences \(\tilde b=b-p\)**: All linear constraints (TAC and QCC) are applied to the **homogeneous** variables after shifting by a finite-window particular solution \(p\). This removes spurious inhomogeneity and aligns the algebra with the true state evolution.
+3. **\(k\)-uniform finisher (Vandermonde/Hermite)**: A single algebraic device handles **all multiplicities** at once via confluent Vandermonde coordinates, giving four real QCC rows that cut the 4-dimensional TAC seed space transversely and close the full \(k\) case.
+
+*What remains from v3.3:* The \(k=1,2\) computational and symbolic checks are retained (for pedagogy and verification), and the asymptotic “analytic instability” route is preserved as supporting material (relocated to an appendix). The mainline finisher is now fully algebraic and \(k\)-uniform.
+
+*Status:* Work-in-progress **sketch** intended for public priority and roadmap; full algebraic derivations will follow this structure in the complete v4.0 manuscript.
+
+
 **Version 3.3 (Latest):** hyperlocal_RH_proof_ACs_v3.3_09082025.pdf available at GitHub.
 
 * *Change remark:* This significant update within the v3 algebraic track solidifies the proof's claim to full generality by extending the computational verification to cover multiple zeros. The previous verification was limited to simple zeros (k=1). This version overcomes that obstacle using a sophisticated analytical shortcut based on Faà di Bruno's formula, enabling the successful verification for the foundational double zero case (k=2). This demonstrated the same pattern of immediate and stable algebraic overdetermination, closing a key theoretical gap. To further enhance clarity, this version also introduces a new 'Boundary of Stability' analysis—which is strategically placed as a post-proof discussion to preserve the minimalist focus of the main argument—and adds a comprehensive summary table for the proof's core algebraic engine.
