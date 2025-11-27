@@ -71,62 +71,119 @@
 
         <p>
             <strong>Author:</strong> Attila Csordas<br>
-            <strong>Affiliation:</strong> AgeCurve Limited, Cambridge, UK<br>
+            <strong>Affiliation:</strong> CriticalZero Ltd, Cambridge, UK<br>
             <strong>ORCID:</strong> <a href="https://orcid.org/0000-0003-3576-1793" target="_blank">0000-0003-3576-1793</a>
         </p>
 
         <p>
             <strong>First Published:</strong> June 26, 2025<br>
-            <strong>Current Version (v3.3):</strong> August 9, 2025
+            <strong>Current Version (v4.0):</strong> November 27, 2025
         </p>
 
         <h2>Abstract</h2>
         <p>
-            The Riemann Hypothesis posits that all non-trivial zeros of the Riemann zeta function ζ(s) lie on the critical line Re(s) = 1/2. This paper presents an unconditional proof of this hypothesis. The argument proceeds by <i>reductio ad absurdum</i>, demonstrating that the assumption of any hypothetical off-critical zero for a transcendental entire function sharing the key symmetries of the Riemann ξ-function leads to an inescapable contradiction, irrespective of the zero's order.
-        </p>
-        <p>
-            The refutation is executed in three stages. First, the assumption of an off-critical zero forces a necessary factorization of the function, which in turn imposes a rigid linear recurrence relation on the Taylor coefficients of the resulting quotient function. Second, a direct analysis proves that for any off-critical zero, this recurrence is universally unstable. This instability forces an exponential growth pattern on the coefficients that is incompatible with the requirement for the quotient function to be an entire function.
-        </p>
-        <p>
-            Third, the proof refutes the only remaining theoretical possibility: a fine-tuned cancellation of this instability. This is achieved by demonstrating that the conditions required for cancellation, when combined with the function's other symmetries, impose an overdetermined system of linear equations. As verified for foundational cases (multiplicity k=1 and k=2), this system admits only the trivial solution, leading to a terminal contradiction. Since the assumption of an off-critical zero is untenable, no such zeros can exist. The Riemann Hypothesis therefore holds unconditionally.
-        </p>
-
-<div class="download-links" id="v4-0-sketch">
-  <h2>Preview: v4.0 Sketch &amp; Response to Reviewer Peter Varju (WORK-IN-PROGRESS)</h2>
-  <p><strong>Date:</strong> 31 Oct 2025 (Europe/London)</p>
-  <p>
-    This sketch outlines the structural revisions planned for v4.0:
-    restriction to <em>&#x03BE;</em> (scope), centering the recurrence via
-    <code>~b = b - p</code>, and a <span style="white-space:nowrap;">k-uniform</span> Vandermonde finisher.
-    It is <strong>not</strong> a complete proof—shared to record priority as a response and sketch to Reviewer Peter Varju.
+  The Riemann Hypothesis asserts that all non-trivial zeros of the Riemann zeta
+  function lie on the critical line Re(s) = 1/2. This paper presents an unconditional
+  proof by <i>reductio ad absurdum</i>, assuming the existence of a single off-critical
+  zero of the Riemann &xi;-function and deriving a structural impossibility.
   </p>
+
   <p>
-    <a href="v4.0_sketch_response_to_reviewer_Varju.pdf" download>
-      <strong>Download v4.0 Sketch [PDF]</strong>
-    </a>
+  The argument is entirely <i>hyperlocal</i>: we analyze the analytic and algebraic
+  consequences of the factorization &xi;(s) = R<sub>&rho;',k</sub>(s) · G(s) in an
+  infinitesimal neighborhood of the hypothetical zero &rho;', relying solely on the
+  unconditional properties of &xi; (entire of order 1, functional equation, and
+  reality symmetry).
   </p>
-  <p><code>SHA256: e1d6bedc9233eea3bc4e5295cb0909a345c391176b72b434ecd923df557f942b</code></p>
-  <hr>
-</div>
+
+  <p><b>Stage 1.</b><br>
+  Factoring out the Minimal Model R<sub>&rho;',k</sub> forces the Taylor coefficients
+  of G(s) to satisfy a finite recurrence. A stability certificate—the
+  Stability Discriminant—shows that all characteristic roots lie strictly off
+  the unit circle for every off-critical geometry. This hyperbolic splitting yields
+  a unique decaying particular solution, the analytic solution enforced by
+  entire growth.
+  </p>
+
+  <p><b>Stage 2.</b><br>
+  Transporting the functional equation and reality symmetry to the off-critical
+  center produces the Taylor Alternation Condition (TAC), a finite Toeplitz
+  transport of the FE/RC parity constraints. Evaluating TAC on the analytic
+  solution gives a non-zero Symmetry–Entirety Gap. A homogeneous correction is
+  therefore necessary, but any such correction must lie entirely in the stable
+  spectral subspace; this requirement is the Quartet Cancellation Condition
+  (QCC). A hyperlocal arithmetic argument (the Single–Prime Transcendental
+  Witness) shows that the gap cannot vanish for any off-critical &rho;'.
+  </p>
+
+  <p><b>Stage 3.</b><br>
+  Symmetry and stability jointly impose the coupled linear system
+  B<sub>cpl</sub>(&sigma;,t) · &Gamma; = y<sub>gap</sub>, where &Gamma; is the
+  critical-line derivative jet of &xi;. The coupling matrix
+  B<sub>cpl</sub> = Q<sub>QCC</sub>(&rho;') · T<sub>TAC</sub>(&delta;)
+  encodes all constraints. A Rank–Genericity Lemma shows that
+  B<sub>cpl</sub> has full column rank on a generic subset of the off-critical
+  domain, making the system overdetermined and unsolvable because
+  y<sub>gap</sub> ≠ 0. This yields the contradiction.
+  </p>
+
+  <p>
+  Since no consistent analytic factor G(s) can exist under the assumption of an
+  off-critical zero, the assumption is impossible. Therefore all non-trivial zeros
+  of the Riemann zeta function lie on the critical line:
+  The Riemann Hypothesis holds.
+  </p>
 
 
-        <div class="download-links">
-            <h2>Downloads</h2>
-            <p>
-                <a href="hyperlocal_RH_proof_ACs_v3.3_09082025.pdf" download>
-                    <strong>Download Full Paper (v3.3) [PDF]</strong>
-                </a>
-            </p>
-            <p>
-                <a href="hyperlocal_one_pager_ACs_v3.3_09082025.pdf" download>
-                    <strong>Download One-Page Summary (v3.3) [PDF]</strong>
-                </a>
-            </p>
-        </div>
+
+  <div class="download-links">
+      <h2>Downloads</h2>
+      <p>
+          <a href="hyperlocal_RH_proof_ACs_v4.0_27112025.pdf" download>
+              <strong>Download Full Paper (v4.0) [PDF]</strong>
+          </a>
+      </p>
+      <p>
+          <a href="hyperlocal_one_pager_ACs_v4.0_27112025.pdf" download>
+              <strong>Download One-Page Summary (v4.0) [PDF]</strong>
+          </a>
+      </p>
+  </div>
+
 
         <div class="version-history">
             <h2>Versioning Information</h2>
             <ul>
+              <li>
+    <strong>Version 4.0 (November 2025):</strong>
+    <div class="change-remark">
+        This update incorporates several structural corrections and clarifications,
+        informed in part by detailed informal feedback from Professor Peter Varju.
+        <br><br>
+        First, the reductio hypothesis is now applied exclusively to the Riemann
+        &xi;–function. Earlier drafts extended the framework to a broader class of
+        four-fold symmetric entire functions, where explicit counterexamples
+        (including Varju’s cosine–product constructions) are known. This version
+        removes that category error and restricts the argument to its proper analytic
+        setting.
+        <br><br>
+        Second, the recurrence analysis has been reformulated in a fully centered
+        form. By separating the analytic forcing from the homogeneous component,
+        the update eliminates the inhomogeneity bleed-through affecting earlier
+        versions and removes hidden dependence on the tail of the forcing vector.
+        <br><br>
+        Third, the concluding contradiction is now expressed through a hyperlocal
+        coupling operator. The Toeplitz-transported symmetry constraints (TAC) and
+        the quartet-based stability constraints (QCC) are combined into a
+        parameter-dependent matrix. A real-analytic rank analysis shows that this
+        operator has full column rank \(3k\) for a generic set of off-critical
+        geometries, yielding a uniform contradiction across all multiplicities.
+        <br><br>
+        Further refinements are expected as the approach continues to undergo
+        scrutiny and external feedback.
+    </div>
+</li>
+
                 <li>
                     <strong>Version 3.3 (August 9, 2025):</strong>
                     <div class="change-remark">

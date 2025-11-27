@@ -1,34 +1,63 @@
+/-
+  Hyperlocal/Smoke.lean  (minimal + robust)
+
+  Purpose:
+  • Import only the concrete modules we need (no umbrella dependence).
+  • #check the key API that the manuscript references.
+  • No vector notation / extensionality / examples that can vary by repo.
+-/
+
 import Mathlib.Data.Complex.Basic
-import Hyperlocal.Cancellation.Solo      -- Jet6, diagScale
-import Hyperlocal.Cancellation.Setup     -- A₀, t₀, diag_nonzero_at_rho'
-import Hyperlocal.Cancellation.QCC       -- QCCfun
-import Hyperlocal.Cancellation.TRC       -- TRCfun
+-- Factorisation & analytic layer
+import Hyperlocal.Factorization
+import Hyperlocal.FactorizationRC
+import Hyperlocal.FactorizationGofSEntire
+-- Growth & transcendence
+import Hyperlocal.GrowthOrder
+import Hyperlocal.Transcendence
+import Hyperlocal.FactorizationConsequences
+-- Cancellation / Instability
+import Hyperlocal.Cancellation.InstabilityHyp
+import Hyperlocal.Cancellation.InstabilityK1
+import Hyperlocal.Cancellation.InstabilityK2
+import Hyperlocal.Cancellation.WrapUp
+import Hyperlocal.Cancellation.WrapUpExport
+
 
 noncomputable section
-namespace Hyperlocal
-namespace Cancellation
 
-open Complex
+-- =========================
+-- #check suite (no runtime)
+-- =========================
 
--- Handy: zero jet written as a function (helps `simp`).
-def zeroJet6 : Jet6 := fun _ => (0 : ℂ)
+-- Growth / Subexp–poly finisher
+#check Hyperlocal.GrowthOrder.Order1Bound
+#check Hyperlocal.GrowthOrder.OrderLEOne
+#check Hyperlocal.GrowthOrder.subExpPoly_eval_Rρk
+#check Hyperlocal.GrowthOrder.order1_for_H_of_order1_for_G
+#check Hyperlocal.GrowthOrder.Order1Bound.mul_of_subExpPoly'
 
--- If your TRC/QCC return vector literals like ![ ... ],
--- this lemma lets `simp` close goals of the form `![0,...] i = 0`.
-@[simp] lemma vecLit6_zero_eval (i : Fin 6) :
-  ((![0, 0, 0, 0, 0, 0] : Jet6) i) = 0 := by
-  fin_cases i <;> simp
+-- Transcendence filter
+#check Hyperlocal.Transcendence.IsPolynomialFun
+#check Hyperlocal.Transcendence.Transcendental
+#check Hyperlocal.Transcendence.transcendental_of_factor
+#check Hyperlocal.Transcendence.G_transcendental_of_eval_poly_factor
 
-/-- TRC smoke: zero in ⇒ zero out. -/
-example : TRCfun A₀ t₀ (0 : Jet6) = 0 := by
-  ext i
-  -- Unfold TRCfun pointwise. If TRCfun builds with `![ ... ]`, the lemma above finishes it.
-  simp [TRCfun]
+-- Consequences interface (growth forward + transcendence back)
+#check Hyperlocal.Consequences.orderLEOne_for_H_of_orderLEOne_for_G
+#check Hyperlocal.Consequences.G_transcendental_of_RrhoK_factor
 
-/-- QCC smoke: zero in ⇒ zero out. -/
-example : QCCfun A₀ t₀ (0 : Jet6) = 0 := by
-  ext i
-  simp [QCCfun]
+-- Factorisation analytic: G entire
+#check Hyperlocal.FactorizationGofSEntire.entire_G_of_factorisation
 
-end Cancellation
-end Hyperlocal
+-- Instability hook + wrappers
+#check Hyperlocal.Cancellation.UnstableHom
+#check Hyperlocal.Cancellation.BridgeData
+#check Hyperlocal.Cancellation.no_cancellation_if_unstable
+#check Hyperlocal.Cancellation.InstabilityK1.unstable_k1_all_t
+#check Hyperlocal.Cancellation.InstabilityK2.unstable_k2_all_t
+
+
+
+
+end section

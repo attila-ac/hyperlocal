@@ -2,12 +2,12 @@
   Hyperlocal/Cancellation/InstabilityK1.lean
 
   k = 1 instability:
-  • keeps your current placeholder instance (nothing breaks today);
+  • keeps current placeholder instance (nothing breaks today);
   • adds TWO “upgrade hooks” for the real proof:
       (1) a *record-free* cover combinator,
       (2) a collision-proof record `K1RegionCover`.
 
-  Use whichever you prefer when you wire in the asymptotics + mid-range UC check.
+  Use whichever when you wire in the asymptotics + mid-range UC check.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -18,17 +18,17 @@ namespace Hyperlocal
 namespace Cancellation
 namespace InstabilityK1
 
-/-- ✅ TODAY: placeholder (keeps everything working).
+/-- TODAY: placeholder (keeps everything working).
     Replace with the genuine characteristic–root argument later. -/
 theorem unstable_k1_all_t (A t : ℝ) : UnstableHom 1 A t :=
   ⟨trivial⟩
 
-/-- ✅ Instance for typeclass search / `haveI`. -/
+/-- Instance for typeclass search / `haveI`. -/
 instance instUnstable_k1 (A t : ℝ) : UnstableHom 1 A t :=
   unstable_k1_all_t A t
 
-/-- 🔌 UPGRADE HOOK (record-free): cover `(0,∞)` by three regions and
-    you get global instability. Use this if you want to avoid any
+/-- UPGRADE HOOK (record-free): cover `(0,∞)` by three regions and
+    get global instability. Use this if want to avoid any
     structure/namespace ambiguity. -/
 theorem unstable_k1_all_t_of_small_mid_large
     (A t1 t2 : ℝ)
@@ -44,7 +44,7 @@ theorem unstable_k1_all_t_of_small_mid_large
     · exact mid (by exact hge1) (by exact hle2)
     · exact large (by exact hge2)
 
-/-- 🔌 UPGRADE HOOK (recorded data): if you prefer a single object to
+/-- 🔌 UPGRADE HOOK (recorded data): if prefer a single object to
     package the cover, use this *distinctly named* record to avoid
     clashing with anything called `RegionCover` elsewhere. -/
 structure K1RegionCover (A : ℝ) : Type where
@@ -67,7 +67,7 @@ theorem unstable_k1_all_t_of_cover
     · exact cov.mid (by exact hge1) (by exact hle2)
     · exact cov.large (by exact hge2)
 
-/-- Handy export if you want a typeclass instance from a cover. -/
+/-- Handy export if want a typeclass instance from a cover. -/
 theorem inst_from_cover
     (A t : ℝ) (cov : K1RegionCover A) (ht : 0 < t) :
     UnstableHom 1 A t :=

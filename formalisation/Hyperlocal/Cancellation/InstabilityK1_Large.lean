@@ -6,11 +6,11 @@
         P1 : ℝ → ℝ → ℂ → ℂ
     so this file does not depend on a concrete name elsewhere.
   • The key “gap” algebra and strict boundary dominance are proved.
-  • The final step (Rouché / reciprocal polynomial) is left to your main
+  • The final step (Rouché / reciprocal polynomial) is left to main
     instability file; here we only produce the class witness to keep the
     pipeline green.
 
-  Hook this into InstabilityK1 via your “fillers” glue.
+  Hook this into InstabilityK1 via “fillers” glue.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -47,7 +47,7 @@ def LargeHyp_pkg (A : ℝ) : LargeHyp A (t2_large A) :=
   * `A_ne0` excludes the degenerate `A = 0` case.
   * `one_lt_AR : 1 < |A| * R` guarantees a positive “gap”
         gap := |A| R^3 − R^2 = R^2 (|A| R − 1) > 0.
-  * `E_bound` is the single analytic inequality to prove for your concrete `P1`.
+  * `E_bound` is the single analytic inequality to prove for concrete `P1`.
     Here  E(z) = P1(A,t,z) − ((A:ℂ) * z^3 − z^2).
 -/
 structure DomAtCircle (P1 : ℝ → ℝ → ℂ → ℂ) (A R t : ℝ) : Prop where
@@ -143,15 +143,15 @@ theorem unstable_large_of_dominance
   classical
   -- Boundary strict dominance is available as:
   --   fun z hz => strict_dominance_on_circle h hz
-  -- Apply Rouché or a reciprocal-polynomial argument in your main file.
+  -- Apply Rouché or a reciprocal-polynomial argument in main file.
   exact ⟨trivial⟩
 
 /-- **Decay ⇒ Dominance** (import-safe, no extra helpers).
-If on the circle `‖z‖=R` you have a decay-in-`t` bound
+If on the circle `‖z‖=R` have a decay-in-`t` bound
   `‖E(A,t;z)‖ ≤ (K / t) * (1 + R + R^2)`,
 then for
   `T(A) = max 1 ( (2*K*(1+R+R^2)) / (|A|*R^3 - R^2) )`
-you get `DomAtCircle` for all `t ≥ T(A)`. -/
+get `DomAtCircle` for all `t ≥ T(A)`. -/
 theorem DomAtCircle_from_decay
   {P1 : ℝ → ℝ → ℂ → ℂ} {A R : ℝ}
   (A_ne0 : A ≠ 0) (R_gt1 : 1 < R) (one_lt_AR : 1 < |A| * R)

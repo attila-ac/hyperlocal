@@ -74,8 +74,7 @@ lemma recurrence_of_convolution_window_le
     {R G H : ℕ → ℂ} {k L : ℕ}
     (hconv : Hyperlocal.Cancellation.Convolution R G H)
     (hRk   : R k ≠ 0)
-    (hwin  : WindowUpTo R L)
-    (hkL   : k ≤ L) :
+    (hwin  : WindowUpTo R L) :
     ∀ m : ℕ, L ≤ m + k →
       G m
         = ( H (m + k)
@@ -83,7 +82,7 @@ lemma recurrence_of_convolution_window_le
                 (fun i => R i * G (m + k - i)) ) / (R k) := by
   classical
   intro m hLm
-  -- start from the full pivot recurrence
+  -- start from the full pivot recurrence (uppercase names)
   have base :=
     Hyperlocal.Cancellation.Bridge.recurrence_of_convolution_pivot
       (R := R) (G := G) (H := H) (k := k) hconv hRk m
@@ -98,7 +97,6 @@ lemma recurrence_of_convolution_window_le
     intro i hi
     have hi_le_L : i ≤ L := Nat.le_of_lt_succ (by simpa [Finset.mem_range] using hi)
     have hi_le_mk : i ≤ m + k := le_trans hi_le_L hLm
-    -- i ≤ m+k ⇒ i < (m+k)+1
     simpa [Finset.mem_range] using Nat.lt_succ_of_le hi_le_mk
   have hsubset : sSmall ⊆ sBig := by
     intro i hiSmall
@@ -110,30 +108,24 @@ lemma recurrence_of_convolution_window_le
       ∀ i ∈ sBig, i ∉ sSmall → f i = 0 := by
     intro i hiBig hiNotSmall
     rcases Finset.mem_erase.mp hiBig with ⟨hik, _hiRangeMK⟩
-    -- not in sSmall ⇒ not in its range-part (since erase only removes k)
     have not_in_small_range : i ∉ range (L + 1) := by
       intro h; exact hiNotSmall (Finset.mem_erase.mpr ⟨hik, h⟩)
-    -- show L < i (otherwise we'd be in range (L+1))
     have hi_gt_L : L < i := by
       by_contra hle
       have hi_le_L : i ≤ L := le_of_not_gt hle
       have : i ∈ range (L + 1) := by
         simpa [Finset.mem_range] using Nat.lt_succ_of_le hi_le_L
       exact not_in_small_range this
-    -- window hypothesis: R i = 0 for i > L
     have : R i = 0 := hwin i hi_gt_L
     simp [f, this]
 
-  -- replace the big sum by the truncated sum
+  -- replace the big sum by the truncated sum (note: `sum_subset` expects `sSmall ⊆ sBig`)
   have sum_truncate : sBig.sum f = sSmall.sum f :=
     (Finset.sum_subset hsubset hzero_outside).symm
 
-  -- finish by rewriting `base`
   simpa [sBig, sSmall, f, sum_truncate] using base
 
-
 /-! ### Packaged APIs for instability consumers (matches manuscript notation) -/
-
 namespace API
 
 /-- Manuscript notation aliases. -/
@@ -143,72 +135,60 @@ abbrev H := ℕ → ℂ
 
 /--
 `PivotRecurrence R G H k` says: the pivot slot `R k` is nonzero and
-we have the explicit order-`k` pivot recurrence for **all** `m`:
-G m = ( H (m+k)
-- ∑ i ∈ (range (m+k+1)).erase k, R i * G (m+k-i) ) / (R k).
-
-go
-Copy code
-This is the convenient, re-usable form of your `recurrence_of_convolution_pivot`.
+we have the explicit order-`k` pivot recurrence for **all** `m`.
 -/
-structure PivotRecurrence (R G H : ℕ → ℂ) (k : ℕ) : Prop :=
-  (rk_ne : R k ≠ 0)
-  (step  : ∀ m : ℕ,
-            G m
-              = ( H (m + k)
-                  - ((range (m + k + 1)).erase k).sum
-                      (fun i => R i * G (m + k - i)) ) / (R k))
+structure PivotRecurrence (R G H : ℕ → ℂ) (k : ℕ) : Prop where
+  rk_ne : R k ≠ 0
+  step  :
+    ∀ m : ℕ,
+      G m
+        = ( H (m + k)
+            - ((range (m + k + 1)).erase k).sum
+                (fun i => R i * G (m + k - i)) ) / (R k)
 
 /-- Build a `PivotRecurrence` from a convolution identity and `R k ≠ 0`. -/
 lemma mk_pivot
     {R G H : ℕ → ℂ} {k : ℕ}
     (hconv : Hyperlocal.Cancellation.Convolution R G H)
-    (rk_ne : R k ≠ 0) :
-    PivotRecurrence R G H k :=
-by
-  refine ⟨rk_ne, ?step⟩
+    (hRk   : R k ≠ 0) :
+    PivotRecurrence R G H k := by
+  refine ⟨hRk, ?step⟩
   intro m
   simpa using
     Hyperlocal.Cancellation.Bridge.recurrence_of_convolution_pivot
-      (r := R) (g := G) (h := H) (k := k) hconv rk_ne m
+      (R := R) (G := G) (H := H) (k := k) hconv hRk m
 
-/-- Window hypothesis (uppercase alias), matching the manuscript: `R(i)=0` for all `i>L`. -/
+/-- Window hypothesis (uppercase alias). -/
 def WindowUpTo (R : ℕ → ℂ) (L : ℕ) : Prop :=
   Hyperlocal.Cancellation.Bridge.WindowUpTo R L
 
 /--
-`WindowedPivotRecurrence R G H k L` packages the truncated recurrence under a window `L`:
-for all `m` with `L ≤ m+k` we have
-G m = ( H (m+k)
-- ∑ i ∈ (range (L+1)).erase k, R i * G (m+k-i) ) / (R k).
-
-go
-Copy code
+`WindowedPivotRecurrence R G H k L` packages the truncated recurrence under a window `L`.
 -/
-structure WindowedPivotRecurrence (R G H : ℕ → ℂ) (k L : ℕ) : Prop :=
-  (rk_ne : R k ≠ 0)
-  (hkL   : k ≤ L)
-  (stepL : ∀ ⦃m : ℕ⦄, L ≤ m + k →
-            G m
-              = ( H (m + k)
-                  - ((range (L + 1)).erase k).sum
-                      (fun i => R i * G (m + k - i)) ) / (R k))
+structure WindowedPivotRecurrence (R G H : ℕ → ℂ) (k L : ℕ) : Prop where
+  rk_ne : R k ≠ 0
+  hkL   : k ≤ L
+  stepL :
+    ∀ ⦃m : ℕ⦄, L ≤ m + k →
+      G m
+        = ( H (m + k)
+            - ((range (L + 1)).erase k).sum
+                (fun i => R i * G (m + k - i)) ) / (R k)
 
 /-- Build a `WindowedPivotRecurrence` from convolution + window + pivot in range. -/
 lemma mk_windowed
     {R G H : ℕ → ℂ} {k L : ℕ}
     (hconv : Hyperlocal.Cancellation.Convolution R G H)
-    (rk_ne : R k ≠ 0)
+    (hRk   : R k ≠ 0)
     (hwin  : WindowUpTo R L)
     (hkL   : k ≤ L) :
-    WindowedPivotRecurrence R G H k L :=
-by
-  refine ⟨rk_ne, hkL, ?step⟩
+    WindowedPivotRecurrence R G H k L := by
+  refine ⟨hRk, hkL, ?step⟩
   intro m hLm
   simpa using
     Hyperlocal.Cancellation.Bridge.recurrence_of_convolution_window_le
-      (r := R) (g := G) (h := H) (k := k) (L := L)
-      hconv rk_ne hwin hkL m hLm
+      (R := R) (G := G) (H := H) (k := k) (L := L)
+      hconv hRk hwin m hLm
 
 end API
 

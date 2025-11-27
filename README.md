@@ -4,6 +4,21 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
+**Version 4.0 (Latest).**
+This update incorporates several structural corrections and clarifications, informed in part by detailed informal feedback from Professor Peter Varju.
+
+First, the reductio hypothesis is now applied exclusively to the Riemann ξ–function.
+Earlier drafts extended the framework to the wider class of four-fold symmetric entire functions, where explicit counterexamples (including Varju’s cosine–product constructions) are known. Version 4.0 removes this category error and restricts the argument to its appropriate analytic setting.$
+
+Second, the recurrence analysis has been placed in a fully centered formulation.
+By separating the analytic forcing from the homogeneous component, the update removes the hidden dependence on the tail of the forcing vector and resolves the inhomogeneity bleed-through that affected earlier versions.
+
+Third, the contradiction mechanism is now expressed through a hyperlocal coupling operator.
+The Toeplitz-transported symmetry constraints (TAC) and the quartet-based stability conditions (QCC) are combined into a parameter-dependent matrix.
+A real-analytic rank analysis shows that this operator has full column rank \(3k\) on a generic set of off-critical geometries, producing a uniform contradiction for all multiplicities \(k\ge1\).
+
+Further refinements are expected as the approach continues to undergo scrutiny and external feedback.
+
 **Version 4.0 (Sketch & Response to Reviewer Peter Varju):** `v4.0_sketch_response_to_reviewer_Varju.pdf` available at GitHub.
 
 *SHA-256:*  
@@ -19,7 +34,7 @@ This repository contains the manuscript and a one-page summary of a proof of the
 *Status:* Work-in-progress **sketch** intended for public priority and roadmap; full algebraic derivations will follow this structure in the complete v4.0 manuscript.
 
 
-**Version 3.3 (Latest):** hyperlocal_RH_proof_ACs_v3.3_09082025.pdf available at GitHub.
+**Version 3.3:** hyperlocal_RH_proof_ACs_v3.3_09082025.pdf available at GitHub.
 
 * *Change remark:* This significant update within the v3 algebraic track solidifies the proof's claim to full generality by extending the computational verification to cover multiple zeros. The previous verification was limited to simple zeros (k=1). This version overcomes that obstacle using a sophisticated analytical shortcut based on Faà di Bruno's formula, enabling the successful verification for the foundational double zero case (k=2). This demonstrated the same pattern of immediate and stable algebraic overdetermination, closing a key theoretical gap. To further enhance clarity, this version also introduces a new 'Boundary of Stability' analysis—which is strategically placed as a post-proof discussion to preserve the minimalist focus of the main argument—and adds a comprehensive summary table for the proof's core algebraic engine.
 

@@ -115,16 +115,15 @@ lemma deriv_RG_minus_quad_is_zero_at
     (hH_affine : deriv (fun s => R s * G s) = fun s => α*s + β)
     (s : ℂ) :
     deriv (fun z => R z * G z - ((α/2) * z^2 + β * z)) s = 0 := by
+  -- differentiability of R*G at s
   have hRGd : DifferentiableAt ℂ (fun z => R z * G z) s :=
     (hR.differentiableAt).mul (hG.differentiableAt)
-  -- differentiability of (α/2) * z^2 + β * z at s
+  -- differentiability of quadratic part at s
   have hQ : Differentiable ℂ (fun z : ℂ => (α/2) * z^2 + β * z) :=
     ((differentiable_const (α/2)).mul (differentiable_pow 2)).add
       ((differentiable_const β).mul differentiable_id)
-
   have hQd : DifferentiableAt ℂ (fun z : ℂ => (α/2) * z^2 + β * z) s :=
     hQ.differentiableAt
-
   -- expand derivative of difference
   have h_sub := deriv_sub (𝕜 := ℂ) hRGd hQd
   calc
@@ -135,29 +134,16 @@ lemma deriv_RG_minus_quad_is_zero_at
       rw [congrFun hH_affine s, deriv_quad_affine_at α β s]
     _ = 0 := by ring
 
-  -- derivative of the affine RHS at s
-  have h_quad : deriv (fun z : ℂ => (α/2) * z^2 + β * z) s = α * s + β := by
-    -- you already have a lemma `deriv_quad_affine_at`; if not, `simp` also works via `deriv_pow`
-    simpa using deriv_quad_affine_at α β s
-
-  -- use the hypothesis at the point s
-  have h_aff_pt : deriv (fun z => R z * G z) s = α * s + β := by
-    simpa using congrArg (fun f => f s) hH_affine
-
-  -- apply `deriv_sub`, then substitute both sides and finish by `simp`
-  have : deriv (fun z => R z * G z - ((α/2) * z^2 + β * z)) s
-        = (α * s + β) - (α * s + β) := by
-    have h_sub :
-        deriv (fun z => R z * G z - ((α/2) * z^2 + β * z)) s
-        = deriv (fun z => R z * G z) s
-          - deriv (fun z : ℂ => (α/2) * z^2 + β * z) s := by
-      simpa using deriv_sub (𝕜 := ℂ) hRGd hQd
-    simpa [h_aff_pt, h_quad] using h_sub
-
-  simpa using this
-
-
-
+/-- Function-level: the derivative is the zero function. -/
+lemma deriv_RG_minus_quad_is_zero
+    {R G : ℂ → ℂ} {α β : ℂ}
+    (hR : Differentiable ℂ R) (hG : Differentiable ℂ G)
+    (hH_affine : deriv (fun s => R s * G s) = fun s => α*s + β) :
+    deriv (fun z => R z * G z - ((α/2) * z^2 + β * z))
+    = (fun _ => (0 : ℂ)) := by
+  funext s
+  simpa using
+    deriv_RG_minus_quad_is_zero_at (R:=R) (G:=G) (α:=α) (β:=β) hR hG hH_affine s
 
 
 end NoPolyG_DE
