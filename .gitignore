@@ -25,3 +25,6 @@
 *.trace
 *.hash
 .DS_Store
+
+# build artifacts
+formalisation.zip
