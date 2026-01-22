@@ -1,5 +1,5 @@
 /-
-  Hyperlocal/Cancellation/InstabilityK1.lean
+  Hyperlocal/Appendix/InstabilityK1.lean
 
   k = 1 instability:
   • keeps current placeholder instance (nothing breaks today);

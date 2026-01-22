@@ -9,7 +9,7 @@ import Hyperlocal.Cancellation.QCC
 import Hyperlocal.Cancellation.TRC
 import Hyperlocal.Cancellation.Setup
 import Hyperlocal.Cancellation.Solo
-import Hyperlocal.Cancellation.InstabilityK1
+import Hyperlocal.Appendix.InstabilityK1
 
 -- We *do* need the API shim here because we refer to WindowedPivotRecSpec.
 import Hyperlocal.Cancellation.Bridge

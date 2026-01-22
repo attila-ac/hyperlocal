@@ -11,8 +11,8 @@
 
 import Mathlib.Data.Real.Basic
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1
-import Hyperlocal.Cancellation.InstabilityK2
+import Hyperlocal.Appendix.InstabilityK1
+import Hyperlocal.Appendix.InstabilityK2
 
 noncomputable section
 namespace Hyperlocal

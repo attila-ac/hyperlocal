@@ -1,6 +1,6 @@
--- Hyperlocal/Cancellation/InstabilityK1_Fillers.lean
+-- Hyperlocal/Appendix/InstabilityK1_Fillers.lean
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1  -- for the hooks added
+import Hyperlocal.Appendix.InstabilityK1  -- for the hooks added
 
 noncomputable section
 namespace Hyperlocal

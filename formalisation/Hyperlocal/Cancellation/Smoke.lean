@@ -18,8 +18,8 @@ import Hyperlocal.Transcendence
 import Hyperlocal.FactorizationConsequences
 -- Cancellation / Instability
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1
-import Hyperlocal.Cancellation.InstabilityK2
+import Hyperlocal.Appendix.InstabilityK1
+import Hyperlocal.Appendix.InstabilityK2
 import Hyperlocal.Cancellation.WrapUp
 import Hyperlocal.Cancellation.WrapUpExport
 
@@ -61,8 +61,8 @@ noncomputable section
 #check Hyperlocal.Cancellation.UnstableHom
 #check Hyperlocal.Cancellation.BridgeData
 #check Hyperlocal.Cancellation.no_cancellation_if_unstable
-#check Hyperlocal.Cancellation.InstabilityK1.unstable_k1_all_t
-#check Hyperlocal.Cancellation.InstabilityK2.unstable_k2_all_t
+#check Hyperlocal.Appendix.InstabilityK1.unstable_k1_all_t
+#check Hyperlocal.Appendix.InstabilityK2.unstable_k2_all_t
 
 
 

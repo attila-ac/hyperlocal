@@ -31,8 +31,8 @@ import Hyperlocal.Cancellation.RecurrenceWithFinsetSum
 import Hyperlocal.Cancellation.Bridge
 import Hyperlocal.Cancellation.BridgeToInstability
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1
-import Hyperlocal.Cancellation.InstabilityK2
+import Hyperlocal.Appendix.InstabilityK1
+import Hyperlocal.Appendix.InstabilityK2
 import Hyperlocal.Cancellation.WrapUp
 
 -- If you added the Schur–Cohn skeleton under Cancellation, import it here too:

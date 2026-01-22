@@ -1,5 +1,5 @@
 /-
-  Hyperlocal/Cancellation/InstabilityK1_UC.lean
+  Hyperlocal/Appendix/InstabilityK1_UC.lean
 
   k = 1: unit-circle elimination scaffold (compiles clean, no sorry).
   We keep it as a future upgrade path while proceeding with the seed plan.

@@ -1,4 +1,4 @@
--- Hyperlocal/Cancellation/InstabilityK1_Small.lean
+-- Hyperlocal/Appendix/InstabilityK1_Small.lean
 /-
   Small-t regime for k = 1 (numeric scaffolding + green stubs)
 
@@ -20,7 +20,7 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Tactic
 
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1_Fillers
+import Hyperlocal.Appendix.InstabilityK1_Fillers
 
 noncomputable section
 namespace Hyperlocal

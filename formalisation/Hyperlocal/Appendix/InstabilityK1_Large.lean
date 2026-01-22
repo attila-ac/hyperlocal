@@ -1,4 +1,4 @@
--- Hyperlocal/Cancellation/InstabilityK1_Large.lean
+-- Hyperlocal/Appendix/InstabilityK1_Large.lean
 /-
   Large-t regime for k = 1 (boundary dominance scaffold, no fragile imports)
 
@@ -18,7 +18,7 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Tactic
 
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1_Fillers
+import Hyperlocal.Appendix.InstabilityK1_Fillers
 
 noncomputable section
 namespace Hyperlocal

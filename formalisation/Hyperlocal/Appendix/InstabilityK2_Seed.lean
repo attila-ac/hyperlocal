@@ -1,5 +1,5 @@
 /-
-  Hyperlocal/Cancellation/InstabilityK2_Seed.lean
+  Hyperlocal/Appendix/InstabilityK2_Seed.lean
   k = 2: seed-style bridge stays; global proof deferred.
 -/
 import Mathlib.Data.Complex.Basic

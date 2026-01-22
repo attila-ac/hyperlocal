@@ -1,4 +1,4 @@
--- Hyperlocal/Cancellation/InstabilityK1_LargeFinish.lean
+-- Hyperlocal/Appendix/InstabilityK1_LargeFinish.lean
 /-
   Finish the large-t route:
   decay ⇒ boundary dominance ⇒ local Rouché ⇒ outside-unit root ⇒ UnstableHom.
@@ -6,7 +6,7 @@
 
 import Mathlib.Data.Complex.Basic
 import Mathlib.Tactic
-import Hyperlocal.Cancellation.InstabilityK1_Large
+import Hyperlocal.Appendix.InstabilityK1_Large
 import Hyperlocal.Cancellation.RoucheCircle
 
 noncomputable section

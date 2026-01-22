@@ -1,8 +1,8 @@
--- Hyperlocal/Cancellation/InstabilityK1_Mid.lean
+-- Hyperlocal/Appendix/InstabilityK1_Mid.lean
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1_Fillers
+import Hyperlocal.Appendix.InstabilityK1_Fillers
 
 noncomputable section
 namespace Hyperlocal

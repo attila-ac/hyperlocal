@@ -1,9 +1,9 @@
--- Hyperlocal/Cancellation/InstabilityK1_Assemble.lean
+-- Hyperlocal/Appendix/InstabilityK1_Assemble.lean
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1_Fillers
-import Hyperlocal.Cancellation.InstabilityK1_Small
-import Hyperlocal.Cancellation.InstabilityK1_Mid
-import Hyperlocal.Cancellation.InstabilityK1_Large
+import Hyperlocal.Appendix.InstabilityK1_Fillers
+import Hyperlocal.Appendix.InstabilityK1_Small
+import Hyperlocal.Appendix.InstabilityK1_Mid
+import Hyperlocal.Appendix.InstabilityK1_Large
 
 noncomputable section
 namespace Hyperlocal

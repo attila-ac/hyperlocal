@@ -40,8 +40,8 @@ import Hyperlocal.Cancellation.Solo12
 
 -- Instability hook + concrete k=1,2 stubs/instances (as available)
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Cancellation.InstabilityK1
-import Hyperlocal.Cancellation.InstabilityK2
+import Hyperlocal.Appendix.InstabilityK1
+import Hyperlocal.Appendix.InstabilityK2
 
 -- Prime witness endpoint / parity bridge / TAC endpoint
 import Hyperlocal.Cancellation.PrimeWitness

@@ -1,5 +1,5 @@
 /-
-  Hyperlocal/Cancellation/InstabilityK2.lean
+  Hyperlocal/Appendix/InstabilityK2.lean
 
   Concrete k=2 instability “toggle”.
   Provides:
