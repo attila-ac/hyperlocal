@@ -43,6 +43,12 @@ import Hyperlocal.Cancellation.InstabilityHyp
 import Hyperlocal.Cancellation.InstabilityK1
 import Hyperlocal.Cancellation.InstabilityK2
 
+-- Prime witness endpoint / parity bridge / TAC endpoint
+import Hyperlocal.Cancellation.PrimeWitness
+import Hyperlocal.Cancellation.PrimeWitnessParity
+import Hyperlocal.Transport.TAC
+
+
 noncomputable section
 /-- This module is intentionally empty: it just imports everything in the
     manuscript’s narrative order so the project can be built end-to-end. -/

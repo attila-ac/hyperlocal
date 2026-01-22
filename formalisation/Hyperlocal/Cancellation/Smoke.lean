@@ -23,6 +23,13 @@ import Hyperlocal.Cancellation.InstabilityK2
 import Hyperlocal.Cancellation.WrapUp
 import Hyperlocal.Cancellation.WrapUpExport
 
+import Hyperlocal.Transport.TAC
+
+#check Hyperlocal.Transport.TAC.oddPart_PhiPrime
+#check Hyperlocal.Transport.TAC.oddPart_PhiPrime_constC
+#check Hyperlocal.Transport.TAC.tac_finite_prime_witness_2_3
+
+
 
 noncomputable section
 

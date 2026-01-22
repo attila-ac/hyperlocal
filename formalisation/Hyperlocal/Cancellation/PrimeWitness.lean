@@ -14,7 +14,7 @@
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic
-
+import Hyperlocal.Cancellation.TwoPrimePhaseLock
 noncomputable section
 
 namespace Hyperlocal
@@ -26,11 +26,6 @@ open scoped Real
 /-- Minimal witness shape: κ * sin(t * log p). -/
 def PhiShape (κ t : ℝ) (p : ℕ) : ℝ :=
   κ * Real.sin (t * Real.log (p : ℝ))
-
-/-- Arithmetic bottleneck (postponed): two-base phase lock forces t = 0. -/
-axiom two_prime_phase_lock (t : ℝ) :
-  Real.sin (t * Real.log (2 : ℝ)) = 0 ∧
-  Real.sin (t * Real.log (3 : ℝ)) = 0 → t = 0
 
 /--
 If κ ≠ 0 and t ≠ 0, then not both Φ(2) and Φ(3) vanish.
