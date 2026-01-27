@@ -93,7 +93,7 @@ def jetOfSeq (G : ℕ → ℂ) (n0 : ℕ) : Jet6 :=
 
 /-!  Stencils: the exact vanishing facts we need at (A₀,t₀).
      These are *what* the windowed pivot recurrence must imply;
-     we carry them as hypotheses so this file stays admit-free. -/
+     we carry them as hypotheses so this file stays placeholder-free. -/
 abbrev QCCStencilAt (G : ℕ → ℂ) (n0 : ℕ) : Prop :=
   QCCfun A₀ t₀ (jetOfSeq G n0) = 0
 

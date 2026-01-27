@@ -7,7 +7,7 @@
 import Mathlib.Data.Complex.Basic
 import Mathlib.Tactic
 import Hyperlocal.Appendix.InstabilityK1_Large
-import Hyperlocal.Cancellation.RoucheCircle
+import Hyperlocal.Appendix.RoucheCircle
 
 noncomputable section
 open Complex

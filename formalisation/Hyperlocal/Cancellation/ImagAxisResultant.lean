@@ -116,20 +116,216 @@ lemma I_mul_I_mul (z : ℂ) : Complex.I * (Complex.I * z) = -z := by
    Downstream theorems (Stage-2+): keep as TODO for now
    ========================================================= -/
 
-/-- Parity decomposition over ℂ (after mapping ℝ→ℂ). -/
 theorem eval_map_eq_evenU_add_w_mul_oddU (Psi : Polynomial ℝ) (w : ℂ) :
     (Psi.map (algebraMap ℝ ℂ)).eval w
       =
     ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
       + w * ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
-  sorry
+  classical
+  set N : ℕ := Psi.natDegree + 1
+  let f : ℕ → ℂ := fun n => (algebraMap ℝ ℂ) (Psi.coeff n) * w ^ n
+
+  -- Map/eval rewrite
+  have hmap :
+      (Psi.map (algebraMap ℝ ℂ)).eval w = Psi.eval₂ (algebraMap ℝ ℂ) w := by
+    simpa [Polynomial.eval] using
+      (Polynomial.eval₂_map (p := Psi) (f := algebraMap ℝ ℂ)
+        (g := RingHom.id ℂ) (x := w))
+
+  -- Expand eval₂ as a finite sum over natDegree+1
+  have hsum :
+      (Psi.map (algebraMap ℝ ℂ)).eval w = (Finset.range N).sum f := by
+    simpa [hmap, f, N] using
+      (Polynomial.eval₂_eq_sum_range (p := Psi) (f := algebraMap ℝ ℂ) (x := w))
+
+  -- Tail (N..2N-1) vanishes (coeffs are 0 past natDegree)
+  have htail : (Finset.range N).sum (fun i => f (N + i)) = 0 := by
+    refine Finset.sum_eq_zero ?_
+    intro i hi
+    have hdeg : Psi.natDegree < N + i := by
+      have hN : Psi.natDegree < N := by
+        simpa [N] using Nat.lt_succ_self Psi.natDegree
+      exact lt_of_lt_of_le hN (Nat.le_add_right N i)
+    have hcoeff : Psi.coeff (N + i) = 0 :=
+      Polynomial.coeff_eq_zero_of_natDegree_lt hdeg
+    simp [f, hcoeff]
+
+  -- Extend sum from N to 2N
+  have h2 : (Finset.range (2 * N)).sum f = (Finset.range N).sum f := by
+    have h :=
+      (Finset.sum_range_add f N N)
+    have h' :
+        (Finset.range (N + N)).sum f
+          = (Finset.range N).sum f + (Finset.range N).sum (fun i => f (N + i)) := by
+      simpa using h
+    have h'' : (Finset.range (N + N)).sum f = (Finset.range N).sum f := by
+      simpa [htail] using h'
+    simpa [two_mul, Nat.mul_comm, Nat.mul_left_comm, Nat.mul_assoc] using h''
+
+  have hNto2N : (Finset.range N).sum f = (Finset.range (2 * N)).sum f := by
+    simpa using h2.symm
+
+  -- Evaluate evenU/oddU after mapping
+  have hEvenEval :
+      ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+        = (Finset.range N).sum (fun m =>
+            (algebraMap ℝ ℂ) (Psi.coeff (2*m)) * (w^2)^m) := by
+    simp [evenU, N, mul_assoc]
+
+  have hOddEval :
+      ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+        = (Finset.range N).sum (fun m =>
+            (algebraMap ℝ ℂ) (Psi.coeff (2*m+1)) * (w^2)^m) := by
+    simp [oddU, N, mul_assoc]
+
+  -- Convert the parity-split terms
+  have hEvenTerm :
+      (Finset.range N).sum (fun m => f (2*m))
+        = (Finset.range N).sum (fun m =>
+            (algebraMap ℝ ℂ) (Psi.coeff (2*m)) * (w^2)^m) := by
+    refine Finset.sum_congr rfl ?_
+    intro m hm
+    have hw2 : w^(2*m) = (w^2)^m := by
+      simpa [pow_mul] using (pow_mul w 2 m)
+    simp [f, hw2, mul_assoc]
+
+  have hEven :
+      (Finset.range N).sum (fun m => f (2*m))
+        = ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+    calc
+      (Finset.range N).sum (fun m => f (2*m))
+          = (Finset.range N).sum (fun m =>
+              (algebraMap ℝ ℂ) (Psi.coeff (2*m)) * (w^2)^m) := hEvenTerm
+      _   = ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+              simpa using hEvenEval.symm
+
+  let g : ℕ → ℂ := fun m =>
+      (algebraMap ℝ ℂ) (Psi.coeff (2*m+1)) * (w^2)^m
+
+  have hOddTerm :
+      (Finset.range N).sum (fun m => f (2*m+1))
+        = (Finset.range N).sum (fun m => w * g m) := by
+    refine Finset.sum_congr rfl ?_
+    intro m hm
+    have hw2 : w^(2*m) = (w^2)^m := by
+      simpa [pow_mul] using (pow_mul w 2 m)
+    have hw : w^(2*m+1) = w * (w^2)^m := by
+      calc
+        w^(2*m+1) = w^(2*m) * w := by
+          simpa [Nat.succ_eq_add_one] using (pow_succ w (2*m))
+        _ = (w^2)^m * w := by simpa [hw2]
+        _ = w * (w^2)^m := by ac_rfl
+    -- rewrite and reassociate
+    simp [f, g, hw] ; ac_rfl
+
+  have hOddSum :
+      (Finset.range N).sum (fun m => f (2*m+1))
+        = w * ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+    have hg : (Finset.range N).sum (fun m => w * g m) = w * (Finset.range N).sum g := by
+      simpa using (Finset.mul_sum (a := w) (s := Finset.range N) (f := g)).symm
+    have hsumeq : (Finset.range N).sum g = ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+      simpa [g] using hOddEval.symm
+    calc
+      (Finset.range N).sum (fun m => f (2*m+1))
+          = (Finset.range N).sum (fun m => w * g m) := hOddTerm
+      _   = w * (Finset.range N).sum g := hg
+      _   = w * ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+              simpa [hsumeq]
+
+  -- Assemble
+  calc
+    (Psi.map (algebraMap ℝ ℂ)).eval w
+        = (Finset.range N).sum f := hsum
+    _   = (Finset.range (2 * N)).sum f := hNto2N
+    _   = (Finset.range N).sum (fun m => f (2*m))
+          + (Finset.range N).sum (fun m => f (2*m+1)) := by
+          simpa using (sum_range_two_mul (α := ℂ) (N := N) (f := f))
+    _   = ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+          + w * ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) := by
+          rw [hEven, hOddSum]
 
 /-- If Ψ(i*y)=0 (real coeffs) and y≠0, then evenU and oddU share root u = -y^2. -/
 theorem imagAxis_root_implies_common_root {Psi : Polynomial ℝ} {y : ℝ}
     (hy : y ≠ 0)
     (hroot : (Psi.map (algebraMap ℝ ℂ)).IsRoot (Complex.I * (y : ℂ))) :
     (evenU Psi).IsRoot (-(y^2)) ∧ (oddU Psi).IsRoot (-(y^2)) := by
-  sorry
+  classical
+  -- abbreviations
+  set w : ℂ := Complex.I * (y : ℂ)
+  set a : ℝ := -(y^2)
+
+  -- (I*y)^2 = -y^2
+  have hw2 : w^2 = (a : ℂ) := by
+    -- unfold the abbreviations
+    dsimp [w, a]
+    -- after unfolding, the goal reduces to I*(I*(↑y*↑y)) = -(↑y*↑y),
+    -- which is exactly `I_mul_I_mul` with z := (↑y*↑y).
+    simpa [pow_two, mul_assoc, mul_left_comm, mul_comm] using
+      (I_mul_I_mul (z := ((y : ℂ) * (y : ℂ))))
+
+
+  -- IsRoot → eval = 0
+  have hwroot : (Psi.map (algebraMap ℝ ℂ)).eval w = 0 := by
+    simpa [Polynomial.IsRoot, w] using hroot
+
+  -- Use parity decomposition at w, then plug root
+  have hz :
+      ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+        + w * ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2) = 0 := by
+    have hdecomp := eval_map_eq_evenU_add_w_mul_oddU (Psi := Psi) (w := w)
+    -- rewrite LHS of hwroot using hdecomp
+    simpa [hdecomp] using hwroot
+
+  -- Move the even/odd evaluations back to ℝ at the real point a = -y^2
+  have hEven :
+      ((evenU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+        = (algebraMap ℝ ℂ) ((evenU Psi).eval a) := by
+    -- NOTE: your missing ')' was here
+    simpa [hw2] using (eval_map_ofReal (p := evenU Psi) (x := a))
+
+  have hOdd :
+      ((oddU Psi).map (algebraMap ℝ ℂ)).eval (w^2)
+        = (algebraMap ℝ ℂ) ((oddU Psi).eval a) := by
+    -- NOTE: and missing ')' here
+    simpa [hw2] using (eval_map_ofReal (p := oddU Psi) (x := a))
+
+  have hz' :
+      (algebraMap ℝ ℂ) ((evenU Psi).eval a)
+        + w * (algebraMap ℝ ℂ) ((oddU Psi).eval a) = 0 := by
+    simpa [hEven, hOdd] using hz
+
+  -- Rewrite the w-term into I * ofReal(y*O)
+  have hz'' :
+      Complex.ofReal ((evenU Psi).eval a)
+        + Complex.I * Complex.ofReal (y * (oddU Psi).eval a) = 0 := by
+    -- first: replace w by I*y
+    have hz1 :
+        Complex.ofReal ((evenU Psi).eval a)
+          + (Complex.I * Complex.ofReal y) * Complex.ofReal ((oddU Psi).eval a) = 0 := by
+      simpa [w] using hz'
+    -- then: reassociate and combine the two ofReals into ofReal (y*O)
+    simpa [mul_assoc, mul_left_comm, mul_comm] using hz1
+
+  -- Real part gives E = 0
+  have he : (evenU Psi).eval a = 0 := by
+    have hre := congrArg Complex.re hz''
+    -- re(ofReal E) = E, re(I * ofReal _) = 0
+    -- simp usually handles this directly
+    simpa using hre
+
+  -- Imag part gives y*O = 0, hence O = 0 since y ≠ 0
+  have hyO : y * (oddU Psi).eval a = 0 := by
+    have him := congrArg Complex.im hz''
+    -- im(ofReal E) = 0, im(I * ofReal q) = q
+    simpa using him
+
+  have ho : (oddU Psi).eval a = 0 :=
+    (mul_eq_zero.mp hyO).resolve_left hy
+
+  constructor
+  · simpa [Polynomial.IsRoot, a] using he
+  · simpa [Polynomial.IsRoot, a] using ho
+
 
 /-- If f and g share a root, resultant f g = 0. -/
 theorem resultant_eq_zero_of_common_root

@@ -7,7 +7,7 @@
   scalar test has the form κ * sin(t * log p). If κ ≠ 0 and t ≠ 0 then at least
   one of p=2 or p=3 witnesses non-vanishing.
 
-  The only arithmetic bottleneck is isolated as an axiom for now:
+  The only arithmetic bottleneck is isolated as an assumption for now:
     sin(t log 2)=0 ∧ sin(t log 3)=0  →  t=0.
 -/
 

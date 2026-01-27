@@ -40,20 +40,19 @@ import Hyperlocal.Cancellation.Solo12
 
 -- Instability hook + concrete k=1,2 stubs/instances (as available)
 import Hyperlocal.Cancellation.InstabilityHyp
-import Hyperlocal.Appendix.InstabilityK1
-import Hyperlocal.Appendix.InstabilityK2
 
 -- Prime witness endpoint / parity bridge / TAC endpoint
 import Hyperlocal.Cancellation.PrimeWitness
 import Hyperlocal.Cancellation.PrimeWitnessParity
 import Hyperlocal.Transport.TAC
-
+import Hyperlocal.Transport.Exports
 
 noncomputable section
-/-- This module is intentionally empty: it just imports everything in the
-    manuscript’s narrative order so the project can be built end-to-end. -/
+
+/- This module is intentionally empty: it just imports everything in the
+   manuscript’s narrative order so the project can be built end-to-end. -/
 namespace Hyperlocal
 namespace Manuscript
--- place manuscript-facing helpers later if you want (#check mirrors, etc.)
+
 end Manuscript
 end Hyperlocal
