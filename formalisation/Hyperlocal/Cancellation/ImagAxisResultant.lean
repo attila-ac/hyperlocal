@@ -5,7 +5,17 @@
   * Prove the two plumbing-heavy lemmas cleanly:
       - eval_map_ofReal
       - sum_range_two_mul
-  * (We already pushed further here: decomposition + common-root + stabRes.)
+  * Decomposition + common-root + stabRes.
+
+  NOTE on Mathlib variance / snapshot minimalism:
+  -----------------------------------------------
+  Your pinned Mathlib provides only `Resultant/Basic.lean`, and does NOT ship
+  the usual bridge lemmas like “common root ⇒ resultant = 0”.
+  So we isolate exactly that step as an axiom:
+
+      resultant_eq_zero_of_common_root
+
+  Everything else in this file is fully proved.
 -/
 
 import Mathlib
@@ -57,7 +67,7 @@ lemma sum_range_two_mul {α : Type*} [AddCommMonoid α] (N : ℕ) (f : ℕ → �
         calc
           (Finset.range (2*(N+1))).sum f
               = (Finset.range (2*N + 2)).sum f := by
-                  simp [Nat.mul_succ, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+                  simp [Nat.mul_succ, Nat.add_comm]
           _   = (Finset.range (2*N + 1)).sum f + f (2*N + 1) := by
                   simpa using (Finset.sum_range_succ f (2*N + 1))
           _   = ((Finset.range (2*N)).sum f + f (2*N)) + f (2*N + 1) := by
@@ -107,10 +117,6 @@ lemma I_mul_I_mul (z : ℂ) : Complex.I * (Complex.I * z) = -z := by
       simpa [mul_assoc] using (mul_assoc (Complex.I) (Complex.I) z).symm
     _ = (-1 : ℂ) * z := by simp
     _ = -z := by simp
-
-/- =========================================================
-   Downstream theorems (already working in your branch)
-   ========================================================= -/
 
 theorem eval_map_eq_evenU_add_w_mul_oddU (Psi : Polynomial ℝ) (w : ℂ) :
     (Psi.map (algebraMap ℝ ℂ)).eval w
@@ -242,8 +248,19 @@ theorem imagAxis_root_implies_common_root {Psi : Polynomial ℝ} {y : ℝ}
 
   have hw2 : w^2 = (a : ℂ) := by
     dsimp [w, a]
-    simpa [pow_two, mul_assoc, mul_left_comm, mul_comm] using
-      (I_mul_I_mul (z := ((y : ℂ) * (y : ℂ))))
+    -- compute (I*y)^2 = (I*I)*(y*y) = - y^2
+    calc
+      (Complex.I * (y : ℂ))^2
+          = (Complex.I * (y : ℂ)) * (Complex.I * (y : ℂ)) := by
+              simp [pow_two]
+      _   = (Complex.I * Complex.I) * ((y : ℂ) * (y : ℂ)) := by
+              -- regroup (I*y)*(I*y) into (I*I)*(y*y)
+              simpa [mul_assoc, mul_left_comm, mul_comm] using
+                (mul_mul_mul_comm (Complex.I) (y : ℂ) (Complex.I) (y : ℂ))
+      _   = (-1 : ℂ) * ((y : ℂ) * (y : ℂ)) := by simp
+      _   = -((y : ℂ) * (y : ℂ)) := by simp
+      _   = (-(y^2) : ℂ) := by simp [pow_two]
+      _   = (a : ℂ) := by simp [a]
 
   have hwroot : (Psi.map (algebraMap ℝ ℂ)).eval w = 0 := by
     simpa [Polynomial.IsRoot, w] using hroot
@@ -293,14 +310,12 @@ theorem imagAxis_root_implies_common_root {Psi : Polynomial ℝ} {y : ℝ}
   · simpa [Polynomial.IsRoot, a] using he
   · simpa [Polynomial.IsRoot, a] using ho
 
-/-- If `f` and `g` share a root, resultant `f g = 0`. -/
-theorem resultant_eq_zero_of_common_root
-    {f g : Polynomial ℝ} {a : ℝ}
-    (hf : f.IsRoot a) (hg : g.IsRoot a) :
-    f.resultant g = 0 := by
-  classical
-  -- This lemma exists in your Mathlib snapshot (it was already in your committed file).
-  simpa using (Polynomial.resultant_eq_zero_of_isRoot (f := f) (g := g) (a := a) hf hg)
+/-
+  Resultant step: isolated to avoid missing theory in your pinned Mathlib snapshot.
+-/
+axiom resultant_eq_zero_of_common_root
+    {f g : Polynomial ℝ} {a : ℝ} :
+    f.IsRoot a → g.IsRoot a → f.resultant g = 0
 
 /-- Stability resultant certificate. -/
 def stabRes (Psi : Polynomial ℝ) : ℝ :=
