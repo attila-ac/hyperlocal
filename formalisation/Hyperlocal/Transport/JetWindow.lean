@@ -18,6 +18,7 @@
 import Hyperlocal.Transport.TACToeplitz
 import Hyperlocal.Transport.ToeplitzInterface
 import Hyperlocal.Transport.ToeplitzLinear
+import Mathlib.Data.Complex.Basic
 
 noncomputable section
 
