@@ -1,20 +1,25 @@
 /-
   Hyperlocal/Conclusion/OffSeedToTAC.lean
 
-  Stage-3 bridge file (repo-API correct).
+  Stage-3 bridge file (SAFE VERSION).
 
-  Goal: isolate the *single* semantic-debt item as one axiom:
+  IMPORTANT FIX:
+  The previous version stated the Stage-3 bridge as a global axiom
+  for arbitrary H : ℂ → ℂ, which makes the whole development inconsistent
+  (e.g. H := 0 has off-seeds).
 
-    OffSeed → ∃ A B κ, κ ≠ 0 ∧ (EvenF A) ∧ (EvenF B)
-              ∧ oddPart (PhiPrime A B (fun _ => κ) 2) t = 0
-              ∧ oddPart (PhiPrime A B (fun _ => κ) 3) t = 0
+  This replacement scopes the bridge as an *assumption on a given H*:
 
-  This is exactly what `Hyperlocal/Transport/TAC.lean` needs to fire
-  the two-prime witness contradiction.
+      Stage3Bridge H : Prop
 
-  Everything else is definitional glue and a closed contradiction proof.
+  and proves the clean meta-theorem:
+
+      Stage3Bridge H → ¬ Nonempty (OffSeed H)
+
+  So now "Conclusion" is importable and does NOT explode the theory.
 -/
 
+import Hyperlocal.AdAbsurdumSetup
 import Hyperlocal.Transport.TAC
 import Mathlib.Tactic
 
@@ -26,17 +31,6 @@ namespace OffSeedToTAC
 
 open scoped Real
 
-/-- Minimal “off-seed” carrier for the Stage-3 bridge layer.
-
-You can later replace/alias this with your upstream off-critical seed object;
-for the bridge itself we only need `(k,A,t)` and `t ≠ 0`.
--/
-structure OffSeed where
-  k : ℕ
-  A : ℝ
-  t : ℝ
-  ht : t ≠ 0
-
 /-- The exact “TAC trigger” package needed to contradict the two-prime witness. -/
 def TAC_trigger (A B : ℝ → ℝ) (κ t : ℝ) : Prop :=
   Hyperlocal.Transport.TAC.EvenF A ∧
@@ -46,44 +40,40 @@ def TAC_trigger (A B : ℝ → ℝ) (κ t : ℝ) : Prop :=
   Hyperlocal.Cancellation.PrimeWitness.oddPart
       (Hyperlocal.Transport.TAC.PhiPrime A B (fun _ => κ) 3) t = 0
 
-/-
-  ===========================
-  Stage-3 semantic debt item:
-  ===========================
+/--
+Stage-3 bridge *as a property of a particular H*.
 
-  Once this is proved from your analytic transport layer,
-  the downstream two-prime witness closes the contradiction with no further axioms.
+This is the single remaining semantic item you must eventually PROVE for ξ:
+from an off-critical seed `s : OffSeed H`, produce the TAC trigger data.
 -/
-axiom offSeed_to_TAC_trigger (s : OffSeed) :
-  ∃ (A B : ℝ → ℝ) (κ : ℝ), κ ≠ 0 ∧ TAC_trigger A B κ s.t
+structure Stage3Bridge (H : ℂ → ℂ) : Prop :=
+  (bridge :
+    ∀ s : Hyperlocal.OffSeed H,
+      ∃ (A B : ℝ → ℝ) (κ : ℝ), κ ≠ 0 ∧ TAC_trigger A B κ s.ρ.im)
 
-/-- From the bridge axiom, we immediately contradict the TAC two-prime witness. -/
-theorem offSeed_false (s : OffSeed) : False := by
-  rcases offSeed_to_TAC_trigger s with ⟨A, B, κ, hκ, htrig⟩
-  have hA : Hyperlocal.Transport.TAC.EvenF A := htrig.1
-  have hB : Hyperlocal.Transport.TAC.EvenF B := htrig.2.1
-  have h2 :
-      Hyperlocal.Cancellation.PrimeWitness.oddPart
-        (Hyperlocal.Transport.TAC.PhiPrime A B (fun _ => κ) 2) s.t = 0 :=
-    htrig.2.2.1
-  have h3 :
-      Hyperlocal.Cancellation.PrimeWitness.oddPart
-        (Hyperlocal.Transport.TAC.PhiPrime A B (fun _ => κ) 3) s.t = 0 :=
-    htrig.2.2.2
+/-- From Stage3Bridge, we contradict the TAC two-prime witness for that seed. -/
+theorem offSeed_false_of_bridge
+    {H : ℂ → ℂ} (hb : Stage3Bridge H) (s : Hyperlocal.OffSeed H) : False := by
+  rcases hb.bridge s with ⟨A, B, κ, hκ, htrig⟩
+  rcases htrig with ⟨hA, hB, h2, h3⟩
 
   have hw :=
     Hyperlocal.Transport.TAC.tac_finite_prime_witness_2_3
-      (A := A) (B := B) (κ := κ) (t := s.t) hA hB hκ s.ht
+      (A := A) (B := B) (κ := κ) (t := s.ρ.im) hA hB hκ s.ht
 
-  -- `hw` is an OR of non-vanishing; kill each branch using the corresponding `= 0`.
   cases hw with
   | inl h2ne => exact h2ne h2
   | inr h3ne => exact h3ne h3
 
-/-- Convenience: no off-seed exists (relative only to the single bridge axiom). -/
-theorem no_offSeed : ¬ (∃ s : OffSeed, True) := by
-  rintro ⟨s, _⟩
-  exact offSeed_false s
+/-- Endgame contract for a *fixed* H: there is no off-seed. -/
+def NoOffSeed (H : ℂ → ℂ) : Prop :=
+  ¬ Nonempty (Hyperlocal.OffSeed H)
+
+/-- Closed contradiction wrapper: Stage3Bridge H implies NoOffSeed H. -/
+theorem no_offSeed_of_bridge {H : ℂ → ℂ} (hb : Stage3Bridge H) : NoOffSeed H := by
+  intro hne
+  rcases hne with ⟨s⟩
+  exact offSeed_false_of_bridge (hb := hb) (s := s)
 
 end OffSeedToTAC
 end Conclusion

@@ -1,31 +1,24 @@
 /-
   Hyperlocal/Targets/RiemannXi.lean
 
-  Target function for the Stage-3 instantiation.
+  Target definition of the Riemann ξ-function used by the v4.0/v4.1 track.
 
-  We take ξ to be Mathlib's "entire completed Riemann zeta with poles removed",
-  namely `completedRiemannZeta₀`.
+  We use the classical multiplicative completion (up to the standard nonzero
+  scalar factors already inside `completedRiemannZeta`):
 
-  This file is intentionally lightweight: it only pins down the target `ξ : ℂ → ℂ`
-  as an actual Lean constant/definition.
+      ξ(s) := s * (s - 1) * completedRiemannZeta s.
+
+  This shares the same nontrivial zeros as ζ (away from the real axis).
 -/
 
-import Mathlib.NumberTheory.LSeries.RiemannZeta
+import Hyperlocal.Targets.RiemannZeta
+import Mathlib.Tactic
 
 noncomputable section
 
 namespace Hyperlocal
-namespace Targets
 
-/-- The Riemann ξ-function used as the target in the hyperlocal development. -/
-abbrev xi : ℂ → ℂ := completedRiemannZeta₀
-
-end Targets
-
-/-- Convenience re-export: `Hyperlocal.xi` is the target ξ-function. -/
-abbrev xi : ℂ → ℂ := Targets.xi
-
-/-- Notation for the target Riemann ξ-function. -/
-notation "ξ" => Hyperlocal.xi
+/-- Riemann ξ-function target: `s * (s - 1) * completedRiemannZeta s`. -/
+abbrev xi : ℂ → ℂ := fun s => s * (s - 1) * completedRiemannZeta s
 
 end Hyperlocal

@@ -87,4 +87,3 @@ theorem offSeedPhaseLock_of_stage3System
 
 end Transport
 end Hyperlocal
-Sc
