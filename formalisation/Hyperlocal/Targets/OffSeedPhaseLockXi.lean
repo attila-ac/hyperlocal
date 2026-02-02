@@ -15,6 +15,7 @@
 import Hyperlocal.Transport.PhaseLock2_3
 import Hyperlocal.Transport.TACExtraction
 import Hyperlocal.Targets.RiemannXi
+import Hyperlocal.Targets.XiOffSeedTACZeros2_3Proof
 import Mathlib.Tactic
 
 noncomputable section
@@ -29,12 +30,14 @@ abbrev Xi : ℂ → ℂ := Hyperlocal.xi
 /--
 **Only remaining semantic gap (transport/TAC, p = 2,3):**
 
-Specialised to ξ, the Stage-3 transport/Toeplitz/window→stencil machinery yields
-the TAC zero constraints at orders 2 and 3 (in the normal form used by
-`PhaseLock2_3.lean`).
+Now sourced from `Hyperlocal.Targets.xi_offSeedTACZeros2_3` (the dedicated proof file).
 -/
-axiom xi_offSeedTACZeros2_3 :
-  Hyperlocal.Transport.OffSeedTACZeros2_3 Xi
+theorem xi_offSeedTACZeros2_3 :
+    Hyperlocal.Transport.OffSeedTACZeros2_3 Xi := by
+  -- Avoid abbrev-mismatch headaches: take it at `Hyperlocal.xi`, then rewrite.
+  have h : Hyperlocal.Transport.OffSeedTACZeros2_3 Hyperlocal.xi :=
+    Hyperlocal.Targets.xi_offSeedTACZeros2_3
+  simpa [Xi] using h
 
 /-- Immediate glue: TAC zeros at 2,3 ⇒ phase-lock. -/
 theorem offSeedPhaseLock_Xi : Hyperlocal.Transport.OffSeedPhaseLock Xi :=
