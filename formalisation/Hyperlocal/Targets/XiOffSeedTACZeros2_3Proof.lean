@@ -1,51 +1,97 @@
 /-
   Hyperlocal/Targets/XiOffSeedTACZeros2_3Proof.lean
 
-  The ONLY remaining semantic cliff for the v4.x track:
+  FINAL semantic cliff (v4.0):
 
-    xi_offSeedTACZeros2_3 : OffSeedTACZeros2_3 Xi
+  To make the last step minimal, we factor it as:
 
-  This file is where the ξ-specific window/transport recurrence must eventually
-  be proved. Everything else downstream is glue (PhaseLock2_3, OffSeedBridge,
-  OffSeedToTAC, Finisher).
+    xi_twoPrimeSine : for an off-seed s, produce κ ≠ 0 with
+      κ * sin(t log 2) = 0  and  κ * sin(t log 3) = 0,  where t = s.ρ.im.
 
-  For now we leave exactly ONE hole (a single `sorry`) at the precise place
-  where the operator/window semantics must enter.
+  Then the required TAC oddPart equalities are immediate using
+  TAC.oddPart_PhiPrime_constC (even-part cancels automatically).
 -/
 
-import Hyperlocal.Transport.TACExtraction
-import Hyperlocal.Transport.TAC
 import Hyperlocal.Targets.RiemannXi
-import Hyperlocal.Targets.XiTransportOp
-import Hyperlocal.Targets.XiTransportToeplitz
+import Hyperlocal.AdAbsurdumSetup
+import Hyperlocal.Transport.TAC
+import Hyperlocal.Transport.TACExtraction
 import Mathlib.Tactic
 
 noncomputable section
 
-namespace Hyperlocal.Targets
+namespace Hyperlocal
+namespace Targets
 
 open scoped Real
+open Hyperlocal.Transport
+open Hyperlocal.Cancellation.PrimeWitness
 
-/-- Notation: ξ target. -/
+/-- Notation match. -/
 abbrev Xi : ℂ → ℂ := Hyperlocal.xi
 
 /--
-**ξ-specific semantic extraction (the remaining cliff):**
+The *only* ξ-specific lemma you still owe.
 
-Produce TAC odd-part zeros at orders 2 and 3 for primes p=2,3, for every off-seed.
-
-This is exactly the statement consumed by `PhaseLock2_3` glue.
-The proof must ultimately be the ξ window/transport recurrence → stencil → TACZeros2_3.
+Interpretation: from your concrete ξ-transport / finite-window recurrence,
+extract a nonzero κ forcing the two-prime phase-lock constraints
+at t = s.ρ.im.
 -/
-theorem xi_offSeedTACZeros2_3 :
-    Hyperlocal.Transport.OffSeedTACZeros2_3 Xi := by
-  intro s
-  classical
-  -- REAL WORK GOES HERE:
-  --   (XiTransportOp + window recurrence + finite extraction) ⇒
-  --     ∃ A B κ, EvenF A ∧ EvenF B ∧ κ≠0 ∧ oddPart(PhiPrime .. 2)=0 ∧ oddPart(PhiPrime .. 3)=0
-  --
-  -- Keep this as the *only* hole in the v4.x track.
+theorem xi_twoPrimeSine (s : Hyperlocal.OffSeed Xi) :
+    ∃ κ : ℝ, κ ≠ 0 ∧
+      κ * Real.sin (s.ρ.im * Real.log 2) = 0 ∧
+      κ * Real.sin (s.ρ.im * Real.log 3) = 0 := by
+  -- TODO: your ξ window recurrence / stencil extraction goes here.
   sorry
 
-end Hyperlocal.Targets
+/--
+Main target: OffSeedTACZeros2_3 for ξ.
+
+This is now *pure glue*: choose A = 0, B = 0, and reuse xi_twoPrimeSine.
+-/
+theorem xi_offSeedTACZeros2_3 : Hyperlocal.Transport.OffSeedTACZeros2_3 Xi := by
+  intro s
+  rcases xi_twoPrimeSine (s := s) with ⟨κ, hκ, h2, h3⟩
+
+  -- Evenness facts for the chosen A,B = 0
+  have hA0 : Hyperlocal.Transport.TAC.EvenF (fun _ : ℝ => (0 : ℝ)) := by
+    intro u; simp [Hyperlocal.Transport.TAC.EvenF]
+  have hB0 : Hyperlocal.Transport.TAC.EvenF (fun _ : ℝ => (0 : ℝ)) := by
+    intro u; simp [Hyperlocal.Transport.TAC.EvenF]
+
+  refine ⟨(fun _ : ℝ => (0 : ℝ)), (fun _ : ℝ => (0 : ℝ)), κ, hA0, hB0, hκ, ?_, ?_⟩
+
+  · -- p = 2
+    calc
+      oddPart
+          (Hyperlocal.Transport.TAC.PhiPrime
+            (fun _ : ℝ => (0 : ℝ)) (fun _ : ℝ => (0 : ℝ)) (fun _ : ℝ => κ) (2 : ℕ))
+          s.ρ.im
+          = PhiShape κ s.ρ.im (2 : ℕ) := by
+              simpa using
+                (Hyperlocal.Transport.TAC.oddPart_PhiPrime_constC
+                  (A := fun _ : ℝ => (0 : ℝ))
+                  (B := fun _ : ℝ => (0 : ℝ))
+                  (κ := κ) (p := (2 : ℕ))
+                  hA0 hB0 (t := s.ρ.im))
+      _ = 0 := by
+              simpa [PhiShape] using h2
+
+  · -- p = 3
+    calc
+      oddPart
+          (Hyperlocal.Transport.TAC.PhiPrime
+            (fun _ : ℝ => (0 : ℝ)) (fun _ : ℝ => (0 : ℝ)) (fun _ : ℝ => κ) (3 : ℕ))
+          s.ρ.im
+          = PhiShape κ s.ρ.im (3 : ℕ) := by
+              simpa using
+                (Hyperlocal.Transport.TAC.oddPart_PhiPrime_constC
+                  (A := fun _ : ℝ => (0 : ℝ))
+                  (B := fun _ : ℝ => (0 : ℝ))
+                  (κ := κ) (p := (3 : ℕ))
+                  hA0 hB0 (t := s.ρ.im))
+      _ = 0 := by
+              simpa [PhiShape] using h3
+
+end Targets
+end Hyperlocal
