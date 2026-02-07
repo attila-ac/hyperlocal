@@ -1,59 +1,50 @@
 /-
   Hyperlocal/Targets/OffSeedPhaseLockXiPayload.lean
 
-  Plan C++ endgame wrapper for the concrete target Xi := Hyperlocal.xi.
+  New Plan C++ endpoint:
 
-  IMPORTANT:
-  - All plumbing is now green and semantic-free.
-  - The *only* remaining ξ-semantic assumption lives in exactly one place:
-        Targets/XiPacket/XiLemmaC_Semantic_FromRecurrence.lean
+  We obtain the Stage-3 “phase lock” contract for ξ by:
+    1) using the single semantic bundle `XiLemmaC s`
+    2) building the definitional WindowPayload via `xiWindowPayload`
+    3) using the already-green `WindowPayloadFacts` pipeline
 
-  This file merely composes:
-    XiLemmaC_Semantic_fromRecurrence
-      -> xiWindowPayload_of_semantic
-      -> WindowPayload.toPrimeTrigPacket
-      -> PrimeTrigPacket.offSeedPhaseLock_of_packet
+  No κ closed-form file is imported here.
 -/
 
-import Hyperlocal.Targets.RiemannXi
-import Hyperlocal.Targets.XiPacket.XiLemmaC_Semantic_FromRecurrence
-import Hyperlocal.Targets.XiPacket.XiLemmaC_SemanticToWindowPayload
-import Hyperlocal.Targets.XiPacket.ToPrimeTrigPacket
 import Hyperlocal.Transport.OffSeedBridge
-import Hyperlocal.Transport.PrimeTrigPacket
+import Hyperlocal.Targets.RiemannXi
+import Hyperlocal.Targets.XiPacket.WindowPayloadFacts
+import Hyperlocal.Targets.XiPacket.XiWindowLemmaC
+import Hyperlocal.Targets.XiPacket.XiWindowLemmaC_FromRecurrence
 import Mathlib.Tactic
 
 set_option autoImplicit false
-
 noncomputable section
 
-namespace Hyperlocal.Targets.OffSeedPhaseLockXiPayload
+namespace Hyperlocal
+namespace Targets
+namespace OffSeedPhaseLockXiPayload
 
 open scoped Real
 
-/-- Notation: our concrete target Xi. -/
-abbrev Xi : ℂ → ℂ := Hyperlocal.xi
+open Hyperlocal.Transport
+open Hyperlocal.Targets.XiPacket
 
-/-- Payload constructor (now pure conversion from the single semantic cliff lemma). -/
+/-- Build the full `WindowPayload` for ξ from the single Lemma-C bundle. -/
 def xiWindowPayload_of_window (s : Hyperlocal.OffSeed Xi) :
-    Hyperlocal.Targets.XiPacket.WindowPayload
-      (Hyperlocal.Targets.XiPacket.σ s) (Hyperlocal.Targets.XiPacket.t s) := by
-  exact
-    Hyperlocal.Targets.XiPacket.xiWindowPayload_of_semantic (s := s)
-      (Hyperlocal.Targets.XiPacket.xiLemmaC_Semantic_fromRecurrence (s := s))
+    WindowPayload (σ s) (t s) :=
+  xiWindowPayload (s := s)
+    (hC := xiWindowLemmaC_fromRecurrence (s := s))
 
-/-- Prime trig packet extracted from the payload (pure conversion). -/
-def xiPrimeTrigPacket (s : Hyperlocal.OffSeed Xi) :
-    Hyperlocal.Transport.PrimeTrigPacket.Packet
-      (Hyperlocal.Targets.XiPacket.σ s) (Hyperlocal.Targets.XiPacket.t s) :=
-  (xiWindowPayload_of_window s).toPrimeTrigPacket
-
-/-- Off-seed phase-lock for Xi, derived from the trig packet. -/
+/--
+Main deliverable for the Stage-3 bridge:
+`OffSeedPhaseLock ξ` obtained purely from `WindowPayloadFacts`.
+-/
 theorem offSeedPhaseLock_Xi : Hyperlocal.Transport.OffSeedPhaseLock Xi := by
   intro s
-  -- Packet -> (∃κ≠0, sin(t log2)=0 ∧ sin(t log3)=0), with t = Im(s.ρ).
-  simpa [xiPrimeTrigPacket] using
-    Hyperlocal.Transport.PrimeTrigPacket.offSeedPhaseLock_of_packet
-      (xiPrimeTrigPacket s)
+  simpa [XiPacket.t, XiPacket.σ] using
+    (WindowPayload.exists_kappa_sinlog2_sinlog3 (X := xiWindowPayload_of_window (s := s)))
 
-end Hyperlocal.Targets.OffSeedPhaseLockXiPayload
+end OffSeedPhaseLockXiPayload
+end Targets
+end Hyperlocal

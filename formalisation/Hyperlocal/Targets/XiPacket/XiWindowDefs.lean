@@ -80,8 +80,11 @@ def w0  (s : Hyperlocal.OffSeed Xi) : Transport.Window 3 := xiTransportedJet s
 def basisW3 (j : Fin 3) : Transport.Window 3 :=
   fun i => if i = j then (1 : ℂ) else 0
 
-private def e1 : Fin 3 := ⟨1, by decide⟩
-private def e2 : Fin 3 := ⟨2, by decide⟩
+-- IMPORTANT: these must not be `private`, otherwise downstream simp cannot decide
+-- equalities like `(0 : Fin 3) = e2` when reducing `basisW3 e2`.
+abbrev e1 : Fin 3 := ⟨1, by decide⟩
+abbrev e2 : Fin 3 := ⟨2, by decide⟩
+
 
 /-- Cosine-direction window (definitional, nonzero). -/
 def wc  (s : Hyperlocal.OffSeed Xi) : Transport.Window 3 :=
