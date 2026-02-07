@@ -3,6 +3,12 @@
 
   Phase 4 (Plan C++):
   PURE construction (Type-valued): no ξ-semantic proofs.
+
+  Contents:
+  1) Generic constructor: build `WindowPayload σ t` from B/C facts about five windows.
+  2) Generic off-seed wrapper.
+  3) Xi-specialized constructor (Plan C++): B is definitional (`rfl`) for `wp2/wp3`,
+     so only Lemma-C facts are required as inputs.
 -/
 
 import Hyperlocal.AdAbsurdumSetup
@@ -87,6 +93,55 @@ def windowPayload_mk_of_BC_offSeed
   simpa using
     (windowPayload_mk_of_BC (σ := s.ρ.re) (t := s.ρ.im)
       W0 Wc Ws Wp2 Wp3 hW2 hW3 hEll2 hEll3 hKap)
+
+/-!
+## Xi-specialized Phase-4 constructor (Plan C++)
+
+For ξ, the five windows are *definitional* objects from `XiWindowDefs.lean`:
+
+  w0  wc  ws  wp2  wp3
+
+and `wp2/wp3` are definitional trig-split linear combos of `w0/wc/ws`.
+So the Lemma-B obligations `hw2/hw3` are discharged by `rfl`.
+Thus we only require Lemma-C facts (`hell2/hell3/hkappa`) as inputs.
+-/
+
+/-- Definitional trig-split at p=2 for the ξ windows from `XiWindowDefs`. -/
+@[simp] lemma xi_hW2 (s : Hyperlocal.OffSeed Xi) :
+    ∀ i : Fin 3,
+      (wp2 s) i = (w0 s) i
+        + ((aCoeff s.ρ.re s.ρ.im (2 : ℝ) : ℂ) * ((wc s) i))
+        + ((bCoeff s.ρ.re s.ρ.im (2 : ℝ) : ℂ) * ((ws s) i)) := by
+  intro i
+  rfl
+
+/-- Definitional trig-split at p=3 for the ξ windows from `XiWindowDefs`. -/
+@[simp] lemma xi_hW3 (s : Hyperlocal.OffSeed Xi) :
+    ∀ i : Fin 3,
+      (wp3 s) i = (w0 s) i
+        + ((aCoeff s.ρ.re s.ρ.im (3 : ℝ) : ℂ) * ((wc s) i))
+        + ((bCoeff s.ρ.re s.ρ.im (3 : ℝ) : ℂ) * ((ws s) i)) := by
+  intro i
+  rfl
+
+/--
+Plan C++ “tiny constructor” for ξ:
+
+Build `WindowPayload s.ρ.re s.ρ.im` from *only* Lemma C facts,
+because Lemma B is definitional (`rfl`) for `wp2/wp3`.
+-/
+def xiWindowPayload_of_C
+    (s : Hyperlocal.OffSeed Xi)
+    (hEll2 : Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0)
+    (hEll3 : Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0)
+    (hKap  : Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+    : WindowPayload s.ρ.re s.ρ.im := by
+  -- Instantiate the generic off-seed constructor with the definitional ξ-windows.
+  simpa using
+    (windowPayload_mk_of_BC_offSeed (H := Xi) s
+      (w0 s) (wc s) (ws s) (wp2 s) (wp3 s)
+      (xi_hW2 (s := s)) (xi_hW3 (s := s))
+      hEll2 hEll3 hKap)
 
 end XiPacket
 end Targets
