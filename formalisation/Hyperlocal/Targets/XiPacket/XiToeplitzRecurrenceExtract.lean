@@ -27,16 +27,15 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/--
-Semantic frontier (minimal):
+/-- Concrete (span) recurrence output frontier. -/
+axiom xiToeplitzConcreteOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+  XiToeplitzSpanOut s
 
-Replace this axiom by the actual theorem proved from the concrete ξ Toeplitz/recurrence
-statement in your ξ transport/Toeplitz bridge layer.
+/-- Derived endpoint: EllOut is a theorem from the concrete span output. -/
+theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    XiToeplitzEllOut s :=
+  XiToeplitzEllOut.of_spanOut (s := s) (xiToeplitzConcreteOut_fromRecurrence (s := s))
 
-This is intentionally the *downstream record* to avoid extra packaging layers.
--/
-axiom xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-  XiToeplitzEllOut s
 
 end XiPacket
 end Targets
