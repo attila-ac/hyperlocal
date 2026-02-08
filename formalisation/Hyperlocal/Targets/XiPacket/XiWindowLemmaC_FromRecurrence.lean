@@ -1,30 +1,35 @@
 /-
   Hyperlocal/Targets/XiPacket/XiWindowLemmaC_FromRecurrence.lean
 
-  Plan C++ frontier (shrunk further, split cleanly):
+  Plan C++ frontier (shrunk further, split cleaner):
 
-  We want `XiLemmaC s` but we do NOT want the recurrence gate to carry more semantics than needed.
+  We want to eliminate the “prime-phase-lock” axioms from the ξ-window pipeline.
 
-  New split:
-    • Recurrence extraction is responsible ONLY for the two window consequences:
-        ell(w0,wc,wp2)=0,  ell(w0,wc,wp3)=0
-    • Anchor nonvanishing is obtained separately via the existing lemma:
-        xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
+  Current state:
 
-  Then κ ≠ 0 is derived purely algebraically from the closed form theorem:
+  * Move-4 wants (hb2,hb3):
+      hb2 : bCoeff (σ s) (t s) 2 = 0
+      hb3 : bCoeff (σ s) (t s) 3 = 0
+
+  * We now PROVE (hb2,hb3) from the *actual Toeplitz/recurrence output*,
+    phrased canonically as the two window-level determinant vanishings:
+
+      ell(w0,wc,wp2)=0,  ell(w0,wc,wp3)=0
+
+    plus the already-separated anchor nonvanishing:
+
+      xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
+
+    and the closed form:
+
       XiLemmaC_kappa_closedForm :
         kappa(reVec3 w0, reVec3 wc, reVec3 ws) = (Xi (sc s)).re
 
-  Finally (JetPivot Move-4 interface): from RecOut we extract exactly:
-      hb2 : bCoeff (σ s) (t s) (2:ℝ) = 0
-      hb3 : bCoeff (σ s) (t s) (3:ℝ) = 0
-  using:
-      ell(..., wp_p) = bCoeff(...,p) * kappa(...)
-  and κ ≠ 0.
-
   Net effect:
-    The old axiom `xiWindowLemmaC_recOut_fromRecurrence` is now a theorem.
-    The only remaining semantic cliff is `xiWindowLemmaC_ell2ell3_fromRecurrence`.
+
+  * The old cliff `xiWindowLemmaC_hb2hb3_fromRecurrence` is now a THEOREM.
+  * The only remaining semantic cliff in this file is the Toeplitz/recurrence
+    extraction of the two ell-vanishings, packaged as `xiToeplitzEllOut_fromRecurrence`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowLemmaC
@@ -45,10 +50,89 @@ open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
 /--
-Smaller semantic output from “recurrence extraction”:
+Canonical “Toeplitz/recurrence extraction” output at the window level:
 
-* `hell2/hell3` are the *actual* recurrence-to-window consequences.
-* `hRe` is the explicit nonvanishing target at the critical-line anchor.
+it yields exactly the two `ell`-vanishings for `p=2,3`.
+This is the right place to later connect ξ-transport/Toeplitz infrastructure.
+-/
+structure XiToeplitzEllOut (s : Hyperlocal.OffSeed Xi) : Prop where
+  hell2 :
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0
+  hell3 :
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0
+
+/--
+THE (temporary) semantic cliff (now in the correct layer):
+
+Toeplitz/recurrence extraction yields the two window-level `ell`-vanishings.
+-/
+axiom xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+  XiToeplitzEllOut s
+
+/-- Convenience projections. -/
+theorem xiWindowLemmaC_hell2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
+  (xiToeplitzEllOut_fromRecurrence (s := s)).hell2
+
+theorem xiWindowLemmaC_hell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
+  (xiToeplitzEllOut_fromRecurrence (s := s)).hell3
+
+theorem xiWindowLemmaC_ell2ell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 ∧
+    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
+  ⟨xiWindowLemmaC_hell2_fromRecurrence (s := s),
+   xiWindowLemmaC_hell3_fromRecurrence (s := s)⟩
+
+/-- κ≠0 from the anchor nonvanishing plus the κ closed form. -/
+theorem xi_kappa_ne0_from_anchor (s : Hyperlocal.OffSeed Xi) :
+    Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
+  intro hk0
+  have hk :
+      Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s))
+        = (Xi (sc s)).re :=
+    XiLemmaC_kappa_closedForm (s := s)
+  have hXi0 : (Xi (sc s)).re = 0 := hk.symm.trans hk0
+  exact (xi_sc_re_ne_zero (s := s)) hXi0
+
+/--
+KEY SHRINK RESULT:
+
+`hb2/hb3` are now THEOREMS obtained by rewriting from the Toeplitz/recurrence
+`ell`-vanishings and using κ≠0 from the anchor.
+-/
+theorem xiWindowLemmaC_hb2hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧ bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
+  have hkappa :
+      Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 :=
+    xi_kappa_ne0_from_anchor (s := s)
+
+  have hb2 : bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
+    have h2 := xiWindowLemmaC_hell2_fromRecurrence (s := s)
+    rw [ell_wp2_eq_b_mul_kappa (s := s)] at h2
+    exact (mul_eq_zero.mp h2).resolve_right hkappa
+
+  have hb3 : bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
+    have h3 := xiWindowLemmaC_hell3_fromRecurrence (s := s)
+    rw [ell_wp3_eq_b_mul_kappa (s := s)] at h3
+    exact (mul_eq_zero.mp h3).resolve_right hkappa
+
+  exact ⟨hb2, hb3⟩
+
+/-- Move-4 outputs as direct projections. -/
+theorem xi_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    bCoeff (σ s) (t s) (2 : ℝ) = 0 :=
+  (xiWindowLemmaC_hb2hb3_fromRecurrence (s := s)).1
+
+theorem xi_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
+  (xiWindowLemmaC_hb2hb3_fromRecurrence (s := s)).2
+
+/--
+Smaller semantic output from “recurrence extraction” used by `XiLemmaC` plumbing:
+
+* `hell2/hell3` are the window-level `ell` vanishings (coming from Toeplitz/recurrence).
+* `hRe` is the explicit anchor nonvanishing.
 -/
 structure XiLemmaC_RecOut (s : Hyperlocal.OffSeed Xi) : Prop where
   hell2 :
@@ -71,101 +155,22 @@ theorem XiLemmaC_of_recOut (s : Hyperlocal.OffSeed Xi) (h : XiLemmaC_RecOut s) :
     hk.symm.trans hk0
   exact h.hRe hXi0
 
-/-!
-## Next Step (Concrete, Minimal): prove the recurrence extraction of the two `ell` vanishings.
-
-This is the only remaining semantic cliff in this file.
-Anchor nonvanishing is supplied separately by `xi_sc_re_ne_zero`.
--/
-
-/--
-THE (temporary) semantic cliff (minimal):
-
-recurrence extraction yields exactly the two window-level `ell` vanishings.
--/
-axiom xiWindowLemmaC_ell2ell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 ∧
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0
-
 /--
 RecOut extraction (theorem form):
 
-* `hell2/hell3` come from the recurrence-extraction lemma above.
-* `hRe` comes from the existing anchor nonvanishing lemma `xi_sc_re_ne_zero`.
+* `hell2/hell3` come from `xiToeplitzEllOut_fromRecurrence`.
+* `hRe` comes from `xi_sc_re_ne_zero`.
 -/
 theorem xiWindowLemmaC_recOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     XiLemmaC_RecOut s := by
   refine ⟨?_, ?_, ?_⟩
-  · exact (xiWindowLemmaC_ell2ell3_fromRecurrence (s := s)).1
-  · exact (xiWindowLemmaC_ell2ell3_fromRecurrence (s := s)).2
+  · exact xiWindowLemmaC_hell2_fromRecurrence (s := s)
+  · exact xiWindowLemmaC_hell3_fromRecurrence (s := s)
   · simpa using (xi_sc_re_ne_zero (s := s))
 
 /-- Backwards-compatible name: rebuild the full `XiLemmaC` from the smaller RecOut. -/
 theorem xiWindowLemmaC_fromRecurrence (s : Hyperlocal.OffSeed Xi) : XiLemmaC s := by
   exact XiLemmaC_of_recOut (s := s) (xiWindowLemmaC_recOut_fromRecurrence (s := s))
-
-/-!
-## JetPivot: extract `hb2/hb3` directly
-
-Move 4 wants the recurrence file to output exactly the two scalar equalities
-
-* `hb2 : bCoeff (σ s) (t s) 2 = 0`
-* `hb3 : bCoeff (σ s) (t s) 3 = 0`
-
-This is pure algebra from `RecOut`: use `ell(..., wp) = bCoeff * kappa` plus `kappa ≠ 0`.
-
-IMPORTANT: avoid `simp` on the `hell2/hell3` goals, because simp can unfold
-`wc/ws` into basis-window normal forms, breaking definitional matching.
-We use `rw` instead.
--/
-
-/-- Internal helper: κ≠0 from `RecOut` (via the closed form κ = Re(Xi(sc))). -/
-theorem xi_kappa_ne0_of_recOut (s : Hyperlocal.OffSeed Xi) (h : XiLemmaC_RecOut s) :
-    Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
-  intro hk0
-  have hk :
-      Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) = (Xi (sc s)).re :=
-    XiLemmaC_kappa_closedForm (s := s)
-  have hXi0 : (Xi (sc s)).re = 0 := hk.symm.trans hk0
-  exact h.hRe hXi0
-
-/-- The requested Move-4 output: `(hb2,hb3)` from recurrence (via `RecOut`). -/
-theorem xi_hb2hb3_of_recOut (s : Hyperlocal.OffSeed Xi) (h : XiLemmaC_RecOut s) :
-    bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧ bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-  have hkappa :
-      Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 :=
-    xi_kappa_ne0_of_recOut (s := s) h
-
-  have hb2 : bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-    have h2 := h.hell2
-    rw [ell_wp2_eq_b_mul_kappa (s := s)] at h2
-    exact (mul_eq_zero.mp h2).resolve_right hkappa
-
-  have hb3 : bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-    have h3 := h.hell3
-    rw [ell_wp3_eq_b_mul_kappa (s := s)] at h3
-    exact (mul_eq_zero.mp h3).resolve_right hkappa
-
-  exact ⟨hb2, hb3⟩
-
-/-- Final minimal lemma (what Move 4 consumes): `hb2`. -/
-theorem xi_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (2 : ℝ) = 0 :=
-  (xi_hb2hb3_of_recOut (s := s) (xiWindowLemmaC_recOut_fromRecurrence (s := s))).1
-
-/-- Final minimal lemma (what Move 4 consumes): `hb3`. -/
-theorem xi_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
-  (xi_hb2hb3_of_recOut (s := s) (xiWindowLemmaC_recOut_fromRecurrence (s := s))).2
-
-theorem xiWindowLemmaC_hell2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
-  (xiWindowLemmaC_ell2ell3_fromRecurrence (s := s)).1
-
-theorem xiWindowLemmaC_hell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
-  (xiWindowLemmaC_ell2ell3_fromRecurrence (s := s)).2
-
 
 end XiPacket
 end Targets
