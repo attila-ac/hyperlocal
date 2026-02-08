@@ -26,6 +26,7 @@
         kappa(reVec3 w0, reVec3 wc, reVec3 ws) = (Xi (sc s)).re
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
 import Hyperlocal.Targets.XiPacket.XiWindowLemmaC
 import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Hyperlocal.Targets.XiPacket.XiWindowAnchorNonvanishing

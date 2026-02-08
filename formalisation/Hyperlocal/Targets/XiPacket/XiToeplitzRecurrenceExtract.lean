@@ -1,23 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceExtract.lean
 
-  ξ-specific Toeplitz/recurrence extraction frontier.
+  ξ-specific Toeplitz/recurrence extraction frontier (MINIMAL two-scalar form).
 
-  This file isolates the *single* remaining ξ-semantic statement needed by the
-  Plan C++ window-level pipeline.
-
-  From the concrete ξ Toeplitz/recurrence extraction, we need *exactly* the two
-  scalar determinant constraints:
-
+  Plan C++ requirement:
     • ell (Re w0) (Re wc) (Re wp2) = 0
     • ell (Re w0) (Re wc) (Re wp3) = 0
 
-  Once these are available, Move--2/3/4 are completely algebraic.
+  We package exactly these two scalars as `XiToeplitzEllOut s`.
 -/
 
 import Hyperlocal.Transport.PrimeSineRescue
 import Hyperlocal.Targets.XiPacket.Vectorize
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -31,19 +27,16 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- Concrete ξ Toeplitz/recurrence extraction output: exactly the two `ell=0` constraints. -/
-structure XiToeplitzRecExtractOut (s : Hyperlocal.OffSeed Xi) : Prop where
-  hell2 : ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0
-  hell3 : ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0
-
 /--
-Semantic frontier:
+Semantic frontier (minimal):
 
-Replace this axiom by the actual theorem proved from the concrete ξ Toeplitz/recurrence extraction
-statement in your ξ bridge layer (whatever final shape you choose there).
+Replace this axiom by the actual theorem proved from the concrete ξ Toeplitz/recurrence
+statement in your ξ transport/Toeplitz bridge layer.
+
+This is intentionally the *downstream record* to avoid extra packaging layers.
 -/
-axiom xiToeplitzRecExtractOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-  XiToeplitzRecExtractOut s
+axiom xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+  XiToeplitzEllOut s
 
 end XiPacket
 end Targets

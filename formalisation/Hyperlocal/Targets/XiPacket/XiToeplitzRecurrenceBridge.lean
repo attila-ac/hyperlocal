@@ -1,14 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceBridge.lean
 
-  This file is intentionally axiom-free:
-  the single ξ-semantic statement lives in `XiToeplitzRecurrenceExtract.lean`,
-  and here we only package it into the downstream `XiToeplitzEllOut` record.
+  Compatibility shim.
+
+  Option A places the unique Toeplitz/recurrence frontier in:
+    `XiToeplitzRecurrenceExtract.lean` as
+      `xiToeplitzEllOut_fromRecurrence : XiToeplitzEllOut s`.
+
+  Some downstream files may still import this Bridge path.
+  This file therefore contains *no* redeclarations; it only re-exports the
+  Extract module.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -17,13 +21,7 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open scoped Real
-open Hyperlocal.Transport
-
-/-- Convenience wrapper: convert the concrete extraction output into the `EllOut` record. -/
-theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) : XiToeplitzEllOut s := by
-  rcases xiToeplitzRecExtractOut_fromRecurrence s with ⟨h2, h3⟩
-  exact ⟨h2, h3⟩
+-- Intentionally empty: do NOT redeclare `xiToeplitzEllOut_fromRecurrence` here.
 
 end XiPacket
 end Targets
