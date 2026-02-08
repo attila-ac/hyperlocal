@@ -1,16 +1,14 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceBridge.lean
 
-  Plan C++: isolate the FINAL ξ-specific Toeplitz/recurrence semantic cliff
-  into a *dedicated* bridge file.
-
-  “Best of both worlds”:
-  * the axiom is stated in the weaker / structural form (SpanOut),
-  * downstream keeps consuming the stronger / convenient form (EllOut),
-    obtained as a theorem from SpanOut via multilinearity.
+  This file is intentionally axiom-free:
+  the single ξ-semantic statement lives in `XiToeplitzRecurrenceExtract.lean`,
+  and here we only package it into the downstream `XiToeplitzEllOut` record.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -22,19 +20,10 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport
 
-/-
-  FINAL SEMANTIC CLIFF (and only one in this layer):
-
-  Later: prove this from the concrete ξ Toeplitz/recurrence extraction lemma.
--/
-axiom xiToeplitzSpanOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    XiToeplitzSpanOut s
-
-/-- Downstream-facing theorem: the ℓ-vanishings needed by Lemma-C plumbing. -/
-theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    XiToeplitzEllOut s :=
-  XiToeplitzEllOut.of_spanOut (s := s)
-    (xiToeplitzSpanOut_fromRecurrence (s := s))
+/-- Convenience wrapper: convert the concrete extraction output into the `EllOut` record. -/
+theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) : XiToeplitzEllOut s := by
+  rcases xiToeplitzRecExtractOut_fromRecurrence s with ⟨h2, h3⟩
+  exact ⟨h2, h3⟩
 
 end XiPacket
 end Targets
