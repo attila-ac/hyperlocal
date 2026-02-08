@@ -11,31 +11,26 @@
       hb2 : bCoeff (σ s) (t s) 2 = 0
       hb3 : bCoeff (σ s) (t s) 3 = 0
 
-  * We now PROVE (hb2,hb3) from the *actual Toeplitz/recurrence output*,
-    phrased canonically as the two window-level determinant vanishings:
+  * The only remaining Toeplitz/recurrence semantic cliff has been moved out of
+    this file into `XiToeplitzRecurrenceBridge.lean` as:
+        xiToeplitzSpanOut_fromRecurrence
 
-      ell(w0,wc,wp2)=0,  ell(w0,wc,wp3)=0
+    This file only consumes the Toeplitz extraction output (ℓ vanishings),
+    plus the anchor nonvanishing, and derives everything else algebraically.
 
-    plus the already-separated anchor nonvanishing:
-
+  Anchor nonvanishing remains separate via:
       xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
 
-    and the closed form:
-
+  κ ≠ 0 is derived purely algebraically from the closed form theorem:
       XiLemmaC_kappa_closedForm :
         kappa(reVec3 w0, reVec3 wc, reVec3 ws) = (Xi (sc s)).re
-
-  Net effect:
-
-  * The old cliff `xiWindowLemmaC_hb2hb3_fromRecurrence` is now a THEOREM.
-  * The only remaining semantic cliff in this file is the Toeplitz/recurrence
-    extraction of the two ell-vanishings, packaged as `xiToeplitzEllOut_fromRecurrence`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowLemmaC
 import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Hyperlocal.Targets.XiPacket.XiWindowAnchorNonvanishing
 import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappa
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceBridge
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -49,27 +44,7 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/--
-Canonical “Toeplitz/recurrence extraction” output at the window level:
-
-it yields exactly the two `ell`-vanishings for `p=2,3`.
-This is the right place to later connect ξ-transport/Toeplitz infrastructure.
--/
-structure XiToeplitzEllOut (s : Hyperlocal.OffSeed Xi) : Prop where
-  hell2 :
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0
-  hell3 :
-    Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0
-
-/--
-THE (temporary) semantic cliff (now in the correct layer):
-
-Toeplitz/recurrence extraction yields the two window-level `ell`-vanishings.
--/
-axiom xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-  XiToeplitzEllOut s
-
-/-- Convenience projections. -/
+/-- Convenience projections: the two `ell` vanishings from Toeplitz extraction. -/
 theorem xiWindowLemmaC_hell2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
   (xiToeplitzEllOut_fromRecurrence (s := s)).hell2
@@ -98,8 +73,8 @@ theorem xi_kappa_ne0_from_anchor (s : Hyperlocal.OffSeed Xi) :
 /--
 KEY SHRINK RESULT:
 
-`hb2/hb3` are now THEOREMS obtained by rewriting from the Toeplitz/recurrence
-`ell`-vanishings and using κ≠0 from the anchor.
+`hb2/hb3` are theorems obtained by rewriting from the Toeplitz-extracted `ell`-vanishings
+and using κ≠0 from the anchor.
 -/
 theorem xiWindowLemmaC_hb2hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧ bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
@@ -131,7 +106,7 @@ theorem xi_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
 /--
 Smaller semantic output from “recurrence extraction” used by `XiLemmaC` plumbing:
 
-* `hell2/hell3` are the window-level `ell` vanishings (coming from Toeplitz/recurrence).
+* `hell2/hell3` are the window-level `ell` vanishings (coming from Toeplitz extraction).
 * `hRe` is the explicit anchor nonvanishing.
 -/
 structure XiLemmaC_RecOut (s : Hyperlocal.OffSeed Xi) : Prop where
@@ -158,7 +133,7 @@ theorem XiLemmaC_of_recOut (s : Hyperlocal.OffSeed Xi) (h : XiLemmaC_RecOut s) :
 /--
 RecOut extraction (theorem form):
 
-* `hell2/hell3` come from `xiToeplitzEllOut_fromRecurrence`.
+* `hell2/hell3` come from Toeplitz extraction (`xiToeplitzEllOut_fromRecurrence`).
 * `hRe` comes from `xi_sc_re_ne_zero`.
 -/
 theorem xiWindowLemmaC_recOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
