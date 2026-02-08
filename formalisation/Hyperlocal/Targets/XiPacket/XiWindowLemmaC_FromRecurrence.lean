@@ -3,7 +3,7 @@
 
   Plan C++ frontier (shrunk further, split cleaner):
 
-  We want to eliminate the “prime-phase-lock” axioms from the ξ-window pipeline.
+  We want to eliminate the “prime-phase-lock” assumptions from the ξ-window pipeline.
 
   Current state:
 
