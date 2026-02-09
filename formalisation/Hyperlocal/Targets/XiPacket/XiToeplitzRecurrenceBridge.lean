@@ -1,18 +1,11 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceBridge.lean
 
-  Compatibility shim.
-
-  Option A places the unique Toeplitz/recurrence frontier in:
-    `XiToeplitzRecurrenceExtract.lean` as
-      `xiToeplitzEllOut_fromRecurrence : XiToeplitzEllOut s`.
-
-  Some downstream files may still import this Bridge path.
-  This file therefore contains *no* redeclarations; it only re-exports the
-  Extract module.
+  Public endpoints live here (and only here).
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceSemantics
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -21,7 +14,18 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
--- Intentionally empty: do NOT redeclare `xiToeplitzEllOut_fromRecurrence` here.
+open scoped Real
+open Hyperlocal.Transport
+
+/-- Public endpoint: SpanOut from the kernel. -/
+theorem xiToeplitzSpanOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    XiToeplitzSpanOut s :=
+  (xiToeplitzKernelOut_fromRecurrence (s := s)).toSpanOut
+
+/-- Public endpoint: EllOut from the kernel (via SpanOut ⇒ EllOut). -/
+theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    XiToeplitzEllOut s :=
+  XiToeplitzEllOut_of_kernel (s := s) (xiToeplitzKernelOut_fromRecurrence (s := s))
 
 end XiPacket
 end Targets
