@@ -4,6 +4,18 @@ This repository contains the manuscript and a one-page summary of a proof of the
 
 ## Versioning Information
 
+**Version 4.1 (Latest).**  
+This update is a notation- and architecture-alignment pass motivated by the Lean formalisation protocol, with the goal of making the Stage-3 “coupling finisher” mechanically consistent end-to-end.
+
+First, the arithmetic non-vanishing input is sharpened to a finite two-prime witness: in the sine normal form, the Symmetry–Entirety Gap is certified using only the primes \(p\in\{2,3\}\), removing any residual “generic prime” wording at the coupling point.
+
+Second, Stage 3 is reformulated as a single canonical coupled system in central variables: the stacked operator \(\mathbf{B}_{\mathrm{cpl}}(\sigma,t)\) and load vector \(\mathbf{y}_{\mathrm{cpl}}(\rho')\) are defined once (via the coupled system \(\mathbf{B}_{\mathrm{cpl}}(\sigma,t)\Gamma=\mathbf{y}_{\mathrm{cpl}}(\rho')\)) and referenced thereafter, eliminating duplicated or swapped block displays and removing inconsistent secondary “gap” notations.
+
+Third, the proof obligations are now explicitly localized into a small number of sharply isolated semantic inputs, with the remaining steps reduced to window-level linear algebra and definitional transport, matching an architecture intended to be Lean-verifiable.
+
+Further refinements are expected as the formalisation and external scrutiny continue.
+
+
 **Version 4.0 (Latest).**
 This update incorporates several structural corrections and clarifications, informed in part by detailed informal feedback from Professor Peter Varju.
 
