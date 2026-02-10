@@ -1,11 +1,15 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceBridge.lean
 
-  Public endpoints live here (and only here).
+  Bridge glue (kept lightweight).
+
+  NOTE:
+  `xiToeplitzEllOut_fromRecurrence` is now the semantic frontier axiom
+  provided by `XiToeplitzRecurrenceExtract.lean`. We do NOT redefine it here.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceSemantics
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -14,18 +18,10 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open scoped Real
-open Hyperlocal.Transport
-
-/-- Public endpoint: SpanOut from the kernel. -/
+/-- Public endpoint: SpanOut from the kernel (semantics layer). -/
 theorem xiToeplitzSpanOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    XiToeplitzSpanOut s :=
-  (xiToeplitzKernelOut_fromRecurrence (s := s)).toSpanOut
-
-/-- Public endpoint: EllOut from the kernel (via SpanOut ⇒ EllOut). -/
-theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    XiToeplitzEllOut s :=
-  XiToeplitzEllOut_of_kernel (s := s) (xiToeplitzKernelOut_fromRecurrence (s := s))
+    XiToeplitzSpanOut s := by
+  exact (xiToeplitzKernelOut_fromRecurrence (s := s)).toSpanOut
 
 end XiPacket
 end Targets
