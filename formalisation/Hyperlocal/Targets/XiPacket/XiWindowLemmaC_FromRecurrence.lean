@@ -26,6 +26,7 @@
         kappa(reVec3 w0, reVec3 wc, reVec3 ws) = (Xi (sc s)).re
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcrete
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
 import Hyperlocal.Targets.XiPacket.XiWindowLemmaC
 import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
@@ -48,11 +49,12 @@ open Hyperlocal.Transport.PrimeTrigPacket
 /-- Convenience projections: the two `ell` vanishings from Toeplitz extraction. -/
 theorem xiWindowLemmaC_hell2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
-  (xiToeplitzEllOut_fromRecurrence (s := s)).hell2
+  (xiToeplitzEllOut_fromRecurrenceC (s := s)).hell2
 
 theorem xiWindowLemmaC_hell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
-  (xiToeplitzEllOut_fromRecurrence (s := s)).hell3
+  (xiToeplitzEllOut_fromRecurrenceC (s := s)).hell3
+
 
 theorem xiWindowLemmaC_ell2ell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 ∧

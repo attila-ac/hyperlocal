@@ -1,15 +1,12 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceExtract.lean
 
-  ξ-specific Toeplitz/recurrence extraction frontier.
+  Toeplitz/recurrence extraction layer (axiom-free).
 
-  Task 1 (Toeplitz extraction):
-  Derive `XiToeplitzEllOut s` from a finite-window (Window 3) “row-stencil” recurrence
-  hypothesis, using a pure linear-algebra elimination lemma (adjugate argument).
-
-  NOTE (your line-89 “expected token”):
-  In practice this is almost always triggered by a bad/unrecognized unicode token
-  (most commonly `⬝`). This file uses plain `*` for matrix multiplication everywhere.
+  Contents:
+  * `toeplitzRow3`
+  * `XiMinimalModelRecurrenceHyp`  (the “3-point stencil” contract)
+  * theorem: `xiToeplitzEllOut_of_minRecurrence`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
@@ -50,13 +47,6 @@ structure XiMinimalModelRecurrenceHyp (s : Hyperlocal.OffSeed Xi) : Prop where
       toeplitzRow3 c3 (reVec3 (w0 s)) ∧
       toeplitzRow3 c3 (reVec3 (wc s)) ∧
       toeplitzRow3 c3 (reVec3 (wp3 s))
-
-/--
-Semantic input (for now): ξ satisfies the minimal-model recurrence hypothesis.
-This is the isolated “recurrence object” frontier; EllOut is derived from it.
--/
-axiom xiMinimalModelRecurrenceHyp (s : Hyperlocal.OffSeed Xi) :
-  XiMinimalModelRecurrenceHyp s
 
 /-!
 ### Pure linear algebra: kernel vector ⇒ det = 0 (adjugate argument)
@@ -121,17 +111,15 @@ private lemma ell_eq_zero_of_toeplitzRow3
   have hker : M.transpose.mulVec c = 0 := by
     funext j
     fin_cases j
-    · -- j = 0 : column u0
-      -- (Mᵀ.mulVec c) 0 = ∑ i, M i 0 * c i = ∑ i, u0 i * c i
-      -- commute to match toeplitzRow3: ∑ i, c i * u0 i = 0
+    ·
       have : (∑ i : Fin 3, u0 i * c i) = 0 := by
         simpa [toeplitzRow3, mul_comm] using h0
       simpa [M, Transport.colsMat, Transport.baseMat, Matrix.mulVec, Matrix.transpose] using this
-    · -- j = 1 : column uc
+    ·
       have : (∑ i : Fin 3, uc i * c i) = 0 := by
         simpa [toeplitzRow3, mul_comm] using h1
       simpa [M, Transport.colsMat, Transport.baseMat, Matrix.mulVec, Matrix.transpose] using this
-    · -- j = 2 : column up
+    ·
       have : (∑ i : Fin 3, up i * c i) = 0 := by
         simpa [toeplitzRow3, mul_comm] using h2
       simpa [M, Transport.colsMat, Transport.baseMat, Matrix.mulVec, Matrix.transpose] using this
@@ -144,7 +132,11 @@ private lemma ell_eq_zero_of_toeplitzRow3
 
   simpa [Transport.ell, M] using hdet
 
-/-- Recurrence hypothesis ⇒ the two determinant “ell-out” constraints. -/
+/--
+Extraction theorem (axiom-free):
+
+Minimal-model recurrence hypothesis ⇒ the two determinant “ell-out” constraints.
+-/
 theorem xiToeplitzEllOut_of_minRecurrence
     (s : Hyperlocal.OffSeed Xi)
     (h : XiMinimalModelRecurrenceHyp s) :
@@ -162,17 +154,6 @@ theorem xiToeplitzEllOut_of_minRecurrence
       (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s))
       hc3
       hc3_w0 hc3_wc hc3_wp3
-
-/--
-Public endpoint (same name/type as before), now a theorem:
-
-  minimal-model recurrence hypothesis
-  ⇒ finite Toeplitz window constraint
-  ⇒ XiToeplitzEllOut(s).
--/
-theorem xiToeplitzEllOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    XiToeplitzEllOut s := by
-  exact xiToeplitzEllOut_of_minRecurrence (s := s) (xiMinimalModelRecurrenceHyp (s := s))
 
 end XiPacket
 end Targets

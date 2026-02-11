@@ -1,28 +1,32 @@
-import Mathlib.Tactic
-import Hyperlocal.Transport.PrimeTrigPacket
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
+/-
+Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceInject.lean
+
+Replace axioms by theorems (now safe: Identity no longer imports Semantics/Inject).
+-/
+
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceIdentity
 
 set_option autoImplicit false
 noncomputable section
 
-namespace Hyperlocal.Targets.XiPacket
+namespace Hyperlocal
+namespace Targets
+namespace XiPacket
 
-open scoped Real
-open Hyperlocal.Transport.PrimeTrigPacket
+open scoped Real BigOperators
+open Hyperlocal.Transport
+open Hyperlocal.Transport.PrimeTrigPacket  -- <-- brings `bCoeff` into scope
 
-/-- ξ Toeplitz/recurrence injection at p=2 (now theorematic). -/
 theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-  simpa using
-    (Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_p
-      (s := s) (p := (2 : ℝ)) (hp := Or.inl rfl))
+  have hp : (2 : ℝ) = (2 : ℝ) ∨ (2 : ℝ) = (3 : ℝ) := Or.inl rfl
+  simpa using (xiToeplitzRecurrenceIdentity_p (s := s) (p := (2 : ℝ)) hp)
 
-/-- ξ Toeplitz/recurrence injection at p=3 (now theorematic). -/
 theorem xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-  simpa using
-    (Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_p
-      (s := s) (p := (3 : ℝ)) (hp := Or.inr rfl))
+  have hp : (3 : ℝ) = (2 : ℝ) ∨ (3 : ℝ) = (3 : ℝ) := Or.inr rfl
+  simpa using (xiToeplitzRecurrenceIdentity_p (s := s) (p := (3 : ℝ)) hp)
 
-end Hyperlocal.Targets.XiPacket
+end XiPacket
+end Targets
+end Hyperlocal
