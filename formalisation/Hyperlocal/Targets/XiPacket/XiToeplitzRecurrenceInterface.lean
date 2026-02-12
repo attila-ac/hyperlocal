@@ -5,6 +5,7 @@ import Hyperlocal.Targets.XiPacket.XiWindowDefs
 -- Option B pieces already exist here:
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceBridge
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcrete
 
 -- Option A pieces already exist here (bCoeff-level facts via recurrence identity):
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceSemantics
@@ -50,9 +51,8 @@ Option B (Toeplitz/window span-out)
 -/
 /-
 NOTE:
-`XiToeplitzSpanOut`, `xiToeplitzSpanOut_fromRecurrence`,
-and `xiToeplitzEllOut_fromRecurrence` are ALREADY declared in the imported
-`XiToeplitzRecurrenceOut/Bridge`. Do not redeclare them here.
+We intentionally avoid redeclaring the global name `xiToeplitzEllOut_fromRecurrence`.
+Use the collision-free endpoint `xiToeplitzEllOut_fromRecurrenceC`.
 -/
 
 /-- Convenience alias with a *new* name (optional). -/
@@ -61,9 +61,9 @@ abbrev XiToeplitzSpanOutB := XiToeplitzSpanOut
 /-- Convenience alias with a *new* name (optional). -/
 abbrev xiToeplitzSpanOut_fromRecurrenceB := xiToeplitzSpanOut_fromRecurrence
 
-/-- Convenience: recurrence ⇒ ell-out (theorem already exists; this is just a new name). -/
+/-- Convenience: recurrence ⇒ ell-out (use the collision-free endpoint). -/
 theorem xiToeplitzEllOut_fromRecurrenceB (s : Hyperlocal.OffSeed Xi) :
     XiToeplitzEllOut s := by
-  exact xiToeplitzEllOut_fromRecurrence (s := s)
+  exact xiToeplitzEllOut_fromRecurrenceC (s := s)
 
 end Hyperlocal.Targets.XiPacket
