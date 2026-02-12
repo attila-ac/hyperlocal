@@ -1,5 +1,22 @@
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
+/-
+  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotient.lean
+
+  Route B (jet-quotient) semantic facade.
+
+  Current status:
+  * The EllOut statements are now theorem-level, sourced from the operator layer
+    (see `XiToeplitzRecurrenceJetQuotientEllFromOperator.lean`).
+  * From EllOut we derive the Window-3 Toeplitz row stencils via
+    `exists_toeplitzRow3_of_ell_eq_zero`.
+
+  Remaining semantic cliff (for later): the operator layer must eventually
+  discharge its two axioms `xiJetQuotStencil_fromOperator2/3`.
+
+  This file intentionally contains no further ξ-specific constructions.
+-/
+
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllToStencil
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientEllFromOperator
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -10,15 +27,17 @@ namespace Hyperlocal.Targets.XiPacket
 open scoped BigOperators Real
 open Hyperlocal.Transport
 
-/-- Route-B semantic target (temporary axiom; later theorem from the operator): p=2 EllOut. -/
-axiom xiJetQuotEll_spec2 (s : Hyperlocal.OffSeed Xi) :
-  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0
+/-- Route-B semantic target (theorem level, sourced from the operator layer): p=2 EllOut. -/
+theorem xiJetQuotEll_spec2 (s : Hyperlocal.OffSeed Xi) :
+  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
+  xiJetQuotEll_spec2_theorem s
 
-/-- Route-B semantic target (temporary axiom; later theorem from the operator): p=3 EllOut. -/
-axiom xiJetQuotEll_spec3 (s : Hyperlocal.OffSeed Xi) :
-  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0
+/-- Route-B semantic target (theorem level, sourced from the operator layer): p=3 EllOut. -/
+theorem xiJetQuotEll_spec3 (s : Hyperlocal.OffSeed Xi) :
+  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
+  xiJetQuotEll_spec3_theorem s
 
-/-- Derived (theorem-level) stencil spec for p=2 from EllOut via the new reverse bridge. -/
+/-- Derived (theorem-level) stencil spec for p=2 from EllOut. -/
 theorem xiJetQuotStencil_spec2 (s : Hyperlocal.OffSeed Xi) :
   ∃ c2 : Fin 3 → ℝ,
     c2 ≠ 0 ∧
@@ -32,7 +51,7 @@ theorem xiJetQuotStencil_spec2 (s : Hyperlocal.OffSeed Xi) :
       (v  := reVec3 (wp2 s))
       (hell := xiJetQuotEll_spec2 s)
 
-/-- Derived (theorem-level) stencil spec for p=3 from EllOut via the new reverse bridge. -/
+/-- Derived (theorem-level) stencil spec for p=3 from EllOut. -/
 theorem xiJetQuotStencil_spec3 (s : Hyperlocal.OffSeed Xi) :
   ∃ c3 : Fin 3 → ℝ,
     c3 ≠ 0 ∧
@@ -45,7 +64,5 @@ theorem xiJetQuotStencil_spec3 (s : Hyperlocal.OffSeed Xi) :
       (uc := reVec3 (wc s))
       (v  := reVec3 (wp3 s))
       (hell := xiJetQuotEll_spec3 s)
-
--- the rest of the file can stay as-is: xiJetQuotRecOut now consumes theorem-level stencils.
 
 end Hyperlocal.Targets.XiPacket

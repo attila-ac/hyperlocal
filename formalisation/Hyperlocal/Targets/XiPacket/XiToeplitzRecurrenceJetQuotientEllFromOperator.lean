@@ -1,13 +1,17 @@
 /-
   formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientEllFromOperator.lean
 
-  FIX: your environment is not seeing `ell_eq_zero_of_toeplitzRow3` (even when imported),
-  so make this file self-contained by using a *private local* lemma with a different name.
+  Narrow semantic cliff:
+    (existence of a real Window-3 Toeplitz annihilator in operator form)
+      ⇒ row stencils on `reVec3`
+      ⇒ `ell = 0`.
 
-  This unblocks commits while keeping `XiToeplitzRecurrenceStencilToEll.lean` intact.
+  After this commit, the only remaining semantics are the two axioms
+  `xiJetQuotToeplitzL_fromOperator2/3`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperator
 import Hyperlocal.MinimalModelNonvanishing
 import Hyperlocal.Cancellation.Recurrence
@@ -65,21 +69,52 @@ private theorem ell_eq_zero_of_toeplitzRow3_local
     simpa [Matrix.det_transpose] using hdetT
   simpa [Transport.ell, M] using hdet
 
-/-- (B1 semantic subgoal) operator/recurrence extraction yields a stencil for p=2. -/
-axiom xiJetQuotStencil_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
+/-
+  NEW (sharper) semantic cliff:
+  the operator layer produces a *real* Toeplitz annihilator in `toeplitzL` form.
+-/
+
+/-- (B1 semantic cliff, sharpened) p=2: Toeplitz operator annihilates the three windows. -/
+axiom xiJetQuotToeplitzL_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c2 : Fin 3 → ℝ,
+    c2 ≠ 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (w0 s) = 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (wc s) = 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (wp2 s) = 0
+
+/-- (B1 semantic cliff, sharpened) p=3: Toeplitz operator annihilates the three windows. -/
+axiom xiJetQuotToeplitzL_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c3 : Fin 3 → ℝ,
+    c3 ≠ 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (w0 s) = 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (wc s) = 0 ∧
+    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (wp3 s) = 0
+
+/-- Derived stencil package (now theorem, not axiom) for p=2. -/
+theorem xiJetQuotStencil_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
   ∃ c2 : Fin 3 → ℝ,
     c2 ≠ 0 ∧
     toeplitzRow3 c2 (reVec3 (w0 s)) ∧
     toeplitzRow3 c2 (reVec3 (wc s)) ∧
-    toeplitzRow3 c2 (reVec3 (wp2 s))
+    toeplitzRow3 c2 (reVec3 (wp2 s)) := by
+  rcases xiJetQuotToeplitzL_fromOperator2 s with ⟨c2, hc2, h0, hc, hp⟩
+  refine ⟨c2, hc2, ?_, ?_, ?_⟩
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (w0 s) h0
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (wc s) hc
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (wp2 s) hp
 
-/-- (B1 semantic subgoal) operator/recurrence extraction yields a stencil for p=3. -/
-axiom xiJetQuotStencil_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
+/-- Derived stencil package (now theorem, not axiom) for p=3. -/
+theorem xiJetQuotStencil_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
   ∃ c3 : Fin 3 → ℝ,
     c3 ≠ 0 ∧
     toeplitzRow3 c3 (reVec3 (w0 s)) ∧
     toeplitzRow3 c3 (reVec3 (wc s)) ∧
-    toeplitzRow3 c3 (reVec3 (wp3 s))
+    toeplitzRow3 c3 (reVec3 (wp3 s)) := by
+  rcases xiJetQuotToeplitzL_fromOperator3 s with ⟨c3, hc3, h0, hc, hp⟩
+  refine ⟨c3, hc3, ?_, ?_, ?_⟩
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (w0 s) h0
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (wc s) hc
+  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (wp3 s) hp
 
 theorem xiJetQuotEll_spec2_theorem (s : Hyperlocal.OffSeed Xi) :
   Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 := by
