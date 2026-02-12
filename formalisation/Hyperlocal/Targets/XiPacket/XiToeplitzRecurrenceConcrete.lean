@@ -17,6 +17,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotient
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceRowMap3
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -45,50 +46,66 @@ structure XiRecRowPkg (s : Hyperlocal.OffSeed Xi) : Type where
   hwc_3 : L3 (reVec3 (wc s)) = 0
   hwp3  : L3 (reVec3 (wp3 s)) = 0
 
-/--
-Concrete package extracted from the (current) jet-quotient recurrence output.
-
-Semantic cliff (next task): implement `xiJetQuotRecOut` from the actual
-jet-quotient recurrence operator.
-
-Once `xiJetQuotRecOut` is theorem-level, this package becomes theorem-level
-without changing any downstream consumers.
--/
 noncomputable def xiRecRowPkg (s : Hyperlocal.OffSeed Xi) : XiRecRowPkg s := by
   classical
+
+  -- existence proofs (Prop)
+  have h2 :
+      ∃ c2 : Fin 3 → ℝ,
+        c2 ≠ 0 ∧
+        toeplitzRow3 c2 (reVec3 (w0 s)) ∧
+        toeplitzRow3 c2 (reVec3 (wc s)) ∧
+        toeplitzRow3 c2 (reVec3 (wp2 s)) :=
+    xiJetQuotStencil_spec2 s
+
+  have h3 :
+      ∃ c3 : Fin 3 → ℝ,
+        c3 ≠ 0 ∧
+        toeplitzRow3 c3 (reVec3 (w0 s)) ∧
+        toeplitzRow3 c3 (reVec3 (wc s)) ∧
+        toeplitzRow3 c3 (reVec3 (wp3 s)) :=
+    xiJetQuotStencil_spec3 s
+
+  -- choose witnesses (now in data, not Prop-elim)
+  let c2 : Fin 3 → ℝ := Classical.choose h2
+  have hc2 :
+      c2 ≠ 0 ∧
+      toeplitzRow3 c2 (reVec3 (w0 s)) ∧
+      toeplitzRow3 c2 (reVec3 (wc s)) ∧
+      toeplitzRow3 c2 (reVec3 (wp2 s)) :=
+    Classical.choose_spec h2
+
+  let c3 : Fin 3 → ℝ := Classical.choose h3
+  have hc3 :
+      c3 ≠ 0 ∧
+      toeplitzRow3 c3 (reVec3 (w0 s)) ∧
+      toeplitzRow3 c3 (reVec3 (wc s)) ∧
+      toeplitzRow3 c3 (reVec3 (wp3 s)) :=
+    Classical.choose_spec h3
+
+  -- unpack the conjunctions (Prop → Prop, allowed)
+  have hc2_ne : c2 ≠ 0 := hc2.1
+  have hw0_2  : toeplitzRow3 c2 (reVec3 (w0 s)) := hc2.2.1
+  have hwc_2  : toeplitzRow3 c2 (reVec3 (wc s)) := hc2.2.2.1
+  have hwp2   : toeplitzRow3 c2 (reVec3 (wp2 s)) := hc2.2.2.2
+
+  have hc3_ne : c3 ≠ 0 := hc3.1
+  have hw0_3  : toeplitzRow3 c3 (reVec3 (w0 s)) := hc3.2.1
+  have hwc_3  : toeplitzRow3 c3 (reVec3 (wc s)) := hc3.2.2.1
+  have hwp3   : toeplitzRow3 c3 (reVec3 (wp3 s)) := hc3.2.2.2
+
+  -- build the package
   refine
-    { L2 := rowMap3 (xiJetQuotRecOut s).c2
-      L3 := rowMap3 (xiJetQuotRecOut s).c3
-      hL2_ne :=
-        rowMap3_ne_zero_of_coeff_ne_zero
-          (c := (xiJetQuotRecOut s).c2) (xiJetQuotRecOut s).hc2_ne
-      hL3_ne :=
-        rowMap3_ne_zero_of_coeff_ne_zero
-          (c := (xiJetQuotRecOut s).c3) (xiJetQuotRecOut s).hc3_ne
-      hw0_2 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c2) (v := reVec3 (w0 s))
-          (xiJetQuotRecOut s).hw0_2
-      hwc_2 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c2) (v := reVec3 (wc s))
-          (xiJetQuotRecOut s).hwc_2
-      hwp2 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c2) (v := reVec3 (wp2 s))
-          (xiJetQuotRecOut s).hwp2
-      hw0_3 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c3) (v := reVec3 (w0 s))
-          (xiJetQuotRecOut s).hw0_3
-      hwc_3 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c3) (v := reVec3 (wc s))
-          (xiJetQuotRecOut s).hwc_3
-      hwp3 := by
-        exact rowMap3_eq_zero_of_toeplitzRow3
-          (c := (xiJetQuotRecOut s).c3) (v := reVec3 (wp3 s))
-          (xiJetQuotRecOut s).hwp3 }
+    { L2 := rowMap3 c2
+      L3 := rowMap3 c3
+      hL2_ne := rowMap3_ne_zero_of_coeff_ne_zero (c := c2) hc2_ne
+      hL3_ne := rowMap3_ne_zero_of_coeff_ne_zero (c := c3) hc3_ne
+      hw0_2 := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (w0 s)) hw0_2
+      hwc_2 := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wc s)) hwc_2
+      hwp2  := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wp2 s)) hwp2
+      hw0_3 := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (w0 s)) hw0_3
+      hwc_3 := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wc s)) hwc_3
+      hwp3  := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wp3 s)) hwp3 }
 
 /--
 Concrete recurrence row functional for a given prime `p`.
