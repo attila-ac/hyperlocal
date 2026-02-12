@@ -91,11 +91,43 @@ structure XiJetQuotRecOut (s : Hyperlocal.OffSeed Xi) : Type where
   hwc_3 : toeplitzRow3 c3 (reVec3 (wc s))
   hwp3  : toeplitzRow3 c3 (reVec3 (wp3 s))
 
+/-- Operator-level stencil spec for `p=2`. -/
+axiom xiJetQuotStencil_spec2 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c2 : Fin 3 → ℝ,
+    c2 ≠ 0 ∧
+    toeplitzRow3 c2 (reVec3 (w0 s)) ∧
+    toeplitzRow3 c2 (reVec3 (wc s)) ∧
+    toeplitzRow3 c2 (reVec3 (wp2 s))
+
+/-- Operator-level stencil spec for `p=3`. -/
+axiom xiJetQuotStencil_spec3 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c3 : Fin 3 → ℝ,
+    c3 ≠ 0 ∧
+    toeplitzRow3 c3 (reVec3 (w0 s)) ∧
+    toeplitzRow3 c3 (reVec3 (wc s)) ∧
+    toeplitzRow3 c3 (reVec3 (wp3 s))
+
 /--
-**Single semantic cliff (next task):**
-replace this axiom by an actual definition extracted from the jet-quotient recurrence operator.
+`xiJetQuotRecOut` is now *definitional* from the operator-level stencil specs.
+
+Semantic frontier becomes exactly the two axioms `xiJetQuotStencil_spec2/3`.
 -/
-axiom xiJetQuotRecOut (s : Hyperlocal.OffSeed Xi) : XiJetQuotRecOut s
+noncomputable def xiJetQuotRecOut (s : Hyperlocal.OffSeed Xi) : XiJetQuotRecOut s := by
+  classical
+  have h2 := Classical.choose_spec (xiJetQuotStencil_spec2 (s := s))
+  have h3 := Classical.choose_spec (xiJetQuotStencil_spec3 (s := s))
+  refine
+    { c2 := Classical.choose (xiJetQuotStencil_spec2 (s := s))
+      c3 := Classical.choose (xiJetQuotStencil_spec3 (s := s))
+      hc2_ne := h2.1
+      hc3_ne := h3.1
+      hw0_2 := h2.2.1
+      hwc_2 := h2.2.2.1
+      hwp2  := h2.2.2.2
+      hw0_3 := h3.2.1
+      hwc_3 := h3.2.2.1
+      hwp3  := h3.2.2.2 }
+
 
 /--
 Jet-quotient recurrence row functional at prime `p`.
