@@ -1,21 +1,25 @@
 /-
-  formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientEllFromOperator.lean
+  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientEllFromOperator.lean
 
-  Narrow semantic cliff:
-    (existence of a real Window-3 Toeplitz annihilator in operator form)
-      ⇒ row stencils on `reVec3`
-      ⇒ `ell = 0`.
+  Correctness fix (row-0 only):
 
-  After this commit, the only remaining semantics are the two axioms
-  `xiJetQuotToeplitzL_fromOperator2/3`.
+  Earlier drafts postulated *full-window* annihilation
+    toeplitzL 2 (coeffsNat3 c) (wc s) = 0
+  for a nonzero stencil c. This is impossible: wc is a transported basis
+  window with a nonzero tail; full ToeplitzL annihilation forces c = 0.
+
+  This file:
+    1) Adds the explicit impossibility lemma
+         toeplitzL_annihilates_wc_imp_coeffs_zero
+    2) Replaces the two false axioms by a corrected “operator output” interface:
+         only row-0/coordinate-0 constraints are required.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
+import Hyperlocal.Transport.Determinant
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperator
-import Hyperlocal.MinimalModelNonvanishing
-import Hyperlocal.Cancellation.Recurrence
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
+import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -25,109 +29,161 @@ namespace Hyperlocal.Targets.XiPacket
 
 open scoped BigOperators Real
 open Hyperlocal.Transport
+open ToeplitzLToRow3
 
-/-- Local fallback: stencil (left-kernel) ⇒ `ell = 0`. -/
-private theorem ell_eq_zero_of_toeplitzRow3_local
-    (u0 uc v : Fin 3 → ℝ) (c : Fin 3 → ℝ)
-    (hc0 : c ≠ 0)
-    (h0 : toeplitzRow3 c u0)
-    (hc : toeplitzRow3 c uc)
-    (hv : toeplitzRow3 c v) :
-    Transport.ell u0 uc v = 0 := by
-  classical
-  let M : Matrix (Fin 3) (Fin 3) ℝ := Transport.colsMat u0 uc v
+/-! ### Local helper: `ell = 0` from a nonzero Toeplitz row annihilating three real vectors -/
 
-  have hmul : M.transpose.mulVec c = 0 := by
-    ext j
-    fin_cases j
-    ·
-      have : (∑ i : Fin 3, u0 i * c i) = 0 := by
-        simpa [toeplitzRow3, mul_comm] using h0
-      simpa [Matrix.mulVec, Matrix.transpose_apply, M, Transport.colsMat, Transport.baseMat] using this
-    ·
-      have : (∑ i : Fin 3, uc i * c i) = 0 := by
-        simpa [toeplitzRow3, mul_comm] using hc
-      simpa [Matrix.mulVec, Matrix.transpose_apply, M, Transport.colsMat, Transport.baseMat] using this
-    ·
-      have : (∑ i : Fin 3, v i * c i) = 0 := by
-        simpa [toeplitzRow3, mul_comm] using hv
-      simpa [Matrix.mulVec, Matrix.transpose_apply, M, Transport.colsMat, Transport.baseMat] using this
-
-  have hdetT : (M.transpose).det = 0 := by
-    by_contra hne
-    have hUnitDet : IsUnit (M.transpose).det := (isUnit_iff_ne_zero).2 hne
-    have hUnitM : IsUnit (M.transpose) :=
-      (Matrix.isUnit_iff_isUnit_det (A := M.transpose)).2 hUnitDet
-    have hinj : Function.Injective (M.transpose.mulVec) :=
-      (Matrix.mulVec_injective_iff_isUnit (A := M.transpose)).2 hUnitM
-    have : c = 0 := by
-      apply hinj
-      simpa [hmul]
-    exact hc0 (by simpa [this])
-
-  have hdet : M.det = 0 := by
-    simpa [Matrix.det_transpose] using hdetT
-  simpa [Transport.ell, M] using hdet
-
-/-
-  NEW (sharper) semantic cliff:
-  the operator layer produces a *real* Toeplitz annihilator in `toeplitzL` form.
+/--
+If a nonzero row stencil `c` annihilates `reVec3(w0)`, `reVec3(wc)`, `reVec3(wp)`,
+then the determinant `ell` vanishes.
 -/
+lemma ell_eq_zero_of_toeplitzRow3_local
+    (u0 uc up : Fin 3 → ℝ) (c : Fin 3 → ℝ)
+    (hc : c ≠ 0)
+    (h0 : toeplitzRow3 c u0)
+    (hc0 : toeplitzRow3 c uc)
+    (hp : toeplitzRow3 c up) :
+    Transport.ell u0 uc up = 0 := by
+  classical
+  refine
+    Hyperlocal.Transport.Transport.ell_eq_zero_of_depRow3
+      u0 uc up c hc ?_ ?_ ?_
+  · simpa [toeplitzRow3] using h0
+  · simpa [toeplitzRow3] using hc0
+  · simpa [toeplitzRow3] using hp
 
-/-- (B1 semantic cliff, sharpened) p=2: Toeplitz operator annihilates the three windows. -/
-axiom xiJetQuotToeplitzL_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
+
+/-! ### Audit: full-window annihilation of `wc` forces the stencil to be zero -/
+
+private lemma delta_ne_zero (s : Hyperlocal.OffSeed Xi) : XiTransport.delta s ≠ 0 := by
+  have : s.ρ.re - (1 : ℝ) / 2 ≠ 0 := sub_ne_zero.mpr s.hσ
+  simpa [XiTransport.delta, div_eq_mul_inv] using this
+
+private lemma delta_ne_zeroC (s : Hyperlocal.OffSeed Xi) : (XiTransport.delta s : ℂ) ≠ 0 := by
+  intro h
+  apply delta_ne_zero (s := s)
+  exact Complex.ofReal_eq_zero.mp h
+
+private lemma wc_fin0 (s : Hyperlocal.OffSeed Xi) : wc s (0 : Fin 3) = 0 := by
+  classical
+  -- uses the closed form `wc = e1 + δ·e2`
+  simpa [wc_eq_basis, basisW3, e1, e2]
+
+private lemma wc_fin1 (s : Hyperlocal.OffSeed Xi) : wc s (1 : Fin 3) = 1 := by
+  classical
+  simpa [wc_eq_basis, basisW3, e1, e2]
+
+private lemma wc_fin2 (s : Hyperlocal.OffSeed Xi) : wc s (2 : Fin 3) = (XiTransport.delta s : ℂ) := by
+  classical
+  simpa [wc_eq_basis, basisW3, e1, e2]
+
+/--
+Requested explicit impossibility lemma:
+
+Full-window annihilation of `wc` by a Window-3 ToeplitzL operator forces the
+stencil coefficients to be identically zero.
+-/
+theorem toeplitzL_annihilates_wc_imp_coeffs_zero
+    (s : Hyperlocal.OffSeed Xi) (c : Fin 3 → ℝ)
+    (h : toeplitzL 2 (coeffsNat3 c) (wc s) = 0) :
+    c = 0 := by
+  classical
+  have hδ : (XiTransport.delta s : ℂ) ≠ 0 := delta_ne_zeroC (s := s)
+  have hw0 : wc s (0 : Fin 3) = 0 := wc_fin0 (s := s)
+  have hw1 : wc s (1 : Fin 3) = 1 := wc_fin1 (s := s)
+  have hw2 : wc s (2 : Fin 3) = (XiTransport.delta s : ℂ) := wc_fin2 (s := s)
+
+  -- Row 2: coeffs0 * wc2 = 0  ⇒ c0 = 0
+  have r2 : (toeplitzL 2 (coeffsNat3 c) (wc s)) (2 : Fin 3) = 0 := by
+    simpa using congrArg (fun x => x (2 : Fin 3)) h
+  have r2' : (coeffsNat3 c 0) * (wc s) (2 : Fin 3) = 0 := by
+    simpa [toeplitzL_two_apply_fin2] using r2
+  have hc0c : (c (0 : Fin 3) : ℂ) = 0 := by
+    have : (c (0 : Fin 3) : ℂ) * (XiTransport.delta s : ℂ) = 0 := by
+      simpa [coeffsNat3_nat0, hw2] using r2'
+    rcases mul_eq_zero.mp this with h0 | h0
+    · exact h0
+    · exfalso; exact hδ h0
+  have hc0 : c (0 : Fin 3) = 0 := Complex.ofReal_eq_zero.mp hc0c
+
+  -- Row 1: coeffs0*wc1 + coeffs1*wc2 = 0 ⇒ c1 = 0   (using c0 = 0, wc1 = 1, wc2 = δ)
+  have r1 : (toeplitzL 2 (coeffsNat3 c) (wc s)) (1 : Fin 3) = 0 := by
+    simpa using congrArg (fun x => x (1 : Fin 3)) h
+  have r1' :
+      (coeffsNat3 c 0) * (wc s) (1 : Fin 3) + (coeffsNat3 c 1) * (wc s) (2 : Fin 3) = 0 := by
+    simpa [toeplitzL_two_apply_fin1] using r1
+  have hc1c : (c (1 : Fin 3) : ℂ) = 0 := by
+    have : ((c (0 : Fin 3) : ℂ) * (1 : ℂ)) + (c (1 : Fin 3) : ℂ) * (XiTransport.delta s : ℂ) = 0 := by
+      simpa [coeffsNat3_nat0, coeffsNat3_nat1, hw1, hw2] using r1'
+    have : (c (1 : Fin 3) : ℂ) * (XiTransport.delta s : ℂ) = 0 := by
+      simpa [hc0] using this
+    rcases mul_eq_zero.mp this with h1 | h1
+    · exact h1
+    · exfalso; exact hδ h1
+  have hc1 : c (1 : Fin 3) = 0 := Complex.ofReal_eq_zero.mp hc1c
+
+  -- Row 0: (coeffs0*wc0 + coeffs1*wc1) + coeffs2*wc2 = 0 ⇒ c2 = 0
+  have r0 : (toeplitzL 2 (coeffsNat3 c) (wc s)) (0 : Fin 3) = 0 := by
+    simpa using congrArg (fun x => x (0 : Fin 3)) h
+  have r0' :
+      ((coeffsNat3 c 0) * (wc s) (0 : Fin 3) + (coeffsNat3 c 1) * (wc s) (1 : Fin 3)) +
+        (coeffsNat3 c 2) * (wc s) (2 : Fin 3) = 0 := by
+    simpa [toeplitzL_two_apply_fin0] using r0
+  have hc2c : (c (2 : Fin 3) : ℂ) = 0 := by
+    have :
+        ((c (0 : Fin 3) : ℂ) * (0 : ℂ) + (c (1 : Fin 3) : ℂ) * (1 : ℂ)) +
+          (c (2 : Fin 3) : ℂ) * (XiTransport.delta s : ℂ) = 0 := by
+      simpa [coeffsNat3_nat0, coeffsNat3_nat1, coeffsNat3_nat2, hw0, hw1, hw2] using r0'
+    have : (c (2 : Fin 3) : ℂ) * (XiTransport.delta s : ℂ) = 0 := by
+      simpa [hc0, hc1] using this
+    rcases mul_eq_zero.mp this with h2 | h2
+    · exact h2
+    · exfalso; exact hδ h2
+  have hc2 : c (2 : Fin 3) = 0 := Complex.ofReal_eq_zero.mp hc2c
+
+  ext i
+  fin_cases i <;> simp [hc0, hc1, hc2]
+
+/-! ### Corrected semantic interface: operator output is only row-0 constraints -/
+
+/-- (Corrected) p=2: operator output gives row-0 equalities on w0,wc,wp2. -/
+axiom xiJetQuotToeplitzL_row0_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
   ∃ c2 : Fin 3 → ℝ,
     c2 ≠ 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (w0 s) = 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (wc s) = 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c2) (wp2 s) = 0
+    (toeplitzL 2 (coeffsNat3 c2) (w0 s)) (0 : Fin 3) = 0 ∧
+    (toeplitzL 2 (coeffsNat3 c2) (wc s)) (0 : Fin 3) = 0 ∧
+    (toeplitzL 2 (coeffsNat3 c2) (wp2 s)) (0 : Fin 3) = 0
 
-/-- (B1 semantic cliff, sharpened) p=3: Toeplitz operator annihilates the three windows. -/
-axiom xiJetQuotToeplitzL_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
+/-- (Corrected) p=3: operator output gives row-0 equalities on w0,wc,wp3. -/
+axiom xiJetQuotToeplitzL_row0_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
   ∃ c3 : Fin 3 → ℝ,
     c3 ≠ 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (w0 s) = 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (wc s) = 0 ∧
-    toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c3) (wp3 s) = 0
+    (toeplitzL 2 (coeffsNat3 c3) (w0 s)) (0 : Fin 3) = 0 ∧
+    (toeplitzL 2 (coeffsNat3 c3) (wc s)) (0 : Fin 3) = 0 ∧
+    (toeplitzL 2 (coeffsNat3 c3) (wp3 s)) (0 : Fin 3) = 0
 
-/-- Derived stencil package (now theorem, not axiom) for p=2. -/
-theorem xiJetQuotStencil_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
-  ∃ c2 : Fin 3 → ℝ,
-    c2 ≠ 0 ∧
-    toeplitzRow3 c2 (reVec3 (w0 s)) ∧
-    toeplitzRow3 c2 (reVec3 (wc s)) ∧
-    toeplitzRow3 c2 (reVec3 (wp2 s)) := by
-  rcases xiJetQuotToeplitzL_fromOperator2 s with ⟨c2, hc2, h0, hc, hp⟩
-  refine ⟨c2, hc2, ?_, ?_, ?_⟩
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (w0 s) h0
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (wc s) hc
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c2 (wp2 s) hp
-
-/-- Derived stencil package (now theorem, not axiom) for p=3. -/
-theorem xiJetQuotStencil_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
-  ∃ c3 : Fin 3 → ℝ,
-    c3 ≠ 0 ∧
-    toeplitzRow3 c3 (reVec3 (w0 s)) ∧
-    toeplitzRow3 c3 (reVec3 (wc s)) ∧
-    toeplitzRow3 c3 (reVec3 (wp3 s)) := by
-  rcases xiJetQuotToeplitzL_fromOperator3 s with ⟨c3, hc3, h0, hc, hp⟩
-  refine ⟨c3, hc3, ?_, ?_, ?_⟩
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (w0 s) h0
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (wc s) hc
-  · exact ToeplitzLToRow3.toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero c3 (wp3 s) hp
-
-theorem xiJetQuotEll_spec2_theorem (s : Hyperlocal.OffSeed Xi) :
+/-- Theorem-level p=2 ell (row-0 only ⇒ row stencil ⇒ ell=0). -/
+theorem xiJetQuotEllOut_fromOperator2 (s : Hyperlocal.OffSeed Xi) :
   Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 := by
-  rcases xiJetQuotStencil_fromOperator2 s with ⟨c2, hc2, h0, hc, hp⟩
-  exact ell_eq_zero_of_toeplitzRow3_local
-    (u0 := reVec3 (w0 s)) (uc := reVec3 (wc s)) (v := reVec3 (wp2 s))
-    (c := c2) hc2 h0 hc hp
+  rcases xiJetQuotToeplitzL_row0_fromOperator2 s with ⟨c2, hc2, hw0, hwc, hwp⟩
+  have h0  : toeplitzRow3 c2 (reVec3 (w0 s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (w0 s) hw0
+  have hc  : toeplitzRow3 c2 (reVec3 (wc s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (wc s) hwc
+  have hp  : toeplitzRow3 c2 (reVec3 (wp2 s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (wp2 s) hwp
+  exact ell_eq_zero_of_toeplitzRow3_local (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) c2 hc2 h0 hc hp
 
-theorem xiJetQuotEll_spec3_theorem (s : Hyperlocal.OffSeed Xi) :
+/-- Theorem-level p=3 ell (row-0 only ⇒ row stencil ⇒ ell=0). -/
+theorem xiJetQuotEllOut_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
   Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 := by
-  rcases xiJetQuotStencil_fromOperator3 s with ⟨c3, hc3, h0, hc, hp⟩
-  exact ell_eq_zero_of_toeplitzRow3_local
-    (u0 := reVec3 (w0 s)) (uc := reVec3 (wc s)) (v := reVec3 (wp3 s))
-    (c := c3) hc3 h0 hc hp
+  rcases xiJetQuotToeplitzL_row0_fromOperator3 s with ⟨c3, hc3, hw0, hwc, hwp⟩
+  have h0  : toeplitzRow3 c3 (reVec3 (w0 s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (w0 s) hw0
+  have hc  : toeplitzRow3 c3 (reVec3 (wc s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (wc s) hwc
+  have hp  : toeplitzRow3 c3 (reVec3 (wp3 s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (wp3 s) hwp
+  exact ell_eq_zero_of_toeplitzRow3_local (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) c3 hc3 h0 hc hp
 
 end Hyperlocal.Targets.XiPacket
