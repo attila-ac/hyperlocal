@@ -168,4 +168,15 @@ theorem xiJetQuotEllOut_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
       (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s))
       c3 hc3 h0 hc hp
 
+/-- Export name expected by `XiToeplitzRecurrenceJetQuotient.lean` (p=2). -/
+theorem xiJetQuotEll_spec2_theorem (s : Hyperlocal.OffSeed Xi) :
+  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 := by
+  simpa using xiJetQuotEllOut_fromOperator2 (s := s)
+
+/-- Export name expected by `XiToeplitzRecurrenceJetQuotient.lean` (p=3). -/
+theorem xiJetQuotEll_spec3_theorem (s : Hyperlocal.OffSeed Xi) :
+  Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 := by
+  simpa using xiJetQuotEllOut_fromOperator3 (s := s)
+
+
 end Hyperlocal.Targets.XiPacket
