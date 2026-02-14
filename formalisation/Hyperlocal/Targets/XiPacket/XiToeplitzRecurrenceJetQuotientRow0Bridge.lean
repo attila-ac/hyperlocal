@@ -1,20 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Bridge.lean
 
-  Semantic bridge layer (Route B, jet-quotient).
+  Patch: make Route-B bridge axiom-free by repackaging
+  `xiJetQuotRow0ConcreteExtract` (your concrete bundle).
 
-  Goal: provide the *theorem*
-
-    `xiJetQuotRow0WitnessC (s : OffSeed Xi) : XiJetQuotRow0WitnessC s`
-
-  by packaging the ξ-specific recurrence extraction input.
-
-  This isolates the remaining ξ semantics as a single hypothesis bundle
-  (`XiJetQuotRow0RecurrenceExtract`), so downstream plumbing can remain
-  axiom-free.
+  IMPORTANT:
+  `XiJetQuotRow0RecurrenceExtract s` is a `Type`, not a `Prop`,
+  so this must be a `def`, not a `theorem`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtract
 
 set_option autoImplicit false
 noncomputable section
@@ -29,17 +25,18 @@ open Hyperlocal.Transport
 /-!
 ## Recurrence extraction (ξ-specific semantic input)
 
-Eventually, `xiJetQuotRow0RecurrenceExtract` should be proved from the concrete
-ξ recurrence extraction for the jet-quotient Toeplitz operator.
+This file is now pure packaging: it is axiom-free.
 
-For now, we isolate it as a single hypothesis bundle.
+All ξ-specific content is isolated in
+`XiToeplitzRecurrenceJetQuotientRow0ConcreteExtract.lean`
+(via its single remaining semantic placeholder).
 -/
 
 /--
 Row-0 recurrence extraction bundle for the jet-quotient Toeplitz operator on the
 four canonical ξ windows `w0/wc/wp2/wp3`.
 
-This is the *only* remaining ξ-specific semantic input for Route B.
+(Kept in the downstream-facing shape expected by the Route-B pipeline.)
 -/
 structure XiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) : Type where
   hop_w0  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s))  (0 : Fin 3) = 0
@@ -48,19 +45,16 @@ structure XiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) : Type wher
   hop_wp3 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0
 
 /--
-ξ-specific recurrence extraction at row 0 (placeholder axiom).
-
-Once this is discharged from the concrete ξ recurrence extraction proof,
-`xiJetQuotRow0WitnessC` below becomes fully theorem-level and Route B closes.
+ξ-specific recurrence extraction at row 0 (now definition-level, axiom-free here):
+repackage `xiJetQuotRow0ConcreteExtract`.
 -/
-axiom xiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) :
-  XiJetQuotRow0RecurrenceExtract s
+def xiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) :
+  XiJetQuotRow0RecurrenceExtract s := by
+  let h : XiJetQuotRow0ConcreteExtract s := xiJetQuotRow0ConcreteExtract (s := s)
+  exact ⟨h.hop_w0, h.hop_wc, h.hop_wp2, h.hop_wp3⟩
 
 /-!
-## Bridge theorem: recurrence extraction ⇒ row-0 witness
-
-We expose the downstream-facing statement in exactly the shape expected by
-`...Row0Correctness`.
+## Bridge: recurrence extraction ⇒ row-0 witness
 -/
 
 /-- Bridge definition: recurrence extraction ⇒ row-0 witness. -/
