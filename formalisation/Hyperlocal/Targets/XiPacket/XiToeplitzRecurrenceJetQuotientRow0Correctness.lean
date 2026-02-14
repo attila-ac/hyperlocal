@@ -1,39 +1,35 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Correctness.lean
 
-  Key point for “finish the Toeplitz/recurrence arm”:
+  Route B (Jet-Quotient via σ-sums): Row-0 correctness → Window-3 real stencils.
 
-  With Option 2 (σ-sums), you can make (A) realness and (B) nontriviality
-  *pure algebra* (no ξ-semantics). What remains genuinely ξ-semantic is (C):
-  the four row-0 vanishings.
-
-  Therefore: refactor so the only semantic insertion point is an AXIOM
-  `xiJetQuotRow0Witness` (or, if you prefer, `xiJetQuotRow0Out`).
-  Everything downstream stays theorem-level and compiles with *no `sorry`*.
+  This file is pure plumbing/algebra:
+  * coefficient facts (realness, nonzero anchor) come from OperatorDefs
+  * the only ξ-specific semantic input is the C-only witness:
+      `xiJetQuotRow0WitnessC : XiJetQuotRow0WitnessC s`
+    (imported from `...Row0Semantics`)
 -/
 
 import Hyperlocal.Core
 import Hyperlocal.MinimalModel
-import Hyperlocal.Cancellation.Recurrence
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperator
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
 
-namespace Hyperlocal.Targets.XiPacket
+namespace Hyperlocal
+namespace Targets
+namespace XiPacket
 
-open scoped BigOperators
-open Hyperlocal
+open scoped BigOperators Real
 open Hyperlocal.Transport
 open ToeplitzLToRow3
 
-/-!
-  ## Single semantic output (row-0 only)
--/
-
+/-- Row-0 deliverable with a nonzero real stencil. -/
 structure XiJetQuotRow0Out (s : Hyperlocal.OffSeed Xi) : Type where
   c    : Fin 3 → ℝ
   hc   : c ≠ 0
@@ -42,15 +38,17 @@ structure XiJetQuotRow0Out (s : Hyperlocal.OffSeed Xi) : Type where
   hwp2 : (toeplitzL 2 (coeffsNat3 c) (wp2 s)) (0 : Fin 3) = 0
   hwp3 : (toeplitzL 2 (coeffsNat3 c) (wp3 s)) (0 : Fin 3) = 0
 
-/-! ### Local algebra: extract the real stencil from operator coefficients (first 3 terms). -/
 namespace JetQuotRow0
 
+/-- Real stencil extracted from operator coefficients: `c_i = Re(aRk1_i)`. -/
 def cOp (s : Hyperlocal.OffSeed Xi) : Fin 3 → ℝ :=
   fun i => (JetQuotOp.aRk1 s i.1).re
 
+/-- If `z.im = 0` then `z = (z.re : ℂ)`. -/
 lemma complex_eq_ofReal_of_im_zero (z : ℂ) (hz : z.im = 0) : z = (z.re : ℂ) := by
   apply Complex.ext <;> simp [hz]
 
+/-- Row-0 agrees when coeffs 0,1,2 are real. -/
 lemma toeplitzL_row0_eq_of_real_coeffs
     (s : Hyperlocal.OffSeed Xi) (w : Window 3)
     (h0 : (JetQuotOp.aRk1 s 0).im = 0)
@@ -70,7 +68,9 @@ lemma toeplitzL_row0_eq_of_real_coeffs
     have : ((JetQuotOp.aRk1 s 2).re : ℂ) = JetQuotOp.aRk1 s 2 := by
       simpa using (complex_eq_ofReal_of_im_zero (JetQuotOp.aRk1 s 2) h2).symm
     simpa [coeffsNat3_nat2, cOp] using this
-  simp [toeplitzL_two_apply_fin0, hz0, hz1, hz2, add_assoc]
+  classical
+  simp [toeplitzL_two_apply_fin0, hz0, hz1, hz2,
+        add_assoc, add_left_comm, add_comm]
 
 lemma row0_eq_zero_of_op_row0_eq_zero
     (s : Hyperlocal.OffSeed Xi) (w : Window 3)
@@ -85,7 +85,7 @@ lemma row0_eq_zero_of_op_row0_eq_zero
         = (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) := by simpa using heq
     _ = 0 := hop
 
-/-- Generalized nontriviality: if some `aRk1 s j` is real and nonzero, then `cOp s ≠ 0`. -/
+/-- Nontriviality: if `aRk1 s j` is real and nonzero, then `cOp s ≠ 0`. -/
 lemma cOp_ne_zero_of_aRk1_nonzero_at
     (s : Hyperlocal.OffSeed Xi) (j : Fin 3)
     (hj : (JetQuotOp.aRk1 s j.1).im = 0)
@@ -101,39 +101,22 @@ lemma cOp_ne_zero_of_aRk1_nonzero_at
 
 end JetQuotRow0
 
-/-!
-  ### The (A)(B)(C) witness bundle
-
-  With Option 2 (σ-sums), (A) and (B) can be proved algebraically.
-  The genuinely ξ-semantic content is (C).
--/
-structure XiJetQuotRow0Witness (s : Hyperlocal.OffSeed Xi) : Type where
-  /- (A) Realness -/
-  hreal0 : (JetQuotOp.aRk1 s 0).im = 0
-  hreal1 : (JetQuotOp.aRk1 s 1).im = 0
-  hreal2 : (JetQuotOp.aRk1 s 2).im = 0
-  /- (B) Nontriviality: pick j=2 (this is the clean one under σ-sums) -/
-  ha2    : JetQuotOp.aRk1 s 2 ≠ 0
-  /- (C) Row-0 correctness (ξ-semantic cliff) -/
-  hop_w0  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s))  (0 : Fin 3) = 0
-  hop_wc  : (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s))  (0 : Fin 3) = 0
-  hop_wp2 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2 s)) (0 : Fin 3) = 0
-  hop_wp3 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0
-
-/-
-  FINISH-NOW MOVE (no sorry):
-
-  Put the ξ-semantic cliff behind an *axiom* (or later a theorem),
-  then `xiJetQuotRow0Out` becomes definitionally complete and everything
-  downstream compiles immediately.
-
-  This matches your design goal: a single semantic insertion point.
--/
-axiom xiJetQuotRow0Witness (s : Hyperlocal.OffSeed Xi) : XiJetQuotRow0Witness s
-
+/-- Build the Row-0 output from the C-only witness + algebraic coefficient facts. -/
 noncomputable def xiJetQuotRow0Out (s : Hyperlocal.OffSeed Xi) : XiJetQuotRow0Out s := by
   classical
-  have hw : XiJetQuotRow0Witness s := xiJetQuotRow0Witness s
+
+  -- semantic gate (C-only) — use fully-qualified names to avoid namespace/import ambiguity
+  have hC : _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s :=
+    _root_.Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessC s
+
+  -- (A) realness is pure algebra (from σ-sums in OperatorDefs)
+  have hreal0 : (JetQuotOp.aRk1 s 0).im = 0 := JetQuotOp.aRk1_im0 (s := s)
+  have hreal1 : (JetQuotOp.aRk1 s 1).im = 0 := JetQuotOp.aRk1_im1 (s := s)
+  have hreal2 : (JetQuotOp.aRk1 s 2).im = 0 := JetQuotOp.aRk1_im2 (s := s)
+
+  -- (B) nontriviality anchored at j=2 (aRk1 s 2 = -2)
+  have ha2 : JetQuotOp.aRk1 s 2 ≠ 0 := JetQuotOp.aRk1_nat2_ne_zero (s := s)
+
   refine
     { c    := JetQuotRow0.cOp s
       hc   := ?_
@@ -142,23 +125,11 @@ noncomputable def xiJetQuotRow0Out (s : Hyperlocal.OffSeed Xi) : XiJetQuotRow0Ou
       hwp2 := ?_
       hwp3 := ?_ }
 
-  · -- use j=2 for nontriviality
-    exact
-      JetQuotRow0.cOp_ne_zero_of_aRk1_nonzero_at
-        (s := s) (j := (2 : Fin 3)) hw.hreal2 hw.ha2
-
-  · exact
-      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
-        (s := s) (w := w0 s) hw.hreal0 hw.hreal1 hw.hreal2 hw.hop_w0
-  · exact
-      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
-        (s := s) (w := wc s) hw.hreal0 hw.hreal1 hw.hreal2 hw.hop_wc
-  · exact
-      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
-        (s := s) (w := wp2 s) hw.hreal0 hw.hreal1 hw.hreal2 hw.hop_wp2
-  · exact
-      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
-        (s := s) (w := wp3 s) hw.hreal0 hw.hreal1 hw.hreal2 hw.hop_wp3
+  · exact JetQuotRow0.cOp_ne_zero_of_aRk1_nonzero_at (s := s) (j := (2 : Fin 3)) hreal2 ha2
+  · exact JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero (s := s) (w := w0 s)  hreal0 hreal1 hreal2 hC.hop_w0
+  · exact JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)  hreal0 hreal1 hreal2 hC.hop_wc
+  · exact JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2 s) hreal0 hreal1 hreal2 hC.hop_wp2
+  · exact JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp3 s) hreal0 hreal1 hreal2 hC.hop_wp3
 
 /-- Convenience: extracted stencil. -/
 def cJet (s : Hyperlocal.OffSeed Xi) : Fin 3 → ℝ :=
@@ -205,4 +176,6 @@ theorem xiJetQuotToeplitzL_row0_fromOperator3 (s : Hyperlocal.OffSeed Xi) :
   · simpa [cJet] using row0_wc (s := s)
   · simpa [cJet] using row0_wp3 (s := s)
 
-end Hyperlocal.Targets.XiPacket
+end XiPacket
+end Targets
+end Hyperlocal
