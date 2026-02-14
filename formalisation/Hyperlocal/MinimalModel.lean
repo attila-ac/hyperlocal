@@ -110,4 +110,12 @@ lemma quartetPow_derivative_at_seed_is_zero
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hk  -- k = 2 + m
   simpa [Nat.add_comm] using quartetPow_derivative_at_seed_is_zero_twoPlus ρ m
 
+/-
+  Compatibility alias: some jet-quotient operator modules expect this name.
+-/
+
+/-- Quartet polynomial rooted at `ρ` (compatibility alias for operator layers). -/
+def RpolyRooted (ρ : ℂ) : Polynomial ℂ :=
+  quartetPoly ρ
+
 end Hyperlocal.MinimalModel
