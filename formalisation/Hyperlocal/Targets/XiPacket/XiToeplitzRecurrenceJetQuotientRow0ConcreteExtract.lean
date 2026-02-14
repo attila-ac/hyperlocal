@@ -6,20 +6,14 @@
   Semantic input Route B needs:
     `toeplitzL 2 (JetQuotOp.aRk1 s)` annihilates row 0 of `w0/wc/wp2/wp3`.
 
-  Downstream is axiom-free once this file is discharged from the *concrete* ξ
-  jet-quotient recurrence extraction layer.
+  This file is now axiom-free: the only remaining ξ-specific proofs live in
+  `XiToeplitzRecurrenceJetQuotientRow0Concrete.lean` (the four canonical lemmas).
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Concrete
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Transport.TACToeplitz
-
-#check Hyperlocal.Targets.XiPacket.xiJetQuot_row0_w0
-#check Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wc
-#check Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp2
-#check Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp3
-
 
 set_option autoImplicit false
 noncomputable section
@@ -51,15 +45,21 @@ inductive XiJetQuotCanonicalWindow (s : Hyperlocal.OffSeed Xi) : Window 3 → Pr
   | wp2 : XiJetQuotCanonicalWindow s (wp2 s)
   | wp3 : XiJetQuotCanonicalWindow s (wp3 s)
 
-/-
-Concrete ξ row-0 recurrence extraction.
+/--
+Concrete ξ row-0 recurrence extraction for canonical windows.
 
-For now this is the single semantic placeholder:
-replace this axiom by a theorem proved from your concrete jet-quotient recurrence layer.
+This is a thin case-split wrapper around the four concrete lemmas proved in
+`XiToeplitzRecurrenceJetQuotientRow0Concrete.lean`.
 -/
-axiom xiJetQuot_row0_of_canonical (s : Hyperlocal.OffSeed Xi) {w : Window 3} :
+theorem xiJetQuot_row0_of_canonical (s : Hyperlocal.OffSeed Xi) {w : Window 3} :
   XiJetQuotCanonicalWindow s w →
-    (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) = 0
+    (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) = 0 := by
+  intro hw
+  cases hw with
+  | w0  => simpa using xiJetQuot_row0_w0  (s := s)
+  | wc  => simpa using xiJetQuot_row0_wc  (s := s)
+  | wp2 => simpa using xiJetQuot_row0_wp2 (s := s)
+  | wp3 => simpa using xiJetQuot_row0_wp3 (s := s)
 
 /-- Package the canonical-window row-0 identities into the bundled extract. -/
 def xiJetQuotRow0ConcreteExtract (s : Hyperlocal.OffSeed Xi) :

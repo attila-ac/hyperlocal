@@ -2,11 +2,11 @@
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Bridge.lean
 
   Patch: make Route-B bridge axiom-free by repackaging
-  `xiJetQuotRow0ConcreteExtract` (your concrete bundle).
+  `xiJetQuotRow0ConcreteExtract` (the concrete bundle).
 
   IMPORTANT:
   `XiJetQuotRow0RecurrenceExtract s` is a `Type`, not a `Prop`,
-  so this must be a `def`, not a `theorem`.
+  so this is a `def`, not a `theorem`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
@@ -25,11 +25,11 @@ open Hyperlocal.Transport
 /-!
 ## Recurrence extraction (ξ-specific semantic input)
 
-This file is now pure packaging: it is axiom-free.
+This file is pure packaging: it is axiom-free.
 
 All ξ-specific content is isolated in
 `XiToeplitzRecurrenceJetQuotientRow0ConcreteExtract.lean`
-(via its single remaining semantic placeholder).
+(via the four canonical row-0 lemmas).
 -/
 
 /--
@@ -45,7 +45,7 @@ structure XiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) : Type wher
   hop_wp3 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0
 
 /--
-ξ-specific recurrence extraction at row 0 (now definition-level, axiom-free here):
+ξ-specific recurrence extraction at row 0 (definition-level, axiom-free here):
 repackage `xiJetQuotRow0ConcreteExtract`.
 -/
 def xiJetQuotRow0RecurrenceExtract (s : Hyperlocal.OffSeed Xi) :
