@@ -12,6 +12,7 @@
 
 import Hyperlocal.Core
 import Hyperlocal.MinimalModel
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Bridge
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
