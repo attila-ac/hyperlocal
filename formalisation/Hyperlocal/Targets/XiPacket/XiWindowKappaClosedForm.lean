@@ -4,7 +4,9 @@
   Pure Toeplitz/shift-generated computation:
     κ(reVec3 w0, reVec3 wc, reVec3 ws) = (Xi (sc s)).re
 
-  This is PURE algebra on the definitional ξ-windows from XiWindowDefs.
+  This file is intentionally κ-only.  It does NOT mention JetQuotOp or any
+  Route-B row-0 jet-quotient identities.  Those belong in the jet-quotient
+  semantic gate layer.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
@@ -36,16 +38,12 @@ abbrev f2 : Fin 3 := e2
 /-- `xiCentralJet` really is `![Xi z, Xi' z, Xi'' z]`, so at index 0 it is `Xi z`. -/
 @[simp] lemma xiCentralJet_apply_f0 (s : Hyperlocal.OffSeed Xi) :
     xiCentralJet s f0 = Xi (sc s) := by
-  -- IMPORTANT: `simp` needs `e0` to reduce the `![...]` indexing.
   simp [xiCentralJet, xiJet3At, f0, e0]
 
 /-
   The three Toeplitz computations at n=2.
 
-  Key point from your error log:
-  you MUST unfold `e2` (and `e1`) inside simp, otherwise `simp` leaves goals like
-    `¬ (2 = e2) → ...`
-  because `abbrev` isn't unfolded automatically.
+  Key point: unfold `e1/e2` (or use `f1/f2`) so simp can decide Fin equalities.
 -/
 
 /-- On `basisW3 e2`, every positive right-shift term vanishes, so transport fixes it. -/
@@ -72,8 +70,6 @@ lemma xiTransportOp_n2_basis1 (s : Hyperlocal.OffSeed Xi) :
 /-- At index `0`, every positive right-shift term contributes `0`, so Toeplitz fixes coord `0`. -/
 lemma xiTransportOp_n2_fin0 (s : Hyperlocal.OffSeed Xi) (w : Transport.Window 3) :
     (XiTransport.XiTransportOp 2 s w) f0 = w f0 := by
-  -- At coordinate 0, `shiftR' _ 0 = 0` kills all k>0 terms.
-  -- Again: include `f0/e0` so simp knows which coordinate is 0.
   simp [XiTransport.XiTransportOp, XiTransport.shiftCoeff, XiTransport.delta,
     Transport.toeplitzR, Transport.shiftCombo, Transport.compPow,
     Transport.shiftRₗ_apply, Transport.shiftR'_zero,
@@ -92,8 +88,6 @@ lemma xiTransportOp_n2_fin0 (s : Hyperlocal.OffSeed Xi) (w : Transport.Window 3)
 /-- At index `0`, `w0` evaluates to `Xi(sc s)` because Toeplitz fixes coordinate `0`. -/
 lemma w0_apply_f0 (s : Hyperlocal.OffSeed Xi) : (w0 s) f0 = Xi (sc s) := by
   have hfix := xiTransportOp_n2_fin0 (s := s) (w := xiCentralJet s)
-  -- `w0 s = xiTransportedJet s = XiTransportOp 2 s (xiCentralJet s)`
-  -- then use the definitional fact `xiCentralJet s 0 = Xi(sc s)`.
   simpa [w0, xiTransportedJet, f0, e0] using hfix.trans (xiCentralJet_apply_f0 (s := s))
 
 /--
@@ -104,12 +98,10 @@ lemma kappa_eq_u0_f0 (s : Hyperlocal.OffSeed Xi) :
     Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s))
       = (reVec3 (w0 s)) f0 := by
   classical
-  -- abbreviate columns
   set u0 : Fin 3 → ℝ := reVec3 (w0 s)
   set uc : Fin 3 → ℝ := reVec3 (wc s)
   set us : Fin 3 → ℝ := reVec3 (ws s)
 
-  -- compute concrete entries of uc/us using the simp closed forms (unfolding e1/e2 as needed)
   have h_uc0 : uc f0 = 0 := by
     simp [uc, wc_eq_basis, reVec3, basisW3, f0, f1, f2, e0, e1, e2]
   have h_uc1 : uc f1 = 1 := by
@@ -124,8 +116,6 @@ lemma kappa_eq_u0_f0 (s : Hyperlocal.OffSeed Xi) :
   have h_us2 : us f2 = 1 := by
     simp [us, ws_eq_basis, reVec3, basisW3, f0, f1, f2, e2]
 
-  -- now unfold κ = det(colsMat ...) and use the explicit Fin-3 determinant formula
-  -- (and then fully simp all `reVec3`/`basisW3` entries). `simp` now closes the goal, so no `ring`.
   simp [Transport.kappa, Transport.ell, Transport.colsMat, Transport.baseMat,
     Matrix.det_fin_three,
     u0, uc, us,
@@ -136,12 +126,11 @@ lemma kappa_eq_u0_f0 (s : Hyperlocal.OffSeed Xi) :
 theorem XiLemmaC_kappa_closedForm (s : Hyperlocal.OffSeed Xi) :
     Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s))
       = (Xi (sc s)).re := by
-  have hk : Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s))
-      = (reVec3 (w0 s)) f0 :=
+  have hk :
+      Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s))
+        = (reVec3 (w0 s)) f0 :=
     kappa_eq_u0_f0 (s := s)
-  -- rewrite the RHS using `w0_apply_f0`
   have hw : (reVec3 (w0 s)) f0 = (Xi (sc s)).re := by
-    -- reVec3 at index f0 is just `.re` of the complex value at f0
     simpa [reVec3, f0, e0] using congrArg Complex.re (w0_apply_f0 (s := s))
   exact hk.trans hw
 
