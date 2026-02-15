@@ -1,163 +1,182 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceConcrete.lean
 
-  Concrete recurrence-row interface (Window 3, Re-lane).
+  Concrete ξ jet-quotient recurrence extraction layer ⇒ Window-3 row stencils.
 
-  Goal (next semantic work):
-  replace the single axiom `xiJetQuotRecOut` (in `XiToeplitzRecurrenceJetQuotient.lean`)
-  by an actual construction extracted from the jet-quotient recurrence operator.
-  This file then packages those stencils as linear row functionals `L2/L3`.
+  Immediate goal:
+  eliminate the dependency on the JetQuotient Row0-axiom
+    `axiom xiJetQuot_row0_witnessC`
+  by taking the *concrete extraction output* as the interface:
+    • a nonzero row stencil for p=2 annihilating (w0,wc,wp2) in the real lane
+    • a nonzero row stencil for p=3 annihilating (w0,wc,wp3) in the real lane
 
-  For now, this file:
-  • bundles the p=2 and p=3 row functionals + specs into ONE package structure
-  • defines `xiRecRowPkg` by converting the stencil output `c2/c3` into linear maps
-    via `rowMap3`
-  • defines `XiRecRow s p` by selecting `L2/L3` (otherwise 0)
-  • exposes the old names `XiRecRow_*` as theorems (projection lemmas)
+  Downstream plumbing remains unchanged:
+  we package these as a nonzero linear functional `XiRecRow s p` on (Fin 3 → ℝ),
+  and expose the annihilation facts needed by the manufacturing layer.
+
+  NOTE:
+  This file is intentionally *real-lane* (row stencils / linear functionals).
+  It does NOT build a complex Toeplitz operator, and it does NOT use any
+  `toeplitzRow3_iff` lemma (that one lives in the manufacturing layer file).
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotient
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceRowMap3
+import Hyperlocal.Targets.XiPacket.Vectorize
+import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
 
-namespace Hyperlocal.Targets.XiPacket
+namespace Hyperlocal
+namespace Targets
+namespace XiPacket
 
 open scoped BigOperators Real
 open Hyperlocal.Transport
 
 /--
-Jet-quotient recurrence output at Window 3 in the real lane:
+Concrete recurrence extraction for p=2: produces a nonzero Window-3 Toeplitz row stencil
+annihilating `reVec3(w0)`, `reVec3(wc)`, and `reVec3(wp2)`.
 
-two nonzero row functionals (for p=2 and p=3) annihilating the three relevant
-real-window vectors `reVec3(w0)`, `reVec3(wc)`, and `reVec3(wp2/wp3)`.
+(Replace this axiom by your constructed proof from the concrete ξ jet-quotient layer.)
+-/
+axiom xiRecStencil2 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c2 : Fin 3 → ℝ,
+    c2 ≠ 0 ∧
+    toeplitzRow3 c2 (reVec3 (w0 s)) ∧
+    toeplitzRow3 c2 (reVec3 (wc s)) ∧
+    toeplitzRow3 c2 (reVec3 (wp2 s))
+
+/--
+Concrete recurrence extraction for p=3: produces a nonzero Window-3 Toeplitz row stencil
+annihilating `reVec3(w0)`, `reVec3(wc)`, and `reVec3(wp3)`.
+
+(Replace this axiom by your constructed proof from the concrete ξ jet-quotient layer.)
+-/
+axiom xiRecStencil3 (s : Hyperlocal.OffSeed Xi) :
+  ∃ c3 : Fin 3 → ℝ,
+    c3 ≠ 0 ∧
+    toeplitzRow3 c3 (reVec3 (w0 s)) ∧
+    toeplitzRow3 c3 (reVec3 (wc s)) ∧
+    toeplitzRow3 c3 (reVec3 (wp3 s))
+
+/--
+Packaged concrete recurrence output for ξ at Window-3:
+
+`L2, L3` are the *row functionals* (linear maps) induced by the extracted stencils,
+and the `h*_*` fields are the annihilation facts on the three definitional windows.
 -/
 structure XiRecRowPkg (s : Hyperlocal.OffSeed Xi) : Type where
   L2 : (Fin 3 → ℝ) →ₗ[ℝ] ℝ
   L3 : (Fin 3 → ℝ) →ₗ[ℝ] ℝ
-  hL2_ne : L2 ≠ 0
-  hL3_ne : L3 ≠ 0
-  hw0_2 : L2 (reVec3 (w0 s)) = 0
-  hwc_2 : L2 (reVec3 (wc s)) = 0
-  hwp2  : L2 (reVec3 (wp2 s)) = 0
-  hw0_3 : L3 (reVec3 (w0 s)) = 0
-  hwc_3 : L3 (reVec3 (wc s)) = 0
-  hwp3  : L3 (reVec3 (wp3 s)) = 0
+  h2_nonzero : L2 ≠ 0
+  h3_nonzero : L3 ≠ 0
+  h2_w0 : L2 (reVec3 (w0 s)) = 0
+  h2_wc : L2 (reVec3 (wc s)) = 0
+  h2_wp2 : L2 (reVec3 (wp2 s)) = 0
+  h3_w0 : L3 (reVec3 (w0 s)) = 0
+  h3_wc : L3 (reVec3 (wc s)) = 0
+  h3_wp3 : L3 (reVec3 (wp3 s)) = 0
 
+/-- Build the packaged recurrence rows from the concrete stencil axioms. -/
 noncomputable def xiRecRowPkg (s : Hyperlocal.OffSeed Xi) : XiRecRowPkg s := by
   classical
+  -- choose the stencils
+  let c2 : Fin 3 → ℝ := Classical.choose (xiRecStencil2 s)
+  let c3 : Fin 3 → ℝ := Classical.choose (xiRecStencil3 s)
 
-  -- existence proofs (Prop)
-  have h2 :
-      ∃ c2 : Fin 3 → ℝ,
-        c2 ≠ 0 ∧
-        toeplitzRow3 c2 (reVec3 (w0 s)) ∧
-        toeplitzRow3 c2 (reVec3 (wc s)) ∧
-        toeplitzRow3 c2 (reVec3 (wp2 s)) :=
-    xiJetQuotStencil_spec2 s
+  have hc2 : c2 ≠ 0 := (Classical.choose_spec (xiRecStencil2 s)).1
+  have hc3 : c3 ≠ 0 := (Classical.choose_spec (xiRecStencil3 s)).1
 
-  have h3 :
-      ∃ c3 : Fin 3 → ℝ,
-        c3 ≠ 0 ∧
-        toeplitzRow3 c3 (reVec3 (w0 s)) ∧
-        toeplitzRow3 c3 (reVec3 (wc s)) ∧
-        toeplitzRow3 c3 (reVec3 (wp3 s)) :=
-    xiJetQuotStencil_spec3 s
+  -- unpack row annihilations
+  have h2_w0' : toeplitzRow3 c2 (reVec3 (w0 s)) := (Classical.choose_spec (xiRecStencil2 s)).2.1
+  have h2_wc' : toeplitzRow3 c2 (reVec3 (wc s)) := (Classical.choose_spec (xiRecStencil2 s)).2.2.1
+  have h2_wp2' : toeplitzRow3 c2 (reVec3 (wp2 s)) := (Classical.choose_spec (xiRecStencil2 s)).2.2.2
 
-  -- choose witnesses (now in data, not Prop-elim)
-  let c2 : Fin 3 → ℝ := Classical.choose h2
-  have hc2 :
-      c2 ≠ 0 ∧
-      toeplitzRow3 c2 (reVec3 (w0 s)) ∧
-      toeplitzRow3 c2 (reVec3 (wc s)) ∧
-      toeplitzRow3 c2 (reVec3 (wp2 s)) :=
-    Classical.choose_spec h2
+  have h3_w0' : toeplitzRow3 c3 (reVec3 (w0 s)) := (Classical.choose_spec (xiRecStencil3 s)).2.1
+  have h3_wc' : toeplitzRow3 c3 (reVec3 (wc s)) := (Classical.choose_spec (xiRecStencil3 s)).2.2.1
+  have h3_wp3' : toeplitzRow3 c3 (reVec3 (wp3 s)) := (Classical.choose_spec (xiRecStencil3 s)).2.2.2
 
-  let c3 : Fin 3 → ℝ := Classical.choose h3
-  have hc3 :
-      c3 ≠ 0 ∧
-      toeplitzRow3 c3 (reVec3 (w0 s)) ∧
-      toeplitzRow3 c3 (reVec3 (wc s)) ∧
-      toeplitzRow3 c3 (reVec3 (wp3 s)) :=
-    Classical.choose_spec h3
-
-  -- unpack the conjunctions (Prop → Prop, allowed)
-  have hc2_ne : c2 ≠ 0 := hc2.1
-  have hw0_2  : toeplitzRow3 c2 (reVec3 (w0 s)) := hc2.2.1
-  have hwc_2  : toeplitzRow3 c2 (reVec3 (wc s)) := hc2.2.2.1
-  have hwp2   : toeplitzRow3 c2 (reVec3 (wp2 s)) := hc2.2.2.2
-
-  have hc3_ne : c3 ≠ 0 := hc3.1
-  have hw0_3  : toeplitzRow3 c3 (reVec3 (w0 s)) := hc3.2.1
-  have hwc_3  : toeplitzRow3 c3 (reVec3 (wc s)) := hc3.2.2.1
-  have hwp3   : toeplitzRow3 c3 (reVec3 (wp3 s)) := hc3.2.2.2
-
-  -- build the package
   refine
-    { L2 := rowMap3 c2
-      L3 := rowMap3 c3
-      hL2_ne := rowMap3_ne_zero_of_coeff_ne_zero (c := c2) hc2_ne
-      hL3_ne := rowMap3_ne_zero_of_coeff_ne_zero (c := c3) hc3_ne
-      hw0_2 := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (w0 s)) hw0_2
-      hwc_2 := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wc s)) hwc_2
-      hwp2  := rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wp2 s)) hwp2
-      hw0_3 := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (w0 s)) hw0_3
-      hwc_3 := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wc s)) hwc_3
-      hwp3  := rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wp3 s)) hwp3 }
+    ⟨rowMap3 c2, rowMap3 c3,
+      ?_, ?_,
+      ?_, ?_, ?_,
+      ?_, ?_, ?_⟩
+  · -- L2 ≠ 0
+    exact rowMap3_ne_zero_of_coeff_ne_zero (c := c2) hc2
+  · -- L3 ≠ 0
+    exact rowMap3_ne_zero_of_coeff_ne_zero (c := c3) hc3
+  · -- L2 annihilations
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (w0 s)) h2_w0'
+  ·
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wc s)) h2_wc'
+  ·
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wp2 s)) h2_wp2'
+  · -- L3 annihilations
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (w0 s)) h3_w0'
+  ·
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wc s)) h3_wc'
+  ·
+    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wp3 s)) h3_wp3'
 
-/--
-Concrete recurrence row functional for a given prime `p`.
-
-For this project we only consume `p=2` and `p=3`; for other `p` return `0`.
--/
+/-- The concrete recurrence row functional for ξ, parameterized by `p`. -/
 noncomputable def XiRecRow (s : Hyperlocal.OffSeed Xi) (p : ℝ) :
     (Fin 3 → ℝ) →ₗ[ℝ] ℝ :=
-  if hp2 : p = (2 : ℝ) then (xiRecRowPkg s).L2
-  else if hp3 : p = (3 : ℝ) then (xiRecRowPkg s).L3
-  else 0
+  let pkg := xiRecRowPkg s
+  if h : p = 2 then pkg.L2 else pkg.L3
 
-@[simp] lemma XiRecRow_two (s : Hyperlocal.OffSeed Xi) :
+theorem XiRecRow_two (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (2 : ℝ) = (xiRecRowPkg s).L2 := by
+  classical
   simp [XiRecRow]
 
-@[simp] lemma XiRecRow_three (s : Hyperlocal.OffSeed Xi) :
+theorem XiRecRow_three (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (3 : ℝ) = (xiRecRowPkg s).L3 := by
-  have h : (3 : ℝ) ≠ (2 : ℝ) := by norm_num
+  classical
+  have h : (3 : ℝ) ≠ 2 := by norm_num
   simp [XiRecRow, h]
 
-/-- Nontriviality for the two primes we use. -/
-theorem XiRecRow_ne_zero_2 (s : Hyperlocal.OffSeed Xi) : XiRecRow s (2 : ℝ) ≠ 0 := by
-  simpa using (xiRecRowPkg s).hL2_ne
+theorem XiRecRow_ne_zero_2 (s : Hyperlocal.OffSeed Xi) :
+    XiRecRow s (2 : ℝ) ≠ 0 := by
+  classical
+  simpa [XiRecRow_two] using (xiRecRowPkg s).h2_nonzero
 
-theorem XiRecRow_ne_zero_3 (s : Hyperlocal.OffSeed Xi) : XiRecRow s (3 : ℝ) ≠ 0 := by
-  simpa using (xiRecRowPkg s).hL3_ne
+theorem XiRecRow_ne_zero_3 (s : Hyperlocal.OffSeed Xi) :
+    XiRecRow s (3 : ℝ) ≠ 0 := by
+  classical
+  simpa [XiRecRow_three] using (xiRecRowPkg s).h3_nonzero
 
-/-- Window annihilations for p=2. -/
 theorem XiRecRow_w0_2 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (2 : ℝ) (reVec3 (w0 s)) = 0 := by
-  simpa using (xiRecRowPkg s).hw0_2
+  classical
+  simpa [XiRecRow_two] using (xiRecRowPkg s).h2_w0
 
 theorem XiRecRow_wc_2 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (2 : ℝ) (reVec3 (wc s)) = 0 := by
-  simpa using (xiRecRowPkg s).hwc_2
+  classical
+  simpa [XiRecRow_two] using (xiRecRowPkg s).h2_wc
 
 theorem XiRecRow_wp2 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (2 : ℝ) (reVec3 (wp2 s)) = 0 := by
-  simpa using (xiRecRowPkg s).hwp2
+  classical
+  simpa [XiRecRow_two] using (xiRecRowPkg s).h2_wp2
 
-/-- Window annihilations for p=3. -/
 theorem XiRecRow_w0_3 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (3 : ℝ) (reVec3 (w0 s)) = 0 := by
-  simpa using (xiRecRowPkg s).hw0_3
+  classical
+  simpa [XiRecRow_three] using (xiRecRowPkg s).h3_w0
 
 theorem XiRecRow_wc_3 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (3 : ℝ) (reVec3 (wc s)) = 0 := by
-  simpa using (xiRecRowPkg s).hwc_3
+  classical
+  simpa [XiRecRow_three] using (xiRecRowPkg s).h3_wc
 
 theorem XiRecRow_wp3 (s : Hyperlocal.OffSeed Xi) :
     XiRecRow s (3 : ℝ) (reVec3 (wp3 s)) = 0 := by
-  simpa using (xiRecRowPkg s).hwp3
+  classical
+  simpa [XiRecRow_three] using (xiRecRowPkg s).h3_wp3
 
-end Hyperlocal.Targets.XiPacket
+end XiPacket
+end Targets
+end Hyperlocal

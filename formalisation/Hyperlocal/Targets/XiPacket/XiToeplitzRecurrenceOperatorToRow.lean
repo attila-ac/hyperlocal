@@ -29,22 +29,27 @@ open ToeplitzLToRow3
 def jetQuotRow3 (s : Hyperlocal.OffSeed Xi) : Fin 3 → ℝ :=
   fun i => Complex.re (JetQuotOp.aRk1 s i)
 
-/--
-If the jet-quotient Toeplitz operator annihilates `w`, then the extracted real row gives
-a `toeplitzRow3` constraint on `reVec3 w`.
+/-!
+### From row-0 operator output to a real `toeplitzRow3` constraint
 
-We take coordinate `0` (matching the `toeplitzL_two_apply_fin0` convention already used
-in `...ToeplitzLToRow3`).
+Route B only consumes the row-0 scalar output
+`(JetQuotOp.jetQuotToeplitzOp3 s w) 0 = 0`.
+
+The stronger hypothesis `JetQuotOp.jetQuotToeplitzOp3 s w = 0` is not expected to hold
+for canonical windows (see `...XiToeplitzRecurrenceToeplitzLImpossibility`).
 -/
-lemma toeplitzRow3_of_jetQuotOp_eq_zero
+
+/--
+If the jet-quotient Toeplitz operator vanishes at coordinate `0`, then the extracted real
+row gives a `toeplitzRow3` constraint on `reVec3 w`.
+
+We take coordinate `0` (matching the `toeplitzL_two_apply_fin0` convention).
+-/
+lemma toeplitzRow3_of_jetQuotOp_fin0_eq_zero
     (s : Hyperlocal.OffSeed Xi) (w : Window 3)
-    (h : JetQuotOp.jetQuotToeplitzOp3 s w = 0) :
+    (h0 : (JetQuotOp.jetQuotToeplitzOp3 s w) (0 : Fin 3) = 0) :
     toeplitzRow3 (jetQuotRow3 s) (reVec3 w) := by
   classical
-
-  -- Take coordinate `0`.
-  have h0 : (JetQuotOp.jetQuotToeplitzOp3 s w) (0 : Fin 3) = 0 := by
-    simpa using congrArg (fun f : Window 3 => f (0 : Fin 3)) h
 
   -- Rewrite `jetQuotToeplitzOp3` as `toeplitzL 2 ...` and expand row-0.
   have hsum :
@@ -68,5 +73,15 @@ lemma toeplitzRow3_of_jetQuotOp_eq_zero
       add_assoc, add_left_comm, add_comm] using hre
 
   simpa [toeplitzRow3] using hfin
+
+/-- Backwards-compatible wrapper: full-window annihilation implies the row-0 hypothesis. -/
+lemma toeplitzRow3_of_jetQuotOp_eq_zero
+    (s : Hyperlocal.OffSeed Xi) (w : Window 3)
+    (h : JetQuotOp.jetQuotToeplitzOp3 s w = 0) :
+    toeplitzRow3 (jetQuotRow3 s) (reVec3 w) := by
+  classical
+  have h0 : (JetQuotOp.jetQuotToeplitzOp3 s w) (0 : Fin 3) = 0 := by
+    simpa using congrArg (fun f : Window 3 => f (0 : Fin 3)) h
+  exact toeplitzRow3_of_jetQuotOp_fin0_eq_zero (s := s) (w := w) h0
 
 end Hyperlocal.Targets.XiPacket
