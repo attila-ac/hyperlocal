@@ -20,6 +20,7 @@
   `toeplitzRow3_iff` lemma (that one lives in the manufacturing layer file).
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Correctness
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceRowMap3
 import Hyperlocal.Targets.XiPacket.Vectorize
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
@@ -34,32 +35,45 @@ namespace XiPacket
 
 open scoped BigOperators Real
 open Hyperlocal.Transport
+open ToeplitzLToRow3
 
 /--
 Concrete recurrence extraction for p=2: produces a nonzero Window-3 Toeplitz row stencil
 annihilating `reVec3(w0)`, `reVec3(wc)`, and `reVec3(wp2)`.
 
-(Replace this axiom by your constructed proof from the concrete ξ jet-quotient layer.)
+(Derived from the jet-quotient operator correctness layer.)
 -/
-axiom xiRecStencil2 (s : Hyperlocal.OffSeed Xi) :
+theorem xiRecStencil2 (s : Hyperlocal.OffSeed Xi) :
   ∃ c2 : Fin 3 → ℝ,
     c2 ≠ 0 ∧
     toeplitzRow3 c2 (reVec3 (w0 s)) ∧
     toeplitzRow3 c2 (reVec3 (wc s)) ∧
-    toeplitzRow3 c2 (reVec3 (wp2 s))
+    toeplitzRow3 c2 (reVec3 (wp2 s)) := by
+  rcases xiJetQuotToeplitzL_row0_fromOperator2 (s := s) with
+    ⟨c2, hc2, hw0, hwc, hwp2⟩
+  refine ⟨c2, hc2, ?_, ?_, ?_⟩
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (w0 s) hw0
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (wc s) hwc
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c2 (wp2 s) hwp2
 
 /--
 Concrete recurrence extraction for p=3: produces a nonzero Window-3 Toeplitz row stencil
 annihilating `reVec3(w0)`, `reVec3(wc)`, and `reVec3(wp3)`.
 
-(Replace this axiom by your constructed proof from the concrete ξ jet-quotient layer.)
+(Derived from the jet-quotient operator correctness layer.)
 -/
-axiom xiRecStencil3 (s : Hyperlocal.OffSeed Xi) :
+theorem xiRecStencil3 (s : Hyperlocal.OffSeed Xi) :
   ∃ c3 : Fin 3 → ℝ,
     c3 ≠ 0 ∧
     toeplitzRow3 c3 (reVec3 (w0 s)) ∧
     toeplitzRow3 c3 (reVec3 (wc s)) ∧
-    toeplitzRow3 c3 (reVec3 (wp3 s))
+    toeplitzRow3 c3 (reVec3 (wp3 s)) := by
+  rcases xiJetQuotToeplitzL_row0_fromOperator3 (s := s) with
+    ⟨c3, hc3, hw0, hwc, hwp3⟩
+  refine ⟨c3, hc3, ?_, ?_, ?_⟩
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (w0 s) hw0
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (wc s) hwc
+  · exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c3 (wp3 s) hwp3
 
 /--
 Packaged concrete recurrence output for ξ at Window-3:
@@ -79,7 +93,7 @@ structure XiRecRowPkg (s : Hyperlocal.OffSeed Xi) : Type where
   h3_wc : L3 (reVec3 (wc s)) = 0
   h3_wp3 : L3 (reVec3 (wp3 s)) = 0
 
-/-- Build the packaged recurrence rows from the concrete stencil axioms. -/
+/-- Build the packaged recurrence rows from the concrete stencil theorems. -/
 noncomputable def xiRecRowPkg (s : Hyperlocal.OffSeed Xi) : XiRecRowPkg s := by
   classical
   -- choose the stencils
@@ -103,22 +117,14 @@ noncomputable def xiRecRowPkg (s : Hyperlocal.OffSeed Xi) : XiRecRowPkg s := by
       ?_, ?_,
       ?_, ?_, ?_,
       ?_, ?_, ?_⟩
-  · -- L2 ≠ 0
-    exact rowMap3_ne_zero_of_coeff_ne_zero (c := c2) hc2
-  · -- L3 ≠ 0
-    exact rowMap3_ne_zero_of_coeff_ne_zero (c := c3) hc3
-  · -- L2 annihilations
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (w0 s)) h2_w0'
-  ·
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wc s)) h2_wc'
-  ·
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wp2 s)) h2_wp2'
-  · -- L3 annihilations
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (w0 s)) h3_w0'
-  ·
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wc s)) h3_wc'
-  ·
-    exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wp3 s)) h3_wp3'
+  · exact rowMap3_ne_zero_of_coeff_ne_zero (c := c2) hc2
+  · exact rowMap3_ne_zero_of_coeff_ne_zero (c := c3) hc3
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (w0 s)) h2_w0'
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wc s)) h2_wc'
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c2) (v := reVec3 (wp2 s)) h2_wp2'
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (w0 s)) h3_w0'
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wc s)) h3_wc'
+  · exact rowMap3_eq_zero_of_toeplitzRow3 (c := c3) (v := reVec3 (wp3 s)) h3_wp3'
 
 /-- The concrete recurrence row functional for ξ, parameterized by `p`. -/
 noncomputable def XiRecRow (s : Hyperlocal.OffSeed Xi) (p : ℝ) :
