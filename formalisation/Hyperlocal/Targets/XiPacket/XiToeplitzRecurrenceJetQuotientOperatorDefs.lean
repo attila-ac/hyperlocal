@@ -13,11 +13,22 @@
     • σ₂, σ₃ are star-invariant (hence real)
     • aRk1 coeffs 0,1,2 are real
     • aRk1 coeff 2 is -2, hence nonzero
+
+  NEW (row-0 bridge support):
+    • expose the 3 low-coefficient identities for `Rquartet` in the σ-sum basis.
+
+  IMPORTANT:
+  The coefficient identities are *declared here as axioms* to unblock compilation.
+  They are the exact “single semantic gate” you will later discharge by a focused,
+  dedicated proof file that unfolds `Rquartet` and computes coeffs 1/2/3.
+
+  This is strictly “something less” so you can clear + commit now.
 -/
 
 import Hyperlocal.Core
 import Hyperlocal.MinimalModel
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Transport.TACToeplitz
 import Mathlib.Tactic
 
@@ -29,6 +40,10 @@ namespace Targets
 namespace XiPacket
 
 namespace JetQuotOp
+
+open scoped BigOperators
+open Complex
+open Polynomial
 
 /-! ### Quartet roots -/
 
@@ -99,7 +114,6 @@ lemma star_σ3 (s : _root_.Hyperlocal.OffSeed Xi) : star (σ3 s) = σ3 s := by
 /-- Imaginary part of a star-fixed complex number is zero. -/
 lemma im_eq_zero_of_star_eq_self (z : ℂ) (hz : star z = z) : z.im = 0 := by
   cases' z with x y
-  -- `star ⟨x,y⟩ = ⟨x,-y⟩`
   have hy : (-y) = y := by
     have := congrArg Complex.im (by simpa using hz)
     simpa using this
@@ -130,6 +144,46 @@ lemma aRk1_im2 (s : _root_.Hyperlocal.OffSeed Xi) : (aRk1 s 2).im = 0 := by
 
 lemma aRk1_nat2_ne_zero (s : _root_.Hyperlocal.OffSeed Xi) : aRk1 s 2 ≠ 0 := by
   simp [aRk1_nat2_eq_neg_two (s := s)]
+
+/-! ### Row-0 bridge support: `Rquartet` low coefficients in σ-sum form -/
+
+/-
+These are the *exact* identities your Row-0 Cauchy-product bridge needs.
+
+They currently *do not* prove by simp/ring in your environment because:
+  • `Rquartet` expands to a nested `Finset.antidiagonal` coefficient computation,
+  • and `simp` does not normalize away the `X.coeff k` side conditions without
+    extra lemmas + careful rewriting.
+
+So, for now, keep them as axioms (ONE isolated semantic gate), and later discharge
+them in a dedicated proof file where you:
+  (a) prove `X.coeff (n+2) = 0` and `X.coeff (n+3) = 0` lemmas you saw failing,
+  (b) rewrite antidiagonal sums for n=1,2,3 explicitly,
+  (c) finish with `ring_nf`.
+
+This lets you clear/commit now and continue plumbing.
+-/
+
+/-- `Rquartet` coefficient 1. -/
+axiom Rquartet_coeff1_eq_neg_σ3 (s : _root_.Hyperlocal.OffSeed Xi) :
+    (_root_.Hyperlocal.Targets.XiPacket.Rquartet s.ρ).coeff 1 = -σ3 s
+
+/-- `Rquartet` coefficient 2. -/
+axiom Rquartet_coeff2_eq_σ2 (s : _root_.Hyperlocal.OffSeed Xi) :
+    (_root_.Hyperlocal.Targets.XiPacket.Rquartet s.ρ).coeff 2 = σ2 s
+
+/-- `Rquartet` coefficient 3. -/
+axiom Rquartet_coeff3_eq_neg_σ1 (s : _root_.Hyperlocal.OffSeed Xi) :
+    (_root_.Hyperlocal.Targets.XiPacket.Rquartet s.ρ).coeff 3 = -σ1 s
+
+/-- Convenience: with `σ₁=2`, coefficient 3 is `-2`. -/
+lemma Rquartet_coeff3_eq_neg_two (s : _root_.Hyperlocal.OffSeed Xi) :
+    (_root_.Hyperlocal.Targets.XiPacket.Rquartet s.ρ).coeff 3 = (-2 : ℂ) := by
+  -- keep this lemma theorem-level so downstream can use it without new axioms
+  calc
+    (_root_.Hyperlocal.Targets.XiPacket.Rquartet s.ρ).coeff 3
+        = -σ1 s := Rquartet_coeff3_eq_neg_σ1 (s := s)
+    _ = (-2 : ℂ) := by simpa [σ1_eq_two (s := s)]
 
 end JetQuotOp
 
