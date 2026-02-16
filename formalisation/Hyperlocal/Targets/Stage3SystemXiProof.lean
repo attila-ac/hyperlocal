@@ -1,13 +1,13 @@
 /-
   Hyperlocal/Targets/Stage3SystemXiProof.lean
 
-  Target wrapper for Xi := Hyperlocal.xi.
+  Modular construction of Stage3System Xi.
 
-  This file does NOT pretend to prove the analytic step yet.
-  Instead it:
-    • proves (constructively)  OffSeedPhaseLock Xi → Stage3System Xi
-    • composes glue to get NoOffSeed Xi
-    • leaves the final Stage3System Xi theorem stub for later.
+  This file proves (constructively)  OffSeedPhaseLock Xi → Stage3System Xi,
+  and composes to get NoOffSeed Xi.
+
+  NOTE:
+  This does NOT yet prove OffSeedPhaseLock Xi itself (that is the Toeplitz/TAC arm).
 -/
 
 import Hyperlocal.Targets.Stage3SystemXi
@@ -25,7 +25,7 @@ open scoped Real
 open Hyperlocal.Cancellation.PrimeWitness
 open Hyperlocal.Cancellation.PrimeWitness (oddPart)
 
-/-- OffSeedPhaseLock Xi implies Stage3System Xi (real construction, no axioms). -/
+/-- OffSeedPhaseLock Xi implies Stage3System Xi (modular construction, no axioms). -/
 theorem stage3System_xi_of_phaseLock
     (hlock : Hyperlocal.Transport.OffSeedPhaseLock (H := Xi)) :
     Hyperlocal.Transport.Stage3System (H := Xi) := by
@@ -94,7 +94,7 @@ theorem stage3System_xi_of_phaseLock
       _ = 0 := by
               simp [PhiShape, (hκspec s).2.2]
 
-  -- Build the 5-field witness bundle explicitly, then wrap into `Nonempty`.
+  -- Build the witness bundle.
   let sys : Hyperlocal.Transport.Stage3SystemData (H := Xi) :=
     { test := testFun
       tac := tacFun
@@ -112,14 +112,6 @@ theorem noOffSeed_xi_of_phaseLock
     Hyperlocal.Conclusion.OffSeedToTAC.NoOffSeed (H := Xi) := by
   exact noOffSeed_xi_of_stage3System
     (hs := stage3System_xi_of_phaseLock (hlock := hlock))
-
-/-
-THE FINAL TARGET (to be proved from transport → extraction for Xi):
-
-theorem stage3System_xi : Hyperlocal.Transport.Stage3System (H := Xi) := by
-  -- TODO: construct Stage3SystemData Xi from Toeplitz / truncated jet / transport
-  -- refine ⟨{ test := ?_, tac := ?_, hMatch := ?_, hOdd2 := ?_, hOdd3 := ?_ }⟩
--/
 
 end Targets
 end Hyperlocal
