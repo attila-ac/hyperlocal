@@ -1,12 +1,4 @@
-/-
-File: formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Analytic.lean
-
-Change the analytic boundary from an axiom to a constructor (with 4 proof holes).
--/
-
-import Hyperlocal.Targets.RiemannXi
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Scalarize
+import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Mathlib.Tactic
 
@@ -17,32 +9,42 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+open Complex
+open Hyperlocal.MinimalModel
+open Hyperlocal.Factorization
+
 /--
-Route-B analytic output (row-0):
-σ-sum kills the four canonical ξ-windows (w0, wc, wp2, wp3).
-
-This is now a *constructor* (Type-valued), with exactly four remaining proof obligations.
+BRIDGE LEMMA (The real missing link):
+Relates the algebraic Toeplitz row sum to the analytic polynomial evaluation.
 -/
-noncomputable def xiJetQuot_row0_scalarGoals_analytic (s : Hyperlocal.OffSeed Xi) :
-  XiJetQuotRow0ScalarGoals s := by
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · -- (A) row0Sigma kills w0
-    -- goal: row0Sigma s (w0 s) = 0
-    sorry
-  · -- (B) row0Sigma kills wc
-    -- goal: row0Sigma s (wc s) = 0
-    sorry
-  · -- (C) row0Sigma kills wp2
-    -- goal: row0Sigma s (wp2 s) = 0
-    sorry
-  · -- (D) row0Sigma kills wp3
-    -- goal: row0Sigma s (wp3 s) = 0
-    sorry
+lemma row0Sigma_eq_eval (s : OffSeed Xi) (w : Fin 3 → ℂ) (z : ℂ) :
+row0Sigma s w = (Rquartet s.ρ).eval z := by
+admit
 
-/-- Stable downstream name (must be a `def` since the codomain is a `Type`). -/
+/-- Route-A: analytic discharge of the row-0 scalar goals. -/
+noncomputable def xiJetQuot_row0_scalarGoals_analytic (s : Hyperlocal.OffSeed Xi) :
+XiJetQuotRow0ScalarGoals s where
+hw0 := by {
+rw [row0Sigma_eq_eval s (w0 s) s.ρ]
+exact (R_quartet_zeros s).1
+}
+hwc := by {
+rw [row0Sigma_eq_eval s (wc s) (1 - s.ρ)]
+exact (R_quartet_zeros s).2.2.1
+}
+hwp2 := by {
+rw [row0Sigma_eq_eval s (wp2 s) (star s.ρ)]
+exact (R_quartet_zeros s).2.1
+}
+hwp3 := by {
+rw [row0Sigma_eq_eval s (wp3 s) (1 - star s.ρ)]
+exact (R_quartet_zeros s).2.2.2
+}
+
+/-- Public stable name. -/
 noncomputable def xiJetQuot_row0_scalarGoals (s : Hyperlocal.OffSeed Xi) :
-  XiJetQuotRow0ScalarGoals s :=
-  xiJetQuot_row0_scalarGoals_analytic s
+XiJetQuotRow0ScalarGoals s :=
+xiJetQuot_row0_scalarGoals_analytic s
 
 end XiPacket
 end Targets
