@@ -1,24 +1,11 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Concrete.lean
+File: formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Concrete.lean
 
-  NEXT STEP (no refactor, pure semantic burden reduction):
-
-  Replace the old axiom-level semantic gate
-
-    `xiJetQuot_row0_witnessC : XiJetQuotRow0WitnessC s`
-
-  by a strictly smaller axiom stated in the fully scalarised normal form
-
-    `xiJetQuot_row0_scalarGoals : XiJetQuotRow0ScalarGoals s`
-
-  and recover the original witness bundle *definitionally* via
-  `witnessC_of_scalarGoals` from the proof/scalarisation file.
-
-  Downstream files should continue to depend on `xiJetQuot_row0_witnessC`
-  with no changes.
+Delete the old axiom gate here and import the analytic boundary instead.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Analytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Mathlib.Tactic
 
@@ -32,20 +19,13 @@ namespace XiPacket
 /-!
 ## Reduced semantic gate: scalar goals (explicit ℂ-identities)
 
-We keep the same downstream-facing name `xiJetQuot_row0_witnessC`,
-but the *only* remaining semantic axiom is now the four scalar identities
-in the unfolded row-0 form (`row0Sigma`).
+`xiJetQuot_row0_scalarGoals` is now provided by the analytic boundary module
+`...Row0Analytic.lean` as a `def` (with 4 proof obligations).
 -/
-
-/-- NEW smaller semantic gate: the four explicit row-0 scalar identities. -/
-axiom xiJetQuot_row0_scalarGoals (s : Hyperlocal.OffSeed Xi) :
-  XiJetQuotRow0ScalarGoals s
 
 /--
 Backwards-compatibility: recover the original witness bundle required by
 `XiToeplitzRecurrenceJetQuotientRow0Correctness.lean` and downstream.
-
-NOTE: `XiJetQuotRow0WitnessC s` is a `Type`, so this must be a `def`, not a `theorem`.
 -/
 def xiJetQuot_row0_witnessC (s : Hyperlocal.OffSeed Xi) :
     XiJetQuotRow0WitnessC s :=
@@ -72,7 +52,6 @@ theorem xiJetQuot_row0_wp2 (s : Hyperlocal.OffSeed Xi) :
 theorem xiJetQuot_row0_wp3 (s : Hyperlocal.OffSeed Xi) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0 := by
   simpa using (xiJetQuot_row0_witnessC (s := s)).hop_wp3
-
 
 end XiPacket
 end Targets
