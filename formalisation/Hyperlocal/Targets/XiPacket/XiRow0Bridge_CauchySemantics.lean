@@ -20,7 +20,6 @@ import Hyperlocal.Cancellation.Recurrence
 import Mathlib.Tactic
 import Hyperlocal.Targets.XiPacket.XiJet3Defs
 
-
 set_option autoImplicit false
 noncomputable section
 
@@ -35,33 +34,27 @@ open Hyperlocal.Cancellation
 
 /-! ### Jet + convolution semantics (precise Prop boundary) -/
 
-/--
-`JetConvolutionAt` as a *Prop* (data carried via `∃`).
+/-! ### Jet + convolution semantics (precise Prop boundary) -/
 
-Intended reading:
-* There exists a Route-A factor `G` with `Xi = Rquartet * G` (via `FactorisedByQuartet`).
-* `w` is the jet `[G(z), G'(z), G''(z)]`.
-* At the coefficient level, the Cauchy product of `Rquartet.coeff` with the (zero-padded)
-  jet window reproduces the (zero-padded) jet of `Xi` at `z`.
+/-
+Cycle-safe, minimal semantic gate: only the order 0/1/2 Leibniz payload.
+This is exactly what Route-L produces and exactly what Row-0 needs.
 -/
 def JetConvolutionAt (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Prop :=
   ∃ (G : ℂ → ℂ),
     Hyperlocal.Factorization.FactorisedByQuartet Xi s.ρ 1 G ∧
     IsJet3At G z w ∧
-    Convolution
-      (fun n => (Rquartet s.ρ).coeff n)
-      (fun n =>
-        match n with
-        | 0 => w 0
-        | 1 => w 1
-        | 2 => w 2
-        | _ => 0)
-      (fun n =>
-        match n with
-        | 0 => Xi z
-        | 1 => deriv Xi z
-        | 2 => deriv (deriv Xi) z
-        | _ => 0)
+    -- order 0
+    Xi z = (Hyperlocal.Factorization.Rρk s.ρ 1).eval z * (w 0) ∧
+    -- order 1
+    deriv Xi z =
+      deriv (fun t => (Hyperlocal.Factorization.Rρk s.ρ 1).eval t) z * (w 0)
+        + (Hyperlocal.Factorization.Rρk s.ρ 1).eval z * (w 1) ∧
+    -- order 2
+    deriv (deriv Xi) z =
+      deriv (deriv (fun t => (Hyperlocal.Factorization.Rρk s.ρ 1).eval t)) z * (w 0)
+        + (2 : ℂ) * (deriv (fun t => (Hyperlocal.Factorization.Rρk s.ρ 1).eval t) z) * (w 1)
+        + (Hyperlocal.Factorization.Rρk s.ρ 1).eval z * (w 2)
 
 /-! ### Pure algebra: `row0Sigma` as `convCoeff` at index `2` -/
 
@@ -103,8 +96,6 @@ theorem row0Sigma_eq_convCoeff (s : OffSeed Xi) (w : Transport.Window 3) :
   simp [row0Sigma, convCoeff, row0CoeffSeq, winSeq, Finset.range_succ, Finset.sum_insert,
     Finset.mem_range]
   ring_nf
-
-
 
 end XiPacket
 end Targets
