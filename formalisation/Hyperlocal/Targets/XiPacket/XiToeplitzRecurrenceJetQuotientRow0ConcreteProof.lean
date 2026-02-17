@@ -14,12 +14,12 @@
     * `Nonempty WitnessC ↔ Nonempty ScalarGoals` (Prop-level iff)
 -/
 
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Mathlib.Tactic
-
 
 set_option autoImplicit false
 noncomputable section
@@ -39,27 +39,22 @@ def row0Expr (s : Hyperlocal.OffSeed Xi) (w : Window 3) : ℂ :=
   ((JetQuotOp.aRk1 s 0) * w (0 : Fin 3) + (JetQuotOp.aRk1 s 1) * w (1 : Fin 3))
     + (JetQuotOp.aRk1 s 2) * w (2 : Fin 3)
 
-/-- The fully-unfolded row-0 scalar expression with coefficients `(-σ3, σ2, -2)`. -/
-def row0Sigma (s : Hyperlocal.OffSeed Xi) (w : Window 3) : ℂ :=
-  ((-(JetQuotOp.σ3 s : ℂ)) * w (0 : Fin 3) + (JetQuotOp.σ2 s : ℂ) * w (1 : Fin 3))
-    + (-(2 : ℂ)) * w (2 : Fin 3)
-
 /-- Unfold the three `aRk1` values used in row 0: `(-σ3, σ2, -2)`. -/
 lemma row0Expr_eq_row0Sigma (s : Hyperlocal.OffSeed Xi) (w : Window 3) :
     row0Expr s w = row0Sigma s w := by
+  classical
   have hz0 : JetQuotOp.aRk1 s 0 = (-(JetQuotOp.σ3 s : ℂ)) := by
     simp [JetQuotOp.aRk1, JetQuotOp.aR]
   have hz1 : JetQuotOp.aRk1 s 1 = (JetQuotOp.σ2 s : ℂ) := by
     simp [JetQuotOp.aRk1, JetQuotOp.aR]
   have hz2 : JetQuotOp.aRk1 s 2 = (-(2 : ℂ)) := by
     simpa using (JetQuotOp.aRk1_nat2_eq_neg_two (s := s))
-  simp [row0Expr, row0Sigma, hz0, hz1, hz2, add_assoc, add_left_comm, add_comm]
+  simp [row0Expr, row0Sigma, hz0, hz1, hz2, add_assoc, add_comm]
 
 /--
 Row-0 of `toeplitzL 2 (aRk1 s)` is exactly `row0Expr s w`.
 
-This is purely algebraic rewriting via the existing expander
-`toeplitzL_two_apply_fin0` (argument name is `coeffs`).
+Pure rewriting via the existing expander `toeplitzL_two_apply_fin0`.
 -/
 lemma toeplitzL_row0_eq_row0Expr (s : Hyperlocal.OffSeed Xi) (w : Window 3) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) = row0Expr s w := by
@@ -71,7 +66,10 @@ Row-0 of `toeplitzL 2 (aRk1 s)` is exactly the explicit `row0Sigma` expression.
 -/
 lemma toeplitzL_row0_eq_row0Sigma (s : Hyperlocal.OffSeed Xi) (w : Window 3) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) = row0Sigma s w := by
-  simpa [toeplitzL_row0_eq_row0Expr (s := s) (w := w), row0Expr_eq_row0Sigma (s := s) (w := w)]
+  calc
+    (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3)
+        = row0Expr s w := toeplitzL_row0_eq_row0Expr (s := s) (w := w)
+    _   = row0Sigma s w := row0Expr_eq_row0Sigma (s := s) (w := w)
 
 /-!
 ## Scalar goal package (Type-level) and constructive equivalence with the witness bundle
@@ -80,8 +78,7 @@ lemma toeplitzL_row0_eq_row0Sigma (s : Hyperlocal.OffSeed Xi) (w : Window 3) :
 /--
 The *scalar* obligations equivalent (constructively) to `XiJetQuotRow0WitnessC s`.
 
-Each field is a single explicit ℂ-identity:
-  `row0Sigma s w = 0`
+Each field is a single explicit ℂ-identity: `row0Sigma s w = 0`
 for `w = w0, wc, wp2, wp3`.
 -/
 structure XiJetQuotRow0ScalarGoals (s : Hyperlocal.OffSeed Xi) : Type where
@@ -90,41 +87,38 @@ structure XiJetQuotRow0ScalarGoals (s : Hyperlocal.OffSeed Xi) : Type where
   hwp2 : row0Sigma s (wp2 s) = 0
   hwp3 : row0Sigma s (wp3 s) = 0
 
-
 /-- Witness bundle ⇒ scalar-goals (pure rewriting). -/
 def scalarGoals_of_witnessC (s : Hyperlocal.OffSeed Xi) :
-    XiJetQuotRow0WitnessC s → XiJetQuotRow0ScalarGoals s := by
+    _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s → XiJetQuotRow0ScalarGoals s := by
   intro h
   refine ⟨?_, ?_, ?_, ?_⟩
-  · -- hop_w0 is a toeplitzL statement, so rewrite via toeplitzL_row0_eq_row0Sigma
-    simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := w0 s)] using h.hop_w0
+  · simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := w0 s)] using h.hop_w0
   · simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)] using h.hop_wc
   · simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wp2 s)] using h.hop_wp2
   · simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wp3 s)] using h.hop_wp3
 
-
 /-- Scalar-goals ⇒ witness bundle (pure rewriting). -/
 def witnessC_of_scalarGoals (s : Hyperlocal.OffSeed Xi) :
-    XiJetQuotRow0ScalarGoals s → XiJetQuotRow0WitnessC s := by
+    XiJetQuotRow0ScalarGoals s → _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s := by
   intro g
   refine ⟨?_, ?_, ?_, ?_⟩
-  · -- hop_w0
-    have hrew := (toeplitzL_row0_eq_row0Sigma (s := s) (w := w0 s))
-    -- rewrite LHS to `row0Sigma`, then close by `g.hw0`
+  ·
+    have hrew := toeplitzL_row0_eq_row0Sigma (s := s) (w := w0 s)
     simpa [hrew] using g.hw0
-  · -- hop_wc
-    have hrew := (toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s))
+  ·
+    have hrew := toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)
     simpa [hrew] using g.hwc
-  · -- hop_wp2
-    have hrew := (toeplitzL_row0_eq_row0Sigma (s := s) (w := wp2 s))
+  ·
+    have hrew := toeplitzL_row0_eq_row0Sigma (s := s) (w := wp2 s)
     simpa [hrew] using g.hwp2
-  · -- hop_wp3
-    have hrew := (toeplitzL_row0_eq_row0Sigma (s := s) (w := wp3 s))
+  ·
+    have hrew := toeplitzL_row0_eq_row0Sigma (s := s) (w := wp3 s)
     simpa [hrew] using g.hwp3
 
 /-- Prop-level iff (Nonempty on both sides) expressing obligation equivalence. -/
 theorem witnessC_nonempty_iff_scalarGoals_nonempty (s : Hyperlocal.OffSeed Xi) :
-    Nonempty (XiJetQuotRow0WitnessC s) ↔ Nonempty (XiJetQuotRow0ScalarGoals s) := by
+    Nonempty (_root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s) ↔
+      Nonempty (XiJetQuotRow0ScalarGoals s) := by
   constructor
   · intro hw
     rcases hw with ⟨h⟩

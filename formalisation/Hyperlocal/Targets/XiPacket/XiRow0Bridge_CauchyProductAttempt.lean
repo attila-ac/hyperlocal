@@ -1,3 +1,4 @@
+import Hyperlocal.Targets.XiPacket.XiJet3Defs
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Hyperlocal.Cancellation.Recurrence
@@ -14,12 +15,6 @@ open scoped BigOperators
 open Complex
 open Polynomial
 open Hyperlocal.Cancellation
-
-/-- A length-3 jet window for a function `F` at center `z`. -/
-def IsJet3At (F : ℂ → ℂ) (z : ℂ) (w : Transport.Window 3) : Prop :=
-  w 0 = F z ∧
-  w 1 = deriv F z ∧
-  w 2 = deriv (deriv F) z
 
 /--
 `JetConvolutionAt` as a *Prop* (so: use `∃` for data).

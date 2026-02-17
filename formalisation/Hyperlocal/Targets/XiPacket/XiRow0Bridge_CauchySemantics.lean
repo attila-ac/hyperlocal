@@ -3,20 +3,23 @@
 
   Row-0 bridge helper layer (pure algebra + a precise semantic hypothesis).
 
-  This file is intentionally independent of the downstream Toeplitz/recurrence plumbing.
-  It provides:
-    * a robust, type-correct statement of the missing semantic content as a Prop
-      (`JetConvolutionAt`), avoiding `structure ... : Prop` projection issues;
-    * the purely algebraic identity `row0Sigma = convCoeff ... 2`.
+  IMPORTANT DESIGN RULE (cycle breaker):
+  This file must remain *semantic + algebra only*.
+  It MUST NOT import any Row0Semantics / Row0ConcreteProof / Toeplitz-recurrence proof modules.
 
-  The final goal (to remove all semantic axioms) is to prove `JetConvolutionAt`
-  from analytic Taylor/product facts and the Route-A factorisation interface.
+  What this file provides:
+    • `JetConvolutionAt` : Prop boundary for the Cauchy-normalised jet semantics.
+    • `row0Sigma`        : the row-0 σ-linear form (defined locally to avoid missing identifiers).
+    • `row0Sigma_eq_convCoeff` : pure algebra statement identifying `row0Sigma` as `convCoeff` at index 2.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Cancellation.Recurrence
 import Mathlib.Tactic
+import Hyperlocal.Targets.XiPacket.XiJet3Defs
+
 
 set_option autoImplicit false
 noncomputable section
@@ -32,22 +35,13 @@ open Hyperlocal.Cancellation
 
 /-! ### Jet + convolution semantics (precise Prop boundary) -/
 
-/-- A length-3 jet window for a function `F` at center `z`. -/
-def IsJet3At (F : ℂ → ℂ) (z : ℂ) (w : Transport.Window 3) : Prop :=
-  w 0 = F z ∧
-  w 1 = deriv F z ∧
-  w 2 = deriv (deriv F) z
-
 /--
 `JetConvolutionAt` as a *Prop* (data carried via `∃`).
-
-This avoids the Lean error “field must be a proof” that occurs when trying to put
-non-proof fields into a `structure ... : Prop`.
 
 Intended reading:
 * There exists a Route-A factor `G` with `Xi = Rquartet * G` (via `FactorisedByQuartet`).
 * `w` is the jet `[G(z), G'(z), G''(z)]`.
-* At the coefficient level the Cauchy product of `Rquartet.coeff` with the (zero-padded)
+* At the coefficient level, the Cauchy product of `Rquartet.coeff` with the (zero-padded)
   jet window reproduces the (zero-padded) jet of `Xi` at `z`.
 -/
 def JetConvolutionAt (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Prop :=
@@ -69,11 +63,22 @@ def JetConvolutionAt (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Prop 
         | 2 => deriv (deriv Xi) z
         | _ => 0)
 
-/-! ### Pure algebra: `row0Sigma` is `convCoeff` at index `2` -/
+/-! ### Pure algebra: `row0Sigma` as `convCoeff` at index `2` -/
+
+/--
+Row-0 σ-linear form on a Window-3 jet.
+
+Defined *locally* to avoid missing-identifier issues and to keep this file cycle-safe.
+Orientation is chosen so that it matches the existing downstream usage:
+
+  `-(2)*w₂ + σ₂*w₁ - σ₃*w₀`.
+-/
+def row0Sigma (s : OffSeed Xi) (w : Transport.Window 3) : ℂ :=
+  (-(2 : ℂ)) * (w 2) + (JetQuotOp.σ2 s : ℂ) * (w 1) + (-(JetQuotOp.σ3 s : ℂ)) * (w 0)
 
 /-- Kernel coefficient sequence for row-0, in the orientation matching `row0Sigma`. -/
 def row0CoeffSeq (s : OffSeed Xi) : ℕ → ℂ
-  | 0 => (-2 : ℂ)
+  | 0 => (-(2 : ℂ))
   | 1 => (JetQuotOp.σ2 s : ℂ)
   | 2 => (-(JetQuotOp.σ3 s : ℂ))
   | _ => 0
@@ -85,13 +90,20 @@ def winSeq (w : Transport.Window 3) : ℕ → ℂ
   | 2 => w 2
   | _ => 0
 
-/-- `row0Sigma` is exactly `convCoeff` at index `2` with the kernel `row0CoeffSeq`. -/
+/--
+`row0Sigma` is exactly `convCoeff` at index `2` with kernel `row0CoeffSeq`.
+
+This is a *pure algebra* identity.
+-/
 theorem row0Sigma_eq_convCoeff (s : OffSeed Xi) (w : Transport.Window 3) :
     row0Sigma s w = convCoeff (row0CoeffSeq s) (winSeq w) 2 := by
   classical
+  -- Unfold convCoeff at n=2 and expand the finite sum over `range 3 = {0,1,2}`.
+  -- The remaining work is ring-normalisation.
   simp [row0Sigma, convCoeff, row0CoeffSeq, winSeq, Finset.range_succ, Finset.sum_insert,
-    Finset.mem_range, Nat.succ_eq_add_one, add_assoc, add_left_comm, add_comm]
-  -- ring   -- delete this line (simp already solved it)
+    Finset.mem_range]
+  ring_nf
+
 
 
 end XiPacket
