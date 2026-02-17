@@ -35,29 +35,30 @@ axiom xiRouteA_jetPkg (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) :
     Differentiable ℂ (fun t => deriv (Rfun s) t) ∧
     Differentiable ℂ (fun t => deriv G t)
 
-/-- `JetLeibnizAt` for the central window `w0`. -/
+/-- `JetLeibnizAt` for the central window `w0` at `z = s.ρ`. -/
 theorem xiJetLeibnizAt_w0 (s : OffSeed Xi) :
-  JetLeibnizAt s s.ρ (w0 s) := by
+  JetLeibnizAt s (s.ρ) (w0 s) := by
   exact jetLeibnizAt_from_RouteA (s := s) (z := s.ρ) (w := w0 s)
     (xiRouteA_jetPkg (s := s) (z := s.ρ) (w := w0 s))
 
-/-- `JetLeibnizAt` for the conjugate window `wc`. -/
+/-- `JetLeibnizAt` for the conjugate window `wc` at `z = 1 - s.ρ`. -/
 theorem xiJetLeibnizAt_wc (s : OffSeed Xi) :
-  JetLeibnizAt s s.ρ (wc s) := by
-  exact jetLeibnizAt_from_RouteA (s := s) (z := s.ρ) (w := wc s)
-    (xiRouteA_jetPkg (s := s) (z := s.ρ) (w := wc s))
+  JetLeibnizAt s (1 - s.ρ) (wc s) := by
+  exact jetLeibnizAt_from_RouteA (s := s) (z := 1 - s.ρ) (w := wc s)
+    (xiRouteA_jetPkg (s := s) (z := 1 - s.ρ) (w := wc s))
 
-/-- `JetLeibnizAt` for the prime-2 window `wp2`. -/
+/-- `JetLeibnizAt` for `wp2` at `z = star(s.ρ)` (as `starRingEnd`). -/
 theorem xiJetLeibnizAt_wp2 (s : OffSeed Xi) :
-  JetLeibnizAt s s.ρ (wp2 s) := by
-  exact jetLeibnizAt_from_RouteA (s := s) (z := s.ρ) (w := wp2 s)
-    (xiRouteA_jetPkg (s := s) (z := s.ρ) (w := wp2 s))
+  JetLeibnizAt s ((starRingEnd ℂ) s.ρ) (wp2 s) := by
+  exact jetLeibnizAt_from_RouteA (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s)
+    (xiRouteA_jetPkg (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s))
 
-/-- `JetLeibnizAt` for the prime-3 window `wp3`. -/
+/-- `JetLeibnizAt` for `wp3` at `z = 1 - star(s.ρ)` (as `starRingEnd`). -/
 theorem xiJetLeibnizAt_wp3 (s : OffSeed Xi) :
-  JetLeibnizAt s s.ρ (wp3 s) := by
-  exact jetLeibnizAt_from_RouteA (s := s) (z := s.ρ) (w := wp3 s)
-    (xiRouteA_jetPkg (s := s) (z := s.ρ) (w := wp3 s))
+  JetLeibnizAt s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) := by
+  exact jetLeibnizAt_from_RouteA (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3 s)
+    (xiRouteA_jetPkg (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3 s))
+
 
 end JetQuotOp
 
