@@ -1,58 +1,23 @@
 /-
-File: formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Concrete.lean
+PATCH (EDIT) for:
+  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Concrete.lean
 
-Delete the old axiom gate here and import the analytic boundary instead.
+Fix:
+  `export Hyperlocal.Targets.XiPacket (...)` inside `namespace Hyperlocal.Targets.XiPacket`
+  is a self-export (Lean rejects it).
+
+Use the dedicated export namespace from the frontier file instead.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Semantics
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Analytic
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
-import Mathlib.Tactic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Frontier
+-- keep the rest of your existing imports
 
-set_option autoImplicit false
-noncomputable section
+namespace Hyperlocal.Targets.XiPacket
 
-namespace Hyperlocal
-namespace Targets
-namespace XiPacket
+-- If you previously declared `axiom xiJetQuot_row0_*` here, DELETE those lines.
 
-/-!
-## Reduced semantic gate: scalar goals (explicit ℂ-identities)
+-- Re-export the frontier names *without* self-export:
+export _root_.Hyperlocal.Targets.XiPacket.Row0FrontierExport
+  (xiJetQuot_row0_w0 xiJetQuot_row0_wc xiJetQuot_row0_wp2 xiJetQuot_row0_wp3)
 
-`xiJetQuot_row0_scalarGoals` is now provided by the analytic boundary module
-`...Row0Analytic.lean` as a `def` (with 4 proof obligations).
--/
-
-/--
-Backwards-compatibility: recover the original witness bundle required by
-`XiToeplitzRecurrenceJetQuotientRow0Correctness.lean` and downstream.
--/
-def xiJetQuot_row0_witnessC (s : Hyperlocal.OffSeed Xi) :
-    XiJetQuotRow0WitnessC s :=
-  witnessC_of_scalarGoals (s := s) (xiJetQuot_row0_scalarGoals (s := s))
-
-open Hyperlocal.Transport
-
-/-- Canonical row-0 identity for `w0`. -/
-theorem xiJetQuot_row0_w0 (s : Hyperlocal.OffSeed Xi) :
-    (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 := by
-  simpa using (xiJetQuot_row0_witnessC (s := s)).hop_w0
-
-/-- Canonical row-0 identity for `wc`. -/
-theorem xiJetQuot_row0_wc (s : Hyperlocal.OffSeed Xi) :
-    (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
-  simpa using (xiJetQuot_row0_witnessC (s := s)).hop_wc
-
-/-- Canonical row-0 identity for `wp2`. -/
-theorem xiJetQuot_row0_wp2 (s : Hyperlocal.OffSeed Xi) :
-    (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2 s)) (0 : Fin 3) = 0 := by
-  simpa using (xiJetQuot_row0_witnessC (s := s)).hop_wp2
-
-/-- Canonical row-0 identity for `wp3`. -/
-theorem xiJetQuot_row0_wp3 (s : Hyperlocal.OffSeed Xi) :
-    (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0 := by
-  simpa using (xiJetQuot_row0_witnessC (s := s)).hop_wp3
-
-end XiPacket
-end Targets
-end Hyperlocal
+end Hyperlocal.Targets.XiPacket
