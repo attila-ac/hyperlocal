@@ -3,13 +3,12 @@
 
   Row-0 analytic bridge (stabilised): consume only row0Sigma = 0 facts.
 
-  FIX:
-  Do NOT rely on any exported root-level names like `row0Sigma_w0_eq_zero`
-  (they are currently not in the environment at the expected name).
+  FIX (robust):
+  Do NOT reference Route–C frontier axiom names (`JetQuotOp.*`) from here.
+  Instead consume only the root-level stable theorems exported by
+  `XiRow0Bridge_CauchyConvolutionDischarge.lean`:
 
-  Instead, build the four scalar-goal fields *directly* from:
-    • the Route–C semantic gate axioms `JetQuotOp.jetConv_*`
-    • the core discharge lemma `row0Sigma_eq_zero_from_JetConvolutionRev`
+    row0Sigma_w0_eq_zero, row0Sigma_wc_eq_zero, row0Sigma_wp2_eq_zero, row0Sigma_wp3_eq_zero.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
@@ -29,24 +28,19 @@ open scoped BigOperators
 /--
 Route-C/Route-A: analytic discharge of the row-0 scalar goals.
 
-We *inline* the proof of each field from the Route–C semantic gate axioms
-(`JetQuotOp.jetConv_*`) to avoid any namespace/name churn on exported theorems.
+This file is intentionally immune to any naming refactors inside `JetQuotOp`.
+It depends only on the four exported root-level row0Sigma=0 theorems.
 -/
 noncomputable def xiJetQuot_row0_scalarGoals_analytic (s : Hyperlocal.OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s where
   hw0 := by
-    -- goal: row0Sigma s (w0 s) = 0
-    exact row0Sigma_eq_zero_from_JetConvolutionRev
-      (s := s) (z := s.ρ) (w := w0 s) (JetQuotOp.jetConv_w0 s)
+    simpa using (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_w0_eq_zero s)
   hwc := by
-    exact row0Sigma_eq_zero_from_JetConvolutionRev
-      (s := s) (z := (1 - s.ρ)) (w := wc s) (JetQuotOp.jetConv_wc s)
+    simpa using (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wc_eq_zero s)
   hwp2 := by
-    exact row0Sigma_eq_zero_from_JetConvolutionRev
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s) (JetQuotOp.jetConv_wp2 s)
+    simpa using (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wp2_eq_zero s)
   hwp3 := by
-    exact row0Sigma_eq_zero_from_JetConvolutionRev
-      (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3 s) (JetQuotOp.jetConv_wp3 s)
+    simpa using (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wp3_eq_zero s)
 
 /-- Public stable name (consumed downstream). -/
 noncomputable def xiJetQuot_row0_scalarGoals (s : Hyperlocal.OffSeed Xi) :

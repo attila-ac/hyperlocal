@@ -28,3 +28,7 @@
 
 # build artifacts
 formalisation.zip
+
+# local/exchange archives
+*.tar.gz
+*.tgz

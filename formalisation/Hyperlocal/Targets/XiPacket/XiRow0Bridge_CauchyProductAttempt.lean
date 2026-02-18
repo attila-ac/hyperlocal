@@ -8,13 +8,20 @@
   We introduce a NEW semantic gate name `JetConvolutionAtRev` which is genuinely
   a `Convolution` statement, to avoid clashes with existing names in the repo.
 
-  NOTE (2026-02-17 refactor):
-  This file now contains **no** `jetConv_*` axioms and **no** canonical-window
-  instances. Those instances live in
+  MOVE-1 (2026-02-18):
+  Add the *minimal* Row--0 semantic gate `Row0ConvolutionAtRev`, which requires
+  only the single coefficient identity at n=3 that actually feeds `row0Sigma`.
 
-    `XiRow0Bridge_CauchyConvolutionDischarge.lean`
+  This shrinks the eventual analytic discharge obligation from:
+    ∀ n, convolution coefficient identity
+  down to:
+    convCoeff ... 3 = 0.
 
-  which single-sources them from Route--A via one frontier lemma.
+  NOTE:
+  This file contains **no** `jetConv_*` axioms and **no** canonical-window
+  instances. Those instances live in:
+
+    `XiRow0Bridge_CauchyConvolutionDischarge.lean`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
@@ -75,6 +82,16 @@ def JetConvolutionAtRev (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Pr
         | _ => 0)
 
 /--
+`Row0ConvolutionAtRev` is the *minimal* Route--C gate needed for Row--0:
+only the single coefficient identity at `n=3`.
+-/
+def Row0ConvolutionAtRev (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Prop :=
+  ∃ (G : ℂ → ℂ),
+    Hyperlocal.Factorization.FactorisedByQuartet Xi s.ρ 1 G ∧
+    IsJet3At G z w ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0
+
+/--
 Pure algebra: `row0Sigma` equals the `n=3` Cauchy coefficient of the reverse convolution.
 -/
 theorem row0Sigma_eq_convCoeff_rev (s : OffSeed Xi) (w : Transport.Window 3) :
@@ -84,15 +101,35 @@ theorem row0Sigma_eq_convCoeff_rev (s : OffSeed Xi) (w : Transport.Window 3) :
         Finset.range_succ, Finset.sum_range_succ]
   ring_nf
 
-/-- Core discharge: `JetConvolutionAtRev` implies `row0Sigma = 0`. -/
+/-- Projection: full convolution gate implies the minimal Row--0 gate. -/
+theorem row0ConvolutionAtRev_of_JetConvolutionAtRev
+    (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) :
+    JetConvolutionAtRev s z w → Row0ConvolutionAtRev s z w := by
+  classical
+  intro H
+  rcases H with ⟨G, hfac, hjet, Hconv⟩
+  have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0 := by
+    simpa using (Hconv 3)
+  exact ⟨G, hfac, hjet, h3⟩
+
+/-- Core discharge (full gate): `JetConvolutionAtRev` implies `row0Sigma = 0`. -/
 theorem row0Sigma_eq_zero_from_JetConvolutionRev
     (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3)
     (H : JetConvolutionAtRev s z w) :
     row0Sigma s w = 0 := by
   classical
-  rcases H with ⟨G, hfac, hjet, Hconv⟩
-  have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0 := by
-    simpa using (Hconv 3)
+  have H0 : Row0ConvolutionAtRev s z w :=
+    row0ConvolutionAtRev_of_JetConvolutionAtRev (s := s) (z := z) (w := w) H
+  rcases H0 with ⟨G, hfac, hjet, h3⟩
+  simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w)] using h3
+
+/-- Core discharge (minimal gate): `Row0ConvolutionAtRev` implies `row0Sigma = 0`. -/
+theorem row0Sigma_eq_zero_from_Row0ConvolutionAtRev
+    (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3)
+    (H : Row0ConvolutionAtRev s z w) :
+    row0Sigma s w = 0 := by
+  classical
+  rcases H with ⟨G, hfac, hjet, h3⟩
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w)] using h3
 
 /-! ### Re-export (core only) -/
@@ -101,10 +138,12 @@ export _root_.Hyperlocal.Targets.XiPacket
   (winSeqRev
    row0CoeffSeqRev
    JetConvolutionAtRev
+   Row0ConvolutionAtRev
    row0Sigma_eq_convCoeff_rev
-   row0Sigma_eq_zero_from_JetConvolutionRev)
+   row0ConvolutionAtRev_of_JetConvolutionAtRev
+   row0Sigma_eq_zero_from_JetConvolutionRev
+   row0Sigma_eq_zero_from_Row0ConvolutionAtRev)
 end CauchyProductAttemptExport
-
 
 end XiPacket
 end Targets
