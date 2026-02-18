@@ -1,17 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiLemmaC_RecurrenceToEllKappaAtOrder.lean
 
-  Plan C++J (Jet Pivot): “AtOrder” version of the Lemma C core scaffold.
+  FULL REPLACEMENT (restores missing ell/kappa lemmas + Option A κ-widening).
 
-  This file is intentionally cheap + mechanical:
-  it duplicates the non-semantic Lemma-C algebra from
-  `XiLemmaC_RecurrenceToEllKappa.lean`, but replaces
+  What this file provides (and downstream expects):
+    • trig-split reVec3 lemmas for wp2At/wp3At
+    • `ell_of_trigSplit`
+    • determinant identities `ell_wp2At_eq_b_mul_kappa`, `ell_wp3At_eq_b_mul_kappa`
+    • core package `XiLemmaC_CoreAt` with widened κ-witness (Or-shape)
+    • consequences: `XiLemmaC_hell2At_of_core`, `XiLemmaC_hell3At_of_core`
+    • JetPivot κ-leverage:
+        hkappaAt_of_cderivRe_ne0 : Or.inl ...
+        hkappaAt_of_cderivIm_ne0 : Or.inr ...
 
-    w0   ↦ w0At m
-    wp2  ↦ wp2At m
-    wp3  ↦ wp3At m
-
-  so downstream Stage-4 code can be phrased in terms of definitional jet windows.
+  No new axioms.
 -/
 
 import Hyperlocal.Transport.PrimeSineRescue
@@ -51,8 +53,6 @@ lemma reVec3_wp2At (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
       + (aCoeff (σ s) (t s) (2 : ℝ)) • reVec3 (wc s)
       + (bCoeff (σ s) (t s) (2 : ℝ)) • reVec3 (ws s) := by
   funext i
-  -- simp will likely unfold wc/ws into basis form (due to imported simp lemmas),
-  -- leaving only a commutative-ring rearrangement.
   simp [reVec3, wp2At, wpAt, Complex.add_re, Pi.add_apply, Pi.smul_apply,
         add_assoc, add_left_comm, add_comm, mul_assoc]
   ring_nf
@@ -76,7 +76,6 @@ lemma ell_of_trigSplit
       =
     b * kappa u0 uc us := by
   classical
-  -- Copy the working proof pattern from `XiLemmaC_RecurrenceToEllKappa.lean`.
   calc
     ell u0 uc (u0 + a • uc + b • us)
         = ell u0 uc (u0 + a • uc) + ell u0 uc (b • us) := by
@@ -87,10 +86,7 @@ lemma ell_of_trigSplit
           have hu0 : ell u0 uc u0 = 0 := by
             simpa using (ell_u0 (u0 := u0) (uc := uc))
           have huc : ell u0 uc (a • uc) = 0 := by
-            -- multilinearity + repeated column
             simp [ell_smul, ell_uc]
-          -- Now the only surviving term is `b * ell u0 uc us`, rewrite it to κ.
-          -- (This avoids generating the spurious goal `kappa u0 uc (a • uc) = 0`.)
           simp [hu0, huc, ell_us_eq_kappa, add_assoc, add_left_comm, add_comm]
 
 /-- Determinant identity: `ell(..., wp2At)` equals `bCoeff * kappa`. -/
@@ -107,8 +103,9 @@ lemma ell_wp2At_eq_b_mul_kappa (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
           + (aCoeff (σ s) (t s) (2 : ℝ)) • reVec3 (wc s)
           + (bCoeff (σ s) (t s) (2 : ℝ)) • reVec3 (ws s)) := by
             simp [reVec3_wp2At]
-    _ = bCoeff (σ s) (t s) (2 : ℝ)
-          * kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
+    _ =
+      bCoeff (σ s) (t s) (2 : ℝ)
+        * kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
           simpa using
             (ell_of_trigSplit
               (u0 := reVec3 (w0At m s))
@@ -131,8 +128,9 @@ lemma ell_wp3At_eq_b_mul_kappa (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
           + (aCoeff (σ s) (t s) (3 : ℝ)) • reVec3 (wc s)
           + (bCoeff (σ s) (t s) (3 : ℝ)) • reVec3 (ws s)) := by
             simp [reVec3_wp3At]
-    _ = bCoeff (σ s) (t s) (3 : ℝ)
-          * kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
+    _ =
+      bCoeff (σ s) (t s) (3 : ℝ)
+        * kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
           simpa using
             (ell_of_trigSplit
               (u0 := reVec3 (w0At m s))
@@ -141,12 +139,13 @@ lemma ell_wp3At_eq_b_mul_kappa (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
               (a := aCoeff (σ s) (t s) (3 : ℝ))
               (b := bCoeff (σ s) (t s) (3 : ℝ)))
 
-/-- The “AtOrder” Lemma-C core package: (hb2,hb3) plus κ≠0. -/
+/-- The “AtOrder” Lemma-C core package: (hb2,hb3) plus κ≠0 (Option A widened). -/
 structure XiLemmaC_CoreAt (m : ℕ) (s : Hyperlocal.OffSeed Xi) : Prop where
   hb2 : bCoeff (σ s) (t s) (2 : ℝ) = 0
   hb3 : bCoeff (σ s) (t s) (3 : ℝ) = 0
   hkappaAt :
-    kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0
+    (kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+    ∨ (kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
 
 /-- Core ⇒ `ell(..., wp2At)=0`. -/
 theorem XiLemmaC_hell2At_of_core (m : ℕ) (s : Hyperlocal.OffSeed Xi)
@@ -172,15 +171,28 @@ theorem XiLemmaC_hell3At_of_core (m : ℕ) (s : Hyperlocal.OffSeed Xi)
           simpa using (ell_wp3At_eq_b_mul_kappa (m := m) (s := s))
     _ = 0 := by simpa [h.hb3]
 
-/-- JetPivot leverage: `Re(Ξ^{(m)}(sc)) ≠ 0` ⇒ `κ(m,s) ≠ 0` via closed form. -/
+/-- JetPivot leverage (Re): `Re(Ξ^{(m)}(sc)) ≠ 0` ⇒ Or-κ via closed form. -/
 theorem hkappaAt_of_cderivRe_ne0 (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     (hRe : (((cderivIter m Xi) (sc s))).re ≠ 0) :
-    kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
+    (kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+    ∨ (kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0) := by
+  refine Or.inl ?_
   intro hk
   apply hRe
   have hk' := hk
-  -- keep this as `rw`, not `simp`, to avoid rewriting wc/ws into basis forms
   rw [XiLemmaC_kappa_closedFormAt (m := m) (s := s)] at hk'
+  exact hk'
+
+/-- JetPivot leverage (Im): `Im(Ξ^{(m)}(sc)) ≠ 0` ⇒ Or-κ via imag closed form. -/
+theorem hkappaAt_of_cderivIm_ne0 (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    (hIm : (((cderivIter m Xi) (sc s))).im ≠ 0) :
+    (kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+    ∨ (kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0) := by
+  refine Or.inr ?_
+  intro hk
+  apply hIm
+  have hk' := hk
+  rw [XiLemmaC_kappa_closedFormAt_im (m := m) (s := s)] at hk'
   exact hk'
 
 end XiPacket

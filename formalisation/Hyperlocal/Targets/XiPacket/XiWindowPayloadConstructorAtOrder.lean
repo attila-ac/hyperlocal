@@ -1,14 +1,7 @@
 /-
   Hyperlocal/Targets/XiPacket/XiWindowPayloadConstructorAtOrder.lean
 
-  Plan C++J (Jet Pivot): Phase-4 payload constructor “at order m”.
-
-  This is intentionally cheap: just record construction of `WindowPayload`
-  using definitional jet windows
-      w0At m s, wp2At m s, wp3At m s
-  and the Move-2 core ⇒ (hell2At, hell3At) lemmas.
-
-  No semantic proofs here.
+  FULL REPLACEMENT (supports BOTH Re/Im JetPivot branches via Option A widened κ).
 -/
 
 import Hyperlocal.Targets.XiPacket.WindowPayload
@@ -69,8 +62,7 @@ by
       hkappa := h.hkappaAt }
 
 /--
-Convenience: build the order-`m` payload from `(hb2,hb3)` plus the JetPivot nonvanishing witness
-`Re(Ξ^{(m)}(sc)) ≠ 0`, using `hkappaAt_of_cderivRe_ne0`.
+Convenience: build the order-`m` payload from `(hb2,hb3)` plus `Re(Ξ^{(m)}(sc)) ≠ 0`.
 -/
 def xiWindowPayloadAtOrder_of_hb2hb3_cderivRe_ne0
     (m : ℕ) (s : _root_.Hyperlocal.OffSeed Xi)
@@ -84,6 +76,22 @@ by
     { hb2 := hb2
       hb3 := hb3
       hkappaAt := hkappaAt_of_cderivRe_ne0 (m := m) (s := s) hRe }
+
+/--
+Convenience: build the order-`m` payload from `(hb2,hb3)` plus `Im(Ξ^{(m)}(sc)) ≠ 0`.
+-/
+def xiWindowPayloadAtOrder_of_hb2hb3_cderivIm_ne0
+    (m : ℕ) (s : _root_.Hyperlocal.OffSeed Xi)
+    (hb2 : bCoeff (σ s) (t s) (2 : ℝ) = 0)
+    (hb3 : bCoeff (σ s) (t s) (3 : ℝ) = 0)
+    (hIm : (((cderivIter m Xi) (sc s))).im ≠ 0) :
+    WindowPayload (σ s) (t s) :=
+by
+  refine xiWindowPayloadAtOrder_of_core (m := m) (s := s) ?_
+  refine
+    { hb2 := hb2
+      hb3 := hb3
+      hkappaAt := hkappaAt_of_cderivIm_ne0 (m := m) (s := s) hIm }
 
 end XiPacket
 end Targets

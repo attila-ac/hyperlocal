@@ -1,14 +1,14 @@
 /-
   Hyperlocal/Targets/OffSeedPhaseLockXiPayload.lean
 
-  New Plan C++ endpoint:
+  PATCH (Option A compatible):
+  `WindowPayloadFacts.exists_kappa_sinlog2_sinlog3` now needs an explicit
+  Re-κ witness `hKapRe`.  For the non-jet (Plan C++) payload, this witness
+  is exactly `hC.hkappa` from `XiLemmaC`.
 
-  We obtain the Stage-3 “phase lock” contract for ξ by:
-    1) using the single semantic bundle `XiLemmaC s`
-    2) building the definitional WindowPayload via `xiWindowPayload`
-    3) using the already-green `WindowPayloadFacts` pipeline
-
-  No κ closed-form file is imported here.
+  Key point:
+  we pass `hC.hkappa` through, after a `simp` rewrite that identifies
+  `X.w0/X.wc/X.ws` with the definitional ξ windows.
 -/
 
 import Hyperlocal.Transport.OffSeedBridge
@@ -42,8 +42,21 @@ Main deliverable for the Stage-3 bridge:
 -/
 theorem offSeedPhaseLock_Xi : Hyperlocal.Transport.OffSeedPhaseLock Xi := by
   intro s
-  simpa [XiPacket.t, XiPacket.σ] using
-    (WindowPayload.exists_kappa_sinlog2_sinlog3 (X := xiWindowPayload_of_window (s := s)))
+  -- keep the Lemma-C bundle in scope so we can reuse its Re-κ witness
+  let hC : XiLemmaC (s := s) := xiWindowLemmaC_fromRecurrence (s := s)
+  -- payload constructed from that bundle
+  let X : WindowPayload (σ s) (t s) := xiWindowPayload (s := s) (hC := hC)
+
+  -- Re-κ witness in the shape expected by `WindowPayloadFacts`
+  have hKapRe :
+      kappa (reVec3 X.w0) (reVec3 X.wc) (reVec3 X.ws) ≠ 0 := by
+    -- `X` is definitional payload built from `(w0,wc,ws,...)`, so this is just `hC.hkappa`
+    simpa [X, xiWindowPayload, xiWindowPayload_of_C, windowPayload_mk_of_BC_offSeed,
+      windowPayload_mk_of_BC] using hC.hkappa
+
+  -- now call the smoke-test lemma with the explicit κ witness
+  simpa [XiPacket.t, XiPacket.σ, X] using
+    (WindowPayload.exists_kappa_sinlog2_sinlog3 (X := X) (hKapRe := hKapRe))
 
 end OffSeedPhaseLockXiPayload
 end Targets

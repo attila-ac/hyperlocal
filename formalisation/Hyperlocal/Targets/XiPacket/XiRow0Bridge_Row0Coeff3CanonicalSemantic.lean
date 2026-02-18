@@ -1,32 +1,21 @@
 /-
+REPLACE FILE CONTENT for:
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row0Coeff3CanonicalSemantic.lean
 
-  OPTION-A (canonical windows only): isolate the remaining ξ-semantic input as
-  four *canonical* Row--0 gates.
+POST Move–3 canonical closure:
+this file is no longer a semantic insertion point.
 
-  Goal of this file:
-    Provide cycle-safe axioms asserting the minimal Row--0 gate
-      `Row0ConvolutionAtRev s z w`
-    at the four quartet centers for the canonical ξ windows `w0/wc/wp2/wp3`.
+It now re-exports the *theorem-level* canonical Row--0 gates
+`row0ConvolutionAtRev_w0/wc/wp2/wp3` proved in:
 
-  Rationale:
-    The Move--1/Move--2 refactors reduced Route--C Row--0 to the single
-    coefficient constraint at n=3 (reverse-padded Cauchy coefficient).  If the
-    concrete ξ analytic recurrence extractor is currently only available in a
-    downstream layer (or would induce a cycle), the smallest cycle-safe semantic
-    interface is *canonical*: state the n=3 gate directly for the canonical
-    windows.
+  `XiRow0Bridge_JetLeibnizToRow0ConvolutionRev.lean`
 
-  Once your ξ-analytic engine exposes theorem-level proofs of these four
-  statements (without cyclic imports), you can delete the axioms here and keep
-  all downstream files unchanged.
-
-  Cycle safety:
-  * imports only Route--C gate definitions and window definitions
-  * does NOT import Route--B concrete proof/frontier files
+Cycle safety preserved:
+* does NOT import Route--B Row0Concrete/Row0Analytic
+* only imports Route--C bridge + window definitions.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 
 set_option autoImplicit false
@@ -40,23 +29,12 @@ open Complex
 open scoped BigOperators
 
 /-!
-  ## Canonical Row--0 gates (minimal n=3 constraint)
+  ## Canonical Row--0 gates (theorem-level, axiom-free)
 
-  These are the Option-A semantic insertion points.
+  These names remain stable for downstream consumers.
 -/
 
-axiom row0ConvolutionAtRev_w0 (s : OffSeed Xi) :
-    Row0ConvolutionAtRev s (s.ρ) (w0 s)
-
-axiom row0ConvolutionAtRev_wc (s : OffSeed Xi) :
-    Row0ConvolutionAtRev s (1 - s.ρ) (wc s)
-
-axiom row0ConvolutionAtRev_wp2 (s : OffSeed Xi) :
-    Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2 s)
-
-axiom row0ConvolutionAtRev_wp3 (s : OffSeed Xi) :
-    Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3 s)
-
+-- Re-export under the original “canonical semantic” surface API.
 namespace Row0Coeff3CanonicalSemanticExport
 export _root_.Hyperlocal.Targets.XiPacket
   (row0ConvolutionAtRev_w0 row0ConvolutionAtRev_wc

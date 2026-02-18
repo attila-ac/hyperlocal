@@ -1,24 +1,23 @@
 /-
   Hyperlocal/Targets/XiPacket/WindowPayload.lean
 
-  Semantic payload (the “last cliff” object):
+  FULL REPLACEMENT (Option A: widen κ-witness to accept Re-κ OR Im-κ).
 
-  • complex windows w0 wc ws wp2 wp3 : Window 3
-  • prime decompositions written *pointwise at window level*
-  • determinant facts already stated after vectorization (ell/kappa on ℝ³)
+  Change:
+    `hkappa` is now an `Or` of the two κ-shapes:
 
-  Design choice:
-  We vectorize via `reVec3`. If your ξ-window extraction naturally lives in the
-  imaginary lane instead, you can swap to an `imVec3` variant later (you’d add
-  `imVec3` + simp lemmas analogously in `Vectorize.lean` and change the three
-  determinant fields accordingly).
+      (kappa (reVec3 w0) (reVec3 wc) (reVec3 ws) ≠ 0)
+      ∨
+      (kappa (imVec3 w0) (reVec3 wc) (reVec3 ws) ≠ 0)
+
+  No new axioms.
 -/
 
 import Hyperlocal.Transport.PrimeTrigPacket
 import Hyperlocal.Targets.XiPacket.Vectorize
-import Mathlib.Data.Complex.Basic
 import Mathlib.Tactic
 
+set_option autoImplicit false
 noncomputable section
 
 namespace Hyperlocal
@@ -26,16 +25,10 @@ namespace Targets
 namespace XiPacket
 
 open scoped Real
-
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/--
-Minimal ξ-window payload at parameters (σ,t).
-
-This is the object your Toeplitz/window recurrence should *produce*.
-Everything downstream is purely algebraic packaging.
--/
+/-- Phase-4 payload (Plan C++ / C++J). -/
 structure WindowPayload (σ t : ℝ) : Type where
   w0  : Transport.Window 3
   wc  : Transport.Window 3
@@ -43,24 +36,28 @@ structure WindowPayload (σ t : ℝ) : Type where
   wp2 : Transport.Window 3
   wp3 : Transport.Window 3
 
-  /- Prime decompositions at window level (stored pointwise to avoid Pi-type
-     typeclass elaboration issues). -/
+  -- Lemma B (trig split) at p=2,3
   hw2 :
     ∀ i : Fin 3,
       wp2 i = w0 i
-        + ( (aCoeff σ t (2 : ℝ) : ℂ) * (wc i) )
-        + ( (bCoeff σ t (2 : ℝ) : ℂ) * (ws i) )
-
+        + ((aCoeff σ t (2 : ℝ) : ℂ) * (wc i))
+        + ((bCoeff σ t (2 : ℝ) : ℂ) * (ws i))
   hw3 :
     ∀ i : Fin 3,
       wp3 i = w0 i
-        + ( (aCoeff σ t (3 : ℝ) : ℂ) * (wc i) )
-        + ( (bCoeff σ t (3 : ℝ) : ℂ) * (ws i) )
+        + ((aCoeff σ t (3 : ℝ) : ℂ) * (wc i))
+        + ((bCoeff σ t (3 : ℝ) : ℂ) * (ws i))
 
-  /- Determinant facts stated already on the real vectors after vectorization. -/
+  -- Lemma C consequences
   hell2 : Transport.ell (reVec3 w0) (reVec3 wc) (reVec3 wp2) = 0
   hell3 : Transport.ell (reVec3 w0) (reVec3 wc) (reVec3 wp3) = 0
-  hkappa : Transport.kappa (reVec3 w0) (reVec3 wc) (reVec3 ws) ≠ 0
+
+  /--
+  κ-witness (widened): either the real-block κ is nonzero OR the imag-first-column κ is nonzero.
+  -/
+  hkappa :
+    (Transport.kappa (reVec3 w0) (reVec3 wc) (reVec3 ws) ≠ 0)
+    ∨ (Transport.kappa (imVec3 w0) (reVec3 wc) (reVec3 ws) ≠ 0)
 
 end XiPacket
 end Targets

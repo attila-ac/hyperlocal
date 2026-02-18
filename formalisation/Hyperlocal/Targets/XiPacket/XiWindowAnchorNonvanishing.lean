@@ -9,6 +9,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -87,6 +88,51 @@ axiom xiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : XiAnchorNonvanishing s
 /-- Convenience: recover the original shape `(Xi(sc)).re ≠ 0` from the axiom. -/
 theorem xi_sc_re_ne_zero (s : Hyperlocal.OffSeed Xi) : (Xi (sc s)).re ≠ 0 :=
   Xi_sc_re_ne_zero_of_anchor (s := s) (xiAnchorNonvanishing (s := s))
+
+/-!
+## Plan C++J: JetPivot nonflatness (same-height escape hatch)
+
+Even if `Xi (sc s) = 0`, analyticity implies there exists some finite order `m`
+with `(cderivIter m Xi) (sc s) ≠ 0` unless `Xi` is identically zero.
+
+At the current architecture boundary we keep this as a *single* semantic axiom.
+
+Downstream, we only need a real scalar pivot, so we split into `Re`/`Im` cases.
+-/
+
+/-- Semantic nonflatness at the anchor: some complex derivative is nonzero. -/
+def XiJetNonflat (s : Hyperlocal.OffSeed Xi) : Prop :=
+  ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
+
+/-- The JetPivot nonflatness semantic cliff (to be discharged later from analyticity). -/
+axiom xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s
+
+private lemma complex_eq_zero_of_re_im_eq_zero {z : ℂ} (hre : z.re = 0) (him : z.im = 0) : z = 0 :=
+  Complex.ext hre him
+
+/-- If a complex number is nonzero, then at least one of its real/imag parts is nonzero. -/
+lemma re_ne_zero_or_im_ne_zero_of_ne_zero {z : ℂ} (hz : z ≠ 0) : z.re ≠ 0 ∨ z.im ≠ 0 := by
+  by_contra h
+  have hre : z.re = 0 := by
+    exact Classical.byContradiction (fun hre => h (Or.inl hre))
+  have him : z.im = 0 := by
+    exact Classical.byContradiction (fun him => h (Or.inr him))
+  exact hz (complex_eq_zero_of_re_im_eq_zero hre him)
+
+/-!
+Convenience: package the JetPivot scalar pivot as a *disjunction*.
+This is the exact form used by the AtOrder payload constructor layer.
+-/
+
+theorem xiJetNonflat_re_or_im (s : Hyperlocal.OffSeed Xi) :
+    (∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0)
+    ∨ (∃ m : ℕ, (((cderivIter m Xi) (sc s))).im ≠ 0) := by
+  rcases xiJetNonflat (s := s) with ⟨m, hm⟩
+  have hparts : ((cderivIter m Xi) (sc s)).re ≠ 0 ∨ ((cderivIter m Xi) (sc s)).im ≠ 0 :=
+    re_ne_zero_or_im_ne_zero_of_ne_zero hm
+  cases hparts with
+  | inl hre => exact Or.inl ⟨m, hre⟩
+  | inr him => exact Or.inr ⟨m, him⟩
 
 end XiPacket
 end Targets

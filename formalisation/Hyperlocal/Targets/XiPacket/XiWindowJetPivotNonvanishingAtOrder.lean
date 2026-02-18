@@ -1,17 +1,13 @@
 /-
   Hyperlocal/Targets/XiPacket/XiWindowJetPivotNonvanishingAtOrder.lean
 
-  Plan C++J (Jet Pivot): isolate the ONLY remaining analytic nonvanishing input:
+  FULL REPLACEMENT (Prop→Type safe, now that both constructors exist).
 
-    ∃ m, Re(Ξ^{(m)}(sc s)) ≠ 0
-
-  and then choose such an order `m(s)` and build the order-m payload from:
-    • hb2, hb3  (from recurrence side; independent of m)
-    • the chosen witness hRe at order m(s)
-  via `xiWindowPayloadAtOrder_of_hb2hb3_cderivRe_ne0`.
-
-  For now this is bridged from the existing anchor axiom (take m=0),
-  so NO new axioms are added.
+  Uses:
+    * `xiJetNonflat_re_or_im` from XiWindowAnchorNonvanishing
+    * constructors:
+        xiWindowPayloadAtOrder_of_hb2hb3_cderivRe_ne0
+        xiWindowPayloadAtOrder_of_hb2hb3_cderivIm_ne0
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowPayloadConstructorAtOrder
@@ -33,40 +29,65 @@ open Hyperlocal.Transport.PrimeTrigPacket
 def XiJetNonvanishing (s : _root_.Hyperlocal.OffSeed Xi) : Prop :=
   ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0
 
-/--
-Temporary bridge (NO new axiom):
-derive JetPivot nonvanishing from the existing Plan-C++ anchor axiom by taking `m = 0`.
-Delete this bridge once you prove JetPivot nonvanishing directly.
--/
-theorem xiJetPivot_exists_cderivRe_ne0 (s : _root_.Hyperlocal.OffSeed Xi) :
-    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 := by
-  refine ⟨0, ?_⟩
-  -- `cderivIter 0 Xi = Xi`
-  simpa [cderivIter] using (xi_sc_re_ne_zero (s := s))
+/-- Alternative JetPivot target (imaginary part). -/
+def XiJetNonvanishingIm (s : _root_.Hyperlocal.OffSeed Xi) : Prop :=
+  ∃ m : ℕ, (((cderivIter m Xi) (sc s))).im ≠ 0
+
+/-- Combined existence (Prop-packaged): there is some order where Re≠0 or Im≠0. -/
+def XiJetPivotExists (s : _root_.Hyperlocal.OffSeed Xi) : Prop :=
+  ∃ m : ℕ,
+    (((cderivIter m Xi) (sc s))).re ≠ 0
+    ∨ (((cderivIter m Xi) (sc s))).im ≠ 0
+
+theorem xiJetPivot_exists_m_re_or_im (s : _root_.Hyperlocal.OffSeed Xi) : XiJetPivotExists s := by
+  classical
+  have h := xiJetNonflat_re_or_im (s := s)
+  -- h : (∃ m, Re≠0) ∨ (∃ m, Im≠0)
+  cases h with
+  | inl hRe =>
+      refine ⟨Classical.choose hRe, Or.inl (Classical.choose_spec hRe)⟩
+  | inr hIm =>
+      refine ⟨Classical.choose hIm, Or.inr (Classical.choose_spec hIm)⟩
 
 /-- Chosen JetPivot order `m(s)`. -/
 noncomputable def xiJetPivot_m (s : _root_.Hyperlocal.OffSeed Xi) : ℕ :=
-  Classical.choose (xiJetPivot_exists_cderivRe_ne0 (s := s))
+by
+  classical
+  exact Classical.choose (xiJetPivot_exists_m_re_or_im (s := s))
 
-/-- The defining witness: `Re(Ξ^{(m(s))}(sc s)) ≠ 0`. -/
-theorem xiJetPivot_m_spec (s : _root_.Hyperlocal.OffSeed Xi) :
-    (((cderivIter (xiJetPivot_m (s := s)) Xi) (sc s))).re ≠ 0 := by
+/-- Spec at the chosen order: either Re≠0 or Im≠0. -/
+theorem xiJetPivot_m_spec_re_or_im (s : _root_.Hyperlocal.OffSeed Xi) :
+    (((cderivIter (xiJetPivot_m (s := s)) Xi) (sc s))).re ≠ 0
+    ∨ (((cderivIter (xiJetPivot_m (s := s)) Xi) (sc s))).im ≠ 0 := by
+  classical
   simpa [xiJetPivot_m] using
-    (Classical.choose_spec (xiJetPivot_exists_cderivRe_ne0 (s := s)))
+    (Classical.choose_spec (xiJetPivot_exists_m_re_or_im (s := s)))
 
 /--
-Build the payload at the chosen JetPivot order, keeping the order as a Σ-type.
+Build the payload at the chosen JetPivot order.
+
+Prop→Type safe:
+we use `by_cases` on the Re-branch and resolve Im via `Or.resolve_left`.
 -/
 noncomputable def xiWindowPayloadSigma_of_hb2hb3 (s : _root_.Hyperlocal.OffSeed Xi)
     (hb2 : bCoeff (σ s) (t s) (2 : ℝ) = 0)
     (hb3 : bCoeff (σ s) (t s) (3 : ℝ) = 0) :
     Σ m : ℕ, WindowPayload (σ s) (t s) :=
 by
+  classical
   refine ⟨xiJetPivot_m (s := s), ?_⟩
-  exact
-    xiWindowPayloadAtOrder_of_hb2hb3_cderivRe_ne0
-      (m := xiJetPivot_m (s := s)) (s := s)
-      hb2 hb3 (xiJetPivot_m_spec (s := s))
+  have hOr := xiJetPivot_m_spec_re_or_im (s := s)
+  by_cases hRe :
+      (((cderivIter (xiJetPivot_m (s := s)) Xi) (sc s))).re ≠ 0
+  · exact
+      xiWindowPayloadAtOrder_of_hb2hb3_cderivRe_ne0
+        (m := xiJetPivot_m (s := s)) (s := s) hb2 hb3 hRe
+  · have hIm :
+        (((cderivIter (xiJetPivot_m (s := s)) Xi) (sc s))).im ≠ 0 :=
+        Or.resolve_left hOr hRe
+    exact
+      xiWindowPayloadAtOrder_of_hb2hb3_cderivIm_ne0
+        (m := xiJetPivot_m (s := s)) (s := s) hb2 hb3 hIm
 
 /-- Convenience: forget the chosen order and keep only the payload. -/
 noncomputable def xiWindowPayload_of_hb2hb3 (s : _root_.Hyperlocal.OffSeed Xi)
