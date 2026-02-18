@@ -1,8 +1,14 @@
+/-
+PATCH (REPLACE FILE CONTENT) for:
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_CauchyConvolutionDischarge.lean
+
+Use the canonical Move–3 theorems `row0ConvolutionAtRev_w*` (axiom-free),
+instead of the general bridge `row0ConvolutionAtRev_of_JetLeibnizAt`.
+-/
+
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -16,26 +22,18 @@ open scoped BigOperators
 namespace JetQuotOp
 
 theorem row0Conv_w0 (s : OffSeed Xi) : Row0ConvolutionAtRev s (s.ρ) (w0 s) := by
-  exact row0ConvolutionAtRev_of_JetLeibnizAt
-    (s := s) (z := s.ρ) (w := w0 s)
-    (xiJetLeibnizAt_w0 (s := s))
+  simpa using (row0ConvolutionAtRev_w0 (s := s))
 
 theorem row0Conv_wc (s : OffSeed Xi) : Row0ConvolutionAtRev s (1 - s.ρ) (wc s) := by
-  exact row0ConvolutionAtRev_of_JetLeibnizAt
-    (s := s) (z := (1 - s.ρ)) (w := wc s)
-    (xiJetLeibnizAt_wc (s := s))
+  simpa using (row0ConvolutionAtRev_wc (s := s))
 
 theorem row0Conv_wp2 (s : OffSeed Xi) :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2 s) := by
-  exact row0ConvolutionAtRev_of_JetLeibnizAt
-    (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s)
-    (xiJetLeibnizAt_wp2 (s := s))
+  simpa using (row0ConvolutionAtRev_wp2 (s := s))
 
 theorem row0Conv_wp3 (s : OffSeed Xi) :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) := by
-  exact row0ConvolutionAtRev_of_JetLeibnizAt
-    (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3 s)
-    (xiJetLeibnizAt_wp3 (s := s))
+  simpa using (row0ConvolutionAtRev_wp3 (s := s))
 
 end JetQuotOp
 
