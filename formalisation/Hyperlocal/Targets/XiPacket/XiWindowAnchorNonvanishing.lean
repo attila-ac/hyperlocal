@@ -1,15 +1,26 @@
 /-
   Hyperlocal/Targets/XiPacket/XiWindowAnchorNonvanishing.lean
 
-  Plan C++: isolate the last explicit semantic ingredient used to make κ ≠ 0.
+  Plan C++ (Route B): keep the anchor algebra, but remove the hard zeta-specific
+  nonvanishing axiom. The remaining semantic insertion point is jet-nonflatness
+  at the anchor, imported from `XiJetNonflatOfAnalytic`.
 
   Pure algebra:
     Re(Xi(sc s)) = anchorScalar(s) * Re(completedRiemannZeta(sc s)),
   where anchorScalar(s) = -(1/4 + (t s)^2) is a nonzero real scalar.
+
+  The file also provides the Re/Im split interface:
+    `xiJetNonflat_re_or_im`.
+
+  COMPATIBILITY NOTE:
+  Downstream (e.g. `XiToeplitzRecurrenceIdentity.lean`, `XiWindowLemmaC_FromRecurrence.lean`)
+  still expects a semantic lemma named `xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0`.
+  We keep that name here as a temporary semantic cliff (separate from jet-nonflatness).
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -32,13 +43,10 @@ lemma re_ofReal_mul (a : ℝ) (z : ℂ) : (((a : ℂ) * z).re) = a * z.re := by
 /-- The anchor factor `sc(s) * (sc(s) - 1)` is the real number `anchorScalar s`. -/
 lemma sc_mul_sc_sub_one (s : Hyperlocal.OffSeed Xi) :
     sc s * (sc s - 1) = (anchorScalar s : ℂ) := by
-  -- prove equality in ℂ by re/im components
   refine Complex.ext ?_ ?_
-  · -- real part
-    simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
+  · simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
     ring_nf
-  · -- imaginary part
-    simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
+  · simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
     ring_nf
 
 /-- Closed-form for Xi on the critical-line anchor: Xi(sc) is a real scalar times Λ(sc). -/
@@ -60,11 +68,7 @@ lemma anchorScalar_ne_zero (u : ℝ) : (-( (1 : ℝ)/4 + u^2 )) ≠ 0 := by
     nlinarith [sq_nonneg u, hquarter]
   exact neg_ne_zero.mpr (ne_of_gt hpos)
 
-/--
-Canonical form of the remaining semantic target.
-
-Stable form: `Re(Λ(sc)) ≠ 0`.
--/
+/-- Stable “anchor” statement (kept for documentation / compatibility). -/
 def XiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : Prop :=
   (completedRiemannZeta (sc s)).re ≠ 0
 
@@ -72,42 +76,39 @@ def XiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : Prop :=
 theorem Xi_sc_re_ne_zero_of_anchor (s : Hyperlocal.OffSeed Xi)
     (h : XiAnchorNonvanishing s) : (Xi (sc s)).re ≠ 0 := by
   have ha : (anchorScalar s) ≠ 0 := by
-    -- unfold anchorScalar and use the generic lemma
     simpa [anchorScalar] using (anchorScalar_ne_zero (u := t s))
-  -- IMPORTANT: use `rw`, not `simp`, to avoid rewriting `a*b ≠ 0` into a conjunction.
   rw [Xi_sc_re_eq (s := s)]
   exact mul_ne_zero ha h
 
-/--
-THE LAST semantic cliff (explicit and recognizable).
+/-
+COMPATIBILITY SEMANTIC CLIFF (temporary):
 
-For now, keep it as a single axiom in the reduced/stable form.
+Many downstream Route-B “Option-ELL” files still consume a bare
+`(Xi (sc s)).re ≠ 0` assumption under the legacy name `xi_sc_re_ne_zero`.
+
+This is intentionally kept as an axiom for now, to avoid cyclic imports and
+to keep the interface stable while the analytic theory is being migrated.
 -/
-axiom xiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : XiAnchorNonvanishing s
-
-/-- Convenience: recover the original shape `(Xi(sc)).re ≠ 0` from the axiom. -/
-theorem xi_sc_re_ne_zero (s : Hyperlocal.OffSeed Xi) : (Xi (sc s)).re ≠ 0 :=
-  Xi_sc_re_ne_zero_of_anchor (s := s) (xiAnchorNonvanishing (s := s))
+axiom xi_sc_re_ne_zero (s : Hyperlocal.OffSeed Xi) : (Xi (sc s)).re ≠ 0
 
 /-!
-## Plan C++J: JetPivot nonflatness (same-height escape hatch)
+## Route B: JetPivot nonflatness at the anchor
 
-Even if `Xi (sc s) = 0`, analyticity implies there exists some finite order `m`
-with `(cderivIter m Xi) (sc s) ≠ 0` unless `Xi` is identically zero.
-
-At the current architecture boundary we keep this as a *single* semantic axiom.
-
-Downstream, we only need a real scalar pivot, so we split into `Re`/`Im` cases.
+The remaining semantic input is imported as `xiJetNonflat_exists`.
+We expose it in the local API as `xiJetNonflat` and the Re/Im split form
+`xiJetNonflat_re_or_im`.
 -/
 
 /-- Semantic nonflatness at the anchor: some complex derivative is nonzero. -/
 def XiJetNonflat (s : Hyperlocal.OffSeed Xi) : Prop :=
   ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
 
-/-- The JetPivot nonflatness semantic cliff (to be discharged later from analyticity). -/
-axiom xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s
+/-- Route-B nonflatness (currently sourced from `XiJetNonflatOfAnalytic`). -/
+theorem xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s := by
+  simpa [XiJetNonflat] using (xiJetNonflat_exists (s := s))
 
-private lemma complex_eq_zero_of_re_im_eq_zero {z : ℂ} (hre : z.re = 0) (him : z.im = 0) : z = 0 :=
+private lemma complex_eq_zero_of_re_im_eq_zero {z : ℂ}
+    (hre : z.re = 0) (him : z.im = 0) : z = 0 :=
   Complex.ext hre him
 
 /-- If a complex number is nonzero, then at least one of its real/imag parts is nonzero. -/
@@ -119,16 +120,13 @@ lemma re_ne_zero_or_im_ne_zero_of_ne_zero {z : ℂ} (hz : z ≠ 0) : z.re ≠ 0 
     exact Classical.byContradiction (fun him => h (Or.inr him))
   exact hz (complex_eq_zero_of_re_im_eq_zero hre him)
 
-/-!
-Convenience: package the JetPivot scalar pivot as a *disjunction*.
-This is the exact form used by the AtOrder payload constructor layer.
--/
-
+/-- Re/Im split form used by the AtOrder payload constructor layer. -/
 theorem xiJetNonflat_re_or_im (s : Hyperlocal.OffSeed Xi) :
     (∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0)
     ∨ (∃ m : ℕ, (((cderivIter m Xi) (sc s))).im ≠ 0) := by
   rcases xiJetNonflat (s := s) with ⟨m, hm⟩
-  have hparts : ((cderivIter m Xi) (sc s)).re ≠ 0 ∨ ((cderivIter m Xi) (sc s)).im ≠ 0 :=
+  have hparts :
+      ((cderivIter m Xi) (sc s)).re ≠ 0 ∨ ((cderivIter m Xi) (sc s)).im ≠ 0 :=
     re_ne_zero_or_im_ne_zero_of_ne_zero hm
   cases hparts with
   | inl hre => exact Or.inl ⟨m, hre⟩
