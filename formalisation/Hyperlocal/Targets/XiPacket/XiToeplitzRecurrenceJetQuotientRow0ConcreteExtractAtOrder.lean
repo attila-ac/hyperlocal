@@ -5,12 +5,12 @@
 
   Policy:
   * The ONLY axiom is in `...AtOrderFrontier.lean`.
-  * This file exposes a Type-level name (`def`) that downstream imports can use
-    without touching the frontier module directly.
-  * Prop-level packaging remains theorem-level.
+  * This file exposes stable downstream-facing names, without importing any
+    Row0Correctness/Bridge layers.
 
-  When the frontier axiom is discharged (replaced by a theorem/def),
-  this file becomes entirely axiom-free without downstream edits.
+  NOTE (Lean 4.23):
+  Since `XiJetQuotRow0ConcreteExtractAtOrder m s : Type`, the exported witness
+  must be a `def` (not a `theorem`).
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
@@ -24,13 +24,13 @@ namespace Targets
 namespace XiPacket
 
 /--
-Type-level name for the AtOrder concrete extraction witness.
+Type-level witness for the AtOrder concrete extraction cliff.
 
 Currently delegates to the single frontier axiom.
-Once the frontier is discharged, this becomes a definitional alias to that proof.
+When the frontier axiom is replaced by a theorem, this definition stays unchanged.
 -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder
-  (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
   xiJetQuotRow0ConcreteExtractAtOrder_frontier m s
 
 /--

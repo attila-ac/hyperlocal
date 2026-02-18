@@ -1,16 +1,15 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderFrontier.lean
 
-  SINGLE semantic frontier (AtOrder): this is the one remaining axiom for the
-  jet-pivot row-0 jet-quotient recurrence extraction layer.
+  Frontier discharge module (cycle-safe):
 
-  Replace the axiom in this file by a theorem once the concrete order-`m`
-  recurrence extraction theorem is formalised.
-
-  No other file should introduce axioms for this AtOrder endpoint.
+  IMPORTANT (Lean 4.23):
+  `XiJetQuotRow0ConcreteExtractAtOrder m s : Type`, so this frontier must be a `def`,
+  not a `theorem`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
 
 set_option autoImplicit false
 noncomputable section
@@ -19,12 +18,23 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+open Complex
+open scoped BigOperators
+open Hyperlocal.Transport
+
 /--
-SINGLE semantic frontier (AtOrder): the concrete ξ jet-quotient recurrence
-extraction theorem should provide this Type-level witness.
+Frontier witness (Type-level): build the extraction witness from the analytic heart output.
+
+Once `xiJetQuotRow0AtOrderHeartOut` is proved as a theorem, this `def` becomes
+axiom-free without downstream edits.
 -/
-axiom xiJetQuotRow0ConcreteExtractAtOrder_frontier :
-  ∀ (m : ℕ) (s : OffSeed Xi), XiJetQuotRow0ConcreteExtractAtOrder m s
+noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_frontier
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s := by
+  classical
+  refine ⟨?_, ?_, ?_⟩
+  · exact (xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)).hw0At
+  · exact (xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)).hwp2At
+  · exact (xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)).hwp3At
 
 end XiPacket
 end Targets
