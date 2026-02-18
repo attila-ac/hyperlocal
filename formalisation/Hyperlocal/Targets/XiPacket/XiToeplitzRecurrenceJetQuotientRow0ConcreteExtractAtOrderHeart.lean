@@ -1,22 +1,5 @@
-/-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart.lean
-
-  Cycle-safe “analytic heart” interface for the AtOrder row--0 jet-quotient recurrence
-  extraction.
-
-  This file is intentionally minimal and *does not* import Row0Correctness/Bridge layers.
-
-  Status:
-  * The actual analytic extraction theorem is not yet formalised.
-  * For now, we isolate its exact output shape here as a single semantic endpoint.
-  * Once the real theorem exists, replace the single axiom in this file by a theorem.
-
-  Contract (what the heart must provide):
-  exactly the three row-0 Toeplitz annihilations at order `m` for the jet-pivot windows
-  `w0At/wp2At/wp3At` with coefficients `JetQuotOp.aRk1 s` at index `0 : Fin 3`.
--/
-
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderRecurrence
 
 set_option autoImplicit false
 noncomputable section
@@ -43,10 +26,18 @@ structure XiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) : Prop where
 SINGLE semantic endpoint (temporary): the concrete analytic extraction theorem
 for order-`m` jets should produce `XiJetQuotRow0AtOrderHeartOut m s`.
 
-Replace this axiom by a theorem once the analytic extraction layer is formalised.
+This file should *not* postulate that theorem directly.
+Instead, we derive it from the (future) concrete recurrence extraction theorem
+isolated in `...AtOrderRecurrence.lean`.
 -/
-axiom xiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) :
-  XiJetQuotRow0AtOrderHeartOut m s
+theorem xiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) :
+  XiJetQuotRow0AtOrderHeartOut m s := by
+  classical
+  let E := xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrence (m := m) (s := s)
+  refine ⟨?_, ?_, ?_⟩
+  · exact E.hop_w0At
+  · exact E.hop_wp2At
+  · exact E.hop_wp3At
 
 end XiPacket
 end Targets

@@ -81,6 +81,7 @@ noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_of_row0Sigma
   exact extractAtOrder_of_scalarGoals (m := m) (s := s) ⟨hw0At, hwp2At, hwp3At⟩
 
 
+
 end XiPacket
 end Targets
 end Hyperlocal
