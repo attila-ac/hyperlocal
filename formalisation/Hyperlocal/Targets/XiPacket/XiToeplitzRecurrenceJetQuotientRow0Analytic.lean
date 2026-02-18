@@ -1,57 +1,56 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Analytic.lean
 
-  Row-0 analytic bridge.
+  Row-0 analytic bridge (stabilised): consume only row0Sigma = 0 facts.
 
-  UPDATED:
-  The four “row0Sigma_* = eval” facts are no longer axioms here.
-  They are sourced from the Route–C semantic gate file
-    `XiRow0Bridge_CauchyProductAttempt.lean`.
+  FIX:
+  Do NOT rely on any exported root-level names like `row0Sigma_w0_eq_zero`
+  (they are currently not in the environment at the expected name).
+
+  Instead, build the four scalar-goal fields *directly* from:
+    • the Route–C semantic gate axioms `JetQuotOp.jetConv_*`
+    • the core discharge lemma `row0Sigma_eq_zero_from_JetConvolutionRev`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischarge
 import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
 
-namespace Hyperlocal
-namespace Targets
-namespace XiPacket
+namespace Hyperlocal.Targets.XiPacket
 
 open Complex
-open Hyperlocal.MinimalModel
-open Hyperlocal.Factorization
+open scoped BigOperators
 
 /--
-Route-A: analytic discharge of the row-0 scalar goals.
+Route-C/Route-A: analytic discharge of the row-0 scalar goals.
 
-This now consumes the *theorem-level* bridge lemmas exported by
-`XiRow0Bridge_CauchyProductAttempt` (currently they depend on the four
-`jetConv_*` axioms there, but the semantic boundary is single-sourced).
+We *inline* the proof of each field from the Route–C semantic gate axioms
+(`JetQuotOp.jetConv_*`) to avoid any namespace/name churn on exported theorems.
 -/
 noncomputable def xiJetQuot_row0_scalarGoals_analytic (s : Hyperlocal.OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s where
   hw0 := by
-    rw [row0Sigma_w0_eq_eval (s := s)]
-    simpa using (R_quartet_zeros s).1
+    -- goal: row0Sigma s (w0 s) = 0
+    exact row0Sigma_eq_zero_from_JetConvolutionRev
+      (s := s) (z := s.ρ) (w := w0 s) (JetQuotOp.jetConv_w0 s)
   hwc := by
-    rw [row0Sigma_wc_eq_eval (s := s)]
-    simpa using (R_quartet_zeros s).2.2.1
+    exact row0Sigma_eq_zero_from_JetConvolutionRev
+      (s := s) (z := (1 - s.ρ)) (w := wc s) (JetQuotOp.jetConv_wc s)
   hwp2 := by
-    rw [row0Sigma_wp2_eq_eval (s := s)]
-    simpa using (R_quartet_zeros s).2.1
+    exact row0Sigma_eq_zero_from_JetConvolutionRev
+      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s) (JetQuotOp.jetConv_wp2 s)
   hwp3 := by
-    rw [row0Sigma_wp3_eq_eval (s := s)]
-    simpa using (R_quartet_zeros s).2.2.2
+    exact row0Sigma_eq_zero_from_JetConvolutionRev
+      (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3 s) (JetQuotOp.jetConv_wp3 s)
 
 /-- Public stable name (consumed downstream). -/
 noncomputable def xiJetQuot_row0_scalarGoals (s : Hyperlocal.OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s :=
   xiJetQuot_row0_scalarGoals_analytic s
 
-end XiPacket
-end Targets
-end Hyperlocal
+end Hyperlocal.Targets.XiPacket

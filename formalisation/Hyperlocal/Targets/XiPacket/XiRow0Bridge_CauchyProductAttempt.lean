@@ -1,14 +1,20 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_CauchyProductAttempt.lean
 
-  Cauchy-product attempt (cycle-safe enough for now):
+  Cauchy-product bridge (cycle-safe):
   discharge the Row--0 scalar goal from a *Convolution* hypothesis.
 
   IMPORTANT:
   We introduce a NEW semantic gate name `JetConvolutionAtRev` which is genuinely
   a `Convolution` statement, to avoid clashes with existing names in the repo.
 
-  This file is intended to be pasted on-disk exactly, so Lake builds *this* content.
+  NOTE (2026-02-17 refactor):
+  This file now contains **no** `jetConv_*` axioms and **no** canonical-window
+  instances. Those instances live in
+
+    `XiRow0Bridge_CauchyConvolutionDischarge.lean`
+
+  which single-sources them from Route--A via one frontier lemma.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
@@ -89,71 +95,16 @@ theorem row0Sigma_eq_zero_from_JetConvolutionRev
     simpa using (Hconv 3)
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w)] using h3
 
-/-
-Temporary semantic axioms (to be discharged later).
--/
-axiom jetConv_w0  : ∀ s, JetConvolutionAtRev s (s.ρ)                    (w0 s)
-axiom jetConv_wc  : ∀ s, JetConvolutionAtRev s (1 - s.ρ)                (wc s)
-axiom jetConv_wp2 : ∀ s, JetConvolutionAtRev s ((starRingEnd ℂ) s.ρ)     (wp2 s)
-axiom jetConv_wp3 : ∀ s, JetConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3 s)
-
-/-- These are now the *actual Row--0 scalar goals*. -/
-theorem row0Sigma_w0_eq_zero  (s : OffSeed Xi) : row0Sigma s (w0 s) = 0 :=
-  _root_.Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_JetConvolutionRev
-    s (s.ρ) (w0 s) (jetConv_w0 s)
-
-theorem row0Sigma_wc_eq_zero  (s : OffSeed Xi) : row0Sigma s (wc s) = 0 :=
-  _root_.Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_JetConvolutionRev
-    s (1 - s.ρ) (wc s) (jetConv_wc s)
-
-theorem row0Sigma_wp2_eq_zero (s : OffSeed Xi) : row0Sigma s (wp2 s) = 0 :=
-  _root_.Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_JetConvolutionRev
-    s ((starRingEnd ℂ) s.ρ) (wp2 s) (jetConv_wp2 s)
-
-theorem row0Sigma_wp3_eq_zero (s : OffSeed Xi) : row0Sigma s (wp3 s) = 0 :=
-  _root_.Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_JetConvolutionRev
-    s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) (jetConv_wp3 s)
-
-/-- Optional: keep “= eval” statements as corollaries using `R_quartet_zeros`. -/
-theorem row0Sigma_w0_eq_eval  (s : OffSeed Xi) :
-    row0Sigma s (w0 s) = (Rquartet s.ρ).eval (s.ρ) := by
-  have hz : (Rquartet s.ρ).eval (s.ρ) = 0 := (R_quartet_zeros s).1
-  simpa [row0Sigma_w0_eq_zero (s := s), hz]
-
-theorem row0Sigma_wc_eq_eval  (s : OffSeed Xi) :
-    row0Sigma s (wc s) = (Rquartet s.ρ).eval (1 - s.ρ) := by
-  have hz : (Rquartet s.ρ).eval (1 - s.ρ) = 0 := (R_quartet_zeros s).2.2.1
-  simpa [row0Sigma_wc_eq_zero (s := s), hz]
-
-theorem row0Sigma_wp2_eq_eval (s : OffSeed Xi) :
-    row0Sigma s (wp2 s) = (Rquartet s.ρ).eval ((starRingEnd ℂ) s.ρ) := by
-  have hz0 : (Rquartet s.ρ).eval (star s.ρ) = 0 := (R_quartet_zeros s).2.1
-  have hz : (Rquartet s.ρ).eval ((starRingEnd ℂ) s.ρ) = 0 := by
-    simpa using hz0
-  simpa [row0Sigma_wp2_eq_zero (s := s), hz]
-
-theorem row0Sigma_wp3_eq_eval (s : OffSeed Xi) :
-    row0Sigma s (wp3 s) = (Rquartet s.ρ).eval (1 - (starRingEnd ℂ) s.ρ) := by
-  have hz0 : (Rquartet s.ρ).eval (1 - star s.ρ) = 0 := (R_quartet_zeros s).2.2.2
-  have hz : (Rquartet s.ρ).eval (1 - (starRingEnd ℂ) s.ρ) = 0 := by
-    simpa using hz0
-  simpa [row0Sigma_wp3_eq_zero (s := s), hz]
-
-/- Bulletproof visibility: export the key names explicitly. -/
+/-! ### Re-export (core only) -/
 namespace CauchyProductAttemptExport
 export _root_.Hyperlocal.Targets.XiPacket
-  (JetConvolutionAtRev
+  (winSeqRev
+   row0CoeffSeqRev
+   JetConvolutionAtRev
    row0Sigma_eq_convCoeff_rev
-   row0Sigma_eq_zero_from_JetConvolutionRev
-   row0Sigma_w0_eq_zero
-   row0Sigma_wc_eq_zero
-   row0Sigma_wp2_eq_zero
-   row0Sigma_wp3_eq_zero
-   row0Sigma_w0_eq_eval
-   row0Sigma_wc_eq_eval
-   row0Sigma_wp2_eq_eval
-   row0Sigma_wp3_eq_eval)
+   row0Sigma_eq_zero_from_JetConvolutionRev)
 end CauchyProductAttemptExport
+
 
 end XiPacket
 end Targets
