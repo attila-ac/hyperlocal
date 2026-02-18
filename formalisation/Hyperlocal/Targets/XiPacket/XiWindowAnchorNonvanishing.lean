@@ -80,16 +80,24 @@ theorem Xi_sc_re_ne_zero_of_anchor (s : Hyperlocal.OffSeed Xi)
   rw [Xi_sc_re_eq (s := s)]
   exact mul_ne_zero ha h
 
-/-
-COMPATIBILITY SEMANTIC CLIFF (temporary):
+/-!
+LEGACY COMPATIBILITY (temporary):
 
-Many downstream Route-B “Option-ELL” files still consume a bare
-`(Xi (sc s)).re ≠ 0` assumption under the legacy name `xi_sc_re_ne_zero`.
+Some downstream modules still package “Lemma C” at order 0 and therefore
+require a value-level nonvanishing assumption for `(Xi (sc s)).re`.
 
-This is intentionally kept as an axiom for now, to avoid cyclic imports and
-to keep the interface stable while the analytic theory is being migrated.
+The Option-ELL path is now refactored to avoid using this axiom, but we keep
+the name here until the remaining order-0 Lemma-C pipeline is migrated to the
+AtOrder payload constructors.
 -/
 axiom xi_sc_re_ne_zero (s : Hyperlocal.OffSeed Xi) : (Xi (sc s)).re ≠ 0
+
+/-- Stronger form: some order has nonzero real part at the anchor (semantic cliff). -/
+theorem xiJetNonflat_re (s : Hyperlocal.OffSeed Xi) :
+    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 :=
+by
+  -- Fully-qualified to avoid name-resolution issues across imports.
+  simpa using (_root_.Hyperlocal.Targets.XiPacket.xiJetNonflat_re_exists (s := s))
 
 /-!
 ## Route B: JetPivot nonflatness at the anchor

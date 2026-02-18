@@ -183,6 +183,17 @@ theorem hkappaAt_of_cderivRe_ne0 (m : ℕ) (s : Hyperlocal.OffSeed Xi)
   rw [XiLemmaC_kappa_closedFormAt (m := m) (s := s)] at hk'
   exact hk'
 
+/-- JetPivot leverage (Re): direct left-κ nonvanishing (no `Or`). -/
+theorem hkappaAt_re_of_cderivRe_ne0 (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    (hRe : (((cderivIter m Xi) (sc s))).re ≠ 0) :
+    kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
+  intro hk
+  apply hRe
+  have hk' := hk
+  rw [XiLemmaC_kappa_closedFormAt (m := m) (s := s)] at hk'
+  exact hk'
+
+
 /-- JetPivot leverage (Im): `Im(Ξ^{(m)}(sc)) ≠ 0` ⇒ Or-κ via imag closed form. -/
 theorem hkappaAt_of_cderivIm_ne0 (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     (hIm : (((cderivIter m Xi) (sc s))).im ≠ 0) :

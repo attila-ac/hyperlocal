@@ -22,11 +22,19 @@ namespace XiPacket
 
 /--
 Route-B semantic cliff (temporary):
-there exists some order `m` such that the `m`-th complex derivative of `Xi` at `sc s`
-is nonzero.
+there exists some order `m` such that the **real part** of the `m`-th complex
+derivative of `Xi` at `sc s` is nonzero.
 -/
-axiom xiJetNonflat_exists (s : Hyperlocal.OffSeed Xi) :
-  ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
+axiom xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
+  ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0
+
+/-- Backward-compatible derived form: some complex derivative is nonzero. -/
+theorem xiJetNonflat_exists (s : Hyperlocal.OffSeed Xi) :
+  ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0 := by
+  rcases xiJetNonflat_re_exists (s := s) with ⟨m, hm⟩
+  refine ⟨m, ?_⟩
+  intro hz
+  exact hm (by simpa [hz])
 
 end XiPacket
 end Targets
