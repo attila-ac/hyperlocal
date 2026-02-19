@@ -20,7 +20,7 @@ theorem xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
   -- Discharge using the anchor nonvanishing at `m = 0`.
   refine ⟨0, ?_⟩
   -- `cderivIter 0 Xi = Xi`.
-  simpa [cderivIter] using (xi_sc_re_ne_zero (s := s))
+  simpa [cderivIter] using (xi_sc_re_ne_zero_of_analytic (s := s))
 
 end XiPacket
 end Targets

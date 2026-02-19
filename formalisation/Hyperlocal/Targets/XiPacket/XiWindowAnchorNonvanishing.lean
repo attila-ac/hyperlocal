@@ -1,4 +1,4 @@
-/-
+ /-
   Hyperlocal/Targets/XiPacket/XiWindowAnchorNonvanishing.lean
 
   Plan C++ (Route B): keep the anchor algebra, but remove the hard zeta-specific
@@ -13,14 +13,15 @@
     `xiJetNonflat_re_or_im`.
 
   COMPATIBILITY NOTE:
-  Downstream (e.g. `XiToeplitzRecurrenceIdentity.lean`, `XiWindowLemmaC_FromRecurrence.lean`)
-  still expects a semantic lemma named `xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0`.
-  We keep that name here as a temporary semantic cliff (separate from jet-nonflatness).
+  Downstream expects a semantic lemma named `xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0`.
+  That lemma is provided (temporarily) by `XiWindowScNonvanishing.lean`,
+  and this file imports it, so downstream still sees it after importing this module.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
+import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -80,40 +81,37 @@ theorem Xi_sc_re_ne_zero_of_anchor (s : Hyperlocal.OffSeed Xi)
   rw [Xi_sc_re_eq (s := s)]
   exact mul_ne_zero ha h
 
-/-!
-LEGACY COMPATIBILITY (temporary):
+/--
+Stronger form: some order has nonzero real part at the anchor (semantic cliff).
 
-Some downstream modules still package “Lemma C” at order 0 and therefore
-require a value-level nonvanishing assumption for `(Xi (sc s)).re`.
-
-The Option-ELL path is now refactored to avoid using this axiom, but we keep
-the name here until the remaining order-0 Lemma-C pipeline is migrated to the
-AtOrder payload constructors.
+This is imported theorem-level from `XiJetNonflatOfAnalytic.lean`.
 -/
-axiom xi_sc_re_ne_zero (s : Hyperlocal.OffSeed Xi) : (Xi (sc s)).re ≠ 0
-
-/-- Stronger form: some order has nonzero real part at the anchor (semantic cliff). -/
 theorem xiJetNonflat_re (s : Hyperlocal.OffSeed Xi) :
-    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 :=
-by
+    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 := by
   -- Fully-qualified to avoid name-resolution issues across imports.
   simpa using (_root_.Hyperlocal.Targets.XiPacket.xiJetNonflat_re_exists (s := s))
 
 /-!
 ## Route B: JetPivot nonflatness at the anchor
 
-The remaining semantic input is imported as `xiJetNonflat_exists`.
-We expose it in the local API as `xiJetNonflat` and the Re/Im split form
-`xiJetNonflat_re_or_im`.
+The remaining semantic input is imported as `xiJetNonflat_re` above.
+We expose:
+  * `XiJetNonflat` (∃ m, cderivIter m Xi (sc s) ≠ 0)
+  * `xiJetNonflat` as a theorem
+  * `xiJetNonflat_re_or_im` split form.
 -/
 
 /-- Semantic nonflatness at the anchor: some complex derivative is nonzero. -/
 def XiJetNonflat (s : Hyperlocal.OffSeed Xi) : Prop :=
   ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
 
-/-- Route-B nonflatness (currently sourced from `XiJetNonflatOfAnalytic`). -/
+/-- Route-B nonflatness (derived from real-part nonflatness). -/
 theorem xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s := by
-  simpa [XiJetNonflat] using (xiJetNonflat_exists (s := s))
+  rcases xiJetNonflat_re (s := s) with ⟨m, hmre⟩
+  refine ⟨m, ?_⟩
+  intro h0
+  -- if the complex number is 0, its real part is 0
+  exact hmre (by simpa [h0])
 
 private lemma complex_eq_zero_of_re_im_eq_zero {z : ℂ}
     (hre : z.re = 0) (him : z.im = 0) : z = 0 :=
