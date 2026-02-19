@@ -43,15 +43,31 @@ structure XiJetQuotRow0AtOrderConvolutionOut (m : ℕ) (s : OffSeed Xi) : Prop w
   hwp2At : Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s)
   hwp3At : Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s)
 
-/--
-SINGLE semantic endpoint (temporary):
-the AtOrder analytic recurrence extraction theorem, stated in the minimal Row--0
-Cauchy/convolution form.
+/-
+  TEMPORARY SEMANTIC INSERTION (Task A).
 
-Replace this axiom by a theorem once the analytic extraction layer is formalised.
+  Keep the raw axiom name *private* to this module and route all downstream
+  consumers through the stable theorem name
+
+    `xiJetQuotRow0AtOrderConvolutionOut_theorem`.
+
+  When the analytic recurrence extraction layer is proved, replace the body of
+  `xiJetQuotRow0AtOrderConvolutionOut_theorem` (and delete the axiom) without
+  touching any downstream files.
 -/
-axiom xiJetQuotRow0AtOrderConvolutionOut
+axiom xiJetQuotRow0AtOrderConvolutionOut_axiom
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s
+
+/--
+Future-facing theorem name for Task A.
+
+For now this is discharged by the temporary axiom above.
+Once the analytic extraction theorem exists, replace the proof here and delete
+`xiJetQuotRow0AtOrderConvolutionOut_axiom`.
+-/
+theorem xiJetQuotRow0AtOrderConvolutionOut_theorem
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
+  simpa using (xiJetQuotRow0AtOrderConvolutionOut_axiom (m := m) (s := s))
 
 /--
 Concrete (scalar) order-`m` jet-quotient recurrence extraction output.
@@ -63,7 +79,7 @@ noncomputable def xiJetQuotRow0ScalarGoalsAtOrder_fromRecurrence
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ScalarGoalsAtOrder m s := by
   classical
   have H : XiJetQuotRow0AtOrderConvolutionOut m s :=
-    xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)
+    xiJetQuotRow0AtOrderConvolutionOut_theorem (m := m) (s := s)
 
   refine ⟨?_, ?_, ?_⟩
   ·

@@ -2,16 +2,15 @@
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetConvolutionAtFromRouteA.lean
 
   Purpose:
-    Make **Leibniz (binomial)** the *primary* Row--0 semantic gate, and provide
-    `JetConvolutionAt` for the canonical ξ-windows as a *derived* interface.
+    Make **Leibniz (binomial)** the primary Row--0 semantic gate, and provide
+    `JetConvolutionAt` for the canonical ξ-windows as a derived interface.
 
-  Status:
-    Centralises the one shape-change lemma here.
-
-  NOTE:
-    This file depends on `JetConvolutionAt` (from Cauchy semantics). If that module
-    is currently failing due to a build cycle, you must break the cycle first
-    (see grep commands below).
+  Fix:
+    Use the correct evaluation point `z` for each canonical window:
+      w0  at  ρ
+      wc  at  1 - ρ
+      wp2 at  conj ρ
+      wp3 at  1 - conj ρ
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
@@ -38,21 +37,22 @@ theorem xiJetConvolutionAt_w0  (s : _root_.Hyperlocal.OffSeed Xi) :
     (xiJetLeibnizAt_w0 (s := s))
 
 theorem xiJetConvolutionAt_wc  (s : _root_.Hyperlocal.OffSeed Xi) :
-  JetConvolutionAt s (rho s) (wc s) := by
-  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := rho s) (w := wc s)
+  JetConvolutionAt s (1 - s.ρ) (wc s) := by
+  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := 1 - s.ρ) (w := wc s)
     (xiJetLeibnizAt_wc (s := s))
 
 theorem xiJetConvolutionAt_wp2 (s : _root_.Hyperlocal.OffSeed Xi) :
-  JetConvolutionAt s (rho s) (wp2 s) := by
-  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := rho s) (w := wp2 s)
+  JetConvolutionAt s ((starRingEnd ℂ) s.ρ) (wp2 s) := by
+  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s)
     (xiJetLeibnizAt_wp2 (s := s))
 
 theorem xiJetConvolutionAt_wp3 (s : _root_.Hyperlocal.OffSeed Xi) :
-  JetConvolutionAt s (rho s) (wp3 s) := by
-  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := rho s) (w := wp3 s)
+  JetConvolutionAt s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) := by
+  exact jetConvolutionAt_of_jetLeibnizAt (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3 s)
     (xiJetLeibnizAt_wp3 (s := s))
 
 end JetQuotOp
+
 end XiPacket
 end Targets
 end Hyperlocal
