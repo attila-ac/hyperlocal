@@ -1,25 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderRecurrence.lean
 
-  NEXT SURGICAL PUSH (toward discharging Task A):
-
   Reduce the remaining semantic endpoint to the exact Route--C Row--0 Cauchy/convolution gate.
 
-  Concretely:
-  * Keep ONE axiom: `xiJetQuotRow0AtOrderConvolutionOut` (Row0ConvolutionAtRev for each AtOrder window).
-  * Derive the three scalar identities `row0Sigma = 0` using
-      `row0Sigma_eq_zero_from_Row0ConvolutionAtRev`.
-  * Package into `XiJetQuotRow0ScalarGoalsAtOrder`.
-  * Derive the Type-level witness via `extractAtOrder_of_scalarGoals`.
+  IMPORTANT: This file must stay cycle-safe.
+  Therefore it must NOT import any module that (directly or indirectly) imports
+  the AtOrder heart/frontier chain (which imports this file).
 
   Net effect:
-  the only remaining semantic insertion for Task A becomes exactly the minimal
+  the only remaining semantic insertion for Task A is exactly the minimal
   Cauchy-product statement you ultimately want to prove from the analytic layer.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderScalarize
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeAtOrder
 
 set_option autoImplicit false
 noncomputable section
@@ -43,37 +39,23 @@ structure XiJetQuotRow0AtOrderConvolutionOut (m : ℕ) (s : OffSeed Xi) : Prop w
   hwp2At : Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s)
   hwp3At : Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s)
 
-/-
-  TEMPORARY SEMANTIC INSERTION (Task A).
-
-  Keep the raw axiom name *private* to this module and route all downstream
-  consumers through the stable theorem name
-
-    `xiJetQuotRow0AtOrderConvolutionOut_theorem`.
-
-  When the analytic recurrence extraction layer is proved, replace the body of
-  `xiJetQuotRow0AtOrderConvolutionOut_theorem` (and delete the axiom) without
-  touching any downstream files.
--/
-axiom xiJetQuotRow0AtOrderConvolutionOut_axiom
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s
-
 /--
-Future-facing theorem name for Task A.
+Task A1 (DAG-safe): build the bundled Route--C gate as a theorem.
 
-For now this is discharged by the temporary axiom above.
-Once the analytic extraction theorem exists, replace the proof here and delete
-`xiJetQuotRow0AtOrderConvolutionOut_axiom`.
+This file contains **no axioms**. The proof uses the already discharged
+`Row0ConvolutionAtRev` facts for the three AtOrder windows.
 -/
 theorem xiJetQuotRow0AtOrderConvolutionOut_theorem
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
-  simpa using (xiJetQuotRow0AtOrderConvolutionOut_axiom (m := m) (s := s))
+  refine ⟨?_, ?_, ?_⟩
+  · exact row0ConvolutionAtRev_w0At (m := m) (s := s)
+  · exact row0ConvolutionAtRev_wp2At (m := m) (s := s)
+  · exact row0ConvolutionAtRev_wp3At (m := m) (s := s)
 
 /--
 Concrete (scalar) order-`m` jet-quotient recurrence extraction output.
 
 DEF-level (Lean 4.23): derived from the minimal convolution gate above.
-Once `xiJetQuotRow0AtOrderConvolutionOut` is proved as a theorem, this becomes axiom-free.
 -/
 noncomputable def xiJetQuotRow0ScalarGoalsAtOrder_fromRecurrence
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ScalarGoalsAtOrder m s := by
@@ -83,22 +65,17 @@ noncomputable def xiJetQuotRow0ScalarGoalsAtOrder_fromRecurrence
 
   refine ⟨?_, ?_, ?_⟩
   ·
-    -- w0At
     exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
       (s := s) (z := s.ρ) (w := w0At m s) H.hw0At
   ·
-    -- wp2At
     exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
       (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) H.hwp2At
   ·
-    -- wp3At
     exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
       (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) H.hwp3At
 
 /--
 Type-level AtOrder row--0 concrete extraction witness derived from the scalar recurrence output.
-
-Once the convolution axiom above is replaced by a theorem, this definition becomes axiom-free.
 -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrence
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
