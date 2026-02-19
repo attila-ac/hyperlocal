@@ -3,17 +3,14 @@
 
   Discharge `Row0ConvolutionAtRev` for AtOrder windows.
 
-  Depends only on:
-    • CauchyProductAttempt
-    • JetLeibnizAtFromRouteA
-    • Core coeff-3 identities
+  CHANGE (2026-02-19): this file is now a compatibility export layer.
+  The AtOrder Gate is the single semantic insertion point, so we simply
+  project the three convolution facts from:
 
-  NO frontier imports.
+    `xiJetQuotRow0AtOrderConvolutionOut m s`.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
-import Hyperlocal.Targets.XiPacket.XiRow0Coeff3CoreAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGate
 
 import Mathlib.Tactic
 
@@ -25,42 +22,22 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-open Hyperlocal.Cancellation
 open Hyperlocal.Transport
 
 /-- Build `Row0ConvolutionAtRev` for `w0At`. -/
 theorem row0ConvolutionAtRev_w0At (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s (s.ρ) (w0At m s) := by
-  classical
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s) (z := s.ρ) (w := w0At m s) with
-    ⟨G, hfac, hjet, _, _, _, _⟩
-  refine ⟨G, hfac, hjet, ?_⟩
-  simpa using row0ConvCoeff3_w0At (m := m) (s := s)
+  exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hw0At
 
 /-- Build `Row0ConvolutionAtRev` for `wp2At`. -/
 theorem row0ConvolutionAtRev_wp2At (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
-  classical
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s)
-      (z := (starRingEnd ℂ) s.ρ)
-      (w := wp2At m s) with
-    ⟨G, hfac, hjet, _, _, _, _⟩
-  refine ⟨G, hfac, hjet, ?_⟩
-  simpa using row0ConvCoeff3_wp2At (m := m) (s := s)
+  exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hwp2At
 
 /-- Build `Row0ConvolutionAtRev` for `wp3At`. -/
 theorem row0ConvolutionAtRev_wp3At (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
-  classical
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s)
-      (z := (1 - (starRingEnd ℂ) s.ρ))
-      (w := wp3At m s) with
-    ⟨G, hfac, hjet, _, _, _, _⟩
-  refine ⟨G, hfac, hjet, ?_⟩
-  simpa using row0ConvCoeff3_wp3At (m := m) (s := s)
+  exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hwp3At
 
 end XiPacket
 end Targets

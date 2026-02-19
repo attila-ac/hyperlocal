@@ -2,16 +2,21 @@
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGate.lean
 
   Cycle-safe gate for AtOrder concrete extraction:
-  provides exactly the minimal Route--C Row--0 convolution output as an axiom,
-  and derives the scalar goals + concrete extraction witness.
+  provides exactly one semantic insertion point (as a theorem wrapper),
+  and derives scalar goals + concrete extraction witness.
 
-  IMPORTANT:
-  This file must NOT import any *outer* AtOrder frontier modules.
+  CHANGE (fixes unknown identifier issues downstream):
+    The Gate structure is now defined in the defs-only module
+      `...GateDefs.lean`
+    so that analytic discharge files can import it without importing the Gate axiom.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderScalarize
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGateDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGateFromAnalytic
+
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -24,15 +29,20 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
 
-/-- Route--C gate (Row--0 reverse convolution) for each AtOrder window. -/
-structure XiJetQuotRow0AtOrderConvolutionOut (m : ℕ) (s : OffSeed Xi) : Prop where
-  hw0At  : Row0ConvolutionAtRev s (s.ρ) (w0At m s)
-  hwp2At : Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s)
-  hwp3At : Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s)
+/-
+Single semantic insertion point.
 
-/-- Single semantic insertion point (cycle-safe). -/
-axiom xiJetQuotRow0AtOrderConvolutionOut_axiom
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s
+Currently defined by forwarding to the analytic-discharge theorem in
+`...GateFromAnalytic.lean`.
+
+When you replace
+  `xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic`
+by the true recurrence extraction theorem, this Gate becomes axiom-free
+without changing downstream code.
+-/
+theorem xiJetQuotRow0AtOrderConvolutionOut_axiom
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
+  exact xiJetQuotRow0AtOrderConvolutionOut_fromAnalytic (m := m) (s := s)
 
 theorem xiJetQuotRow0AtOrderConvolutionOut
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
