@@ -3,24 +3,20 @@
 
   Route–B analytic recurrence endpoint (AtOrder, row-0 concrete extract).
 
-  PURPOSE (2026-02-19):
-    Provide the *single* theorem that should ultimately be proved from the
-    concrete order-`m` jet-quotient recurrence extraction.
+  Lean 4.23 note:
+    Since `XiJetQuotRow0ConcreteExtractAtOrder m s` is Type-valued,
+    this exported endpoint must be a `def`, not a `theorem`.
 
-      xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB :
-        ∀ m s, XiJetQuotRow0ConcreteExtractAtOrder m s
+  Big sweep (2026-02-19):
+    The endpoint is now axiom-free. The only remaining semantic cliff lives in
 
-  STATUS:
-    This is the correct semantic endpoint module, cycle-safe, with a placeholder
-    axiom (to be replaced by the real proof once the recurrence theorem is
-    formalised).
+      `xiJetQuotOpZeroAtOrder : ∀ m s, XiJetQuotOpZeroAtOrder m s`
 
-  DESIGN:
-    - Keep imports minimal and upstream-safe.
-    - No dependence on Gate/Heart/Frontier-at-order.
+    from `XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder.lean`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
 
 set_option autoImplicit false
 noncomputable section
@@ -32,14 +28,12 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-/--
-Route–B analytic recurrence endpoint (AtOrder):
-
-This is the *exact* statement you want to eventually discharge from
-the concrete order-`m` jet-quotient recurrence extraction theorem.
--/
-axiom xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s
+/-- Route–B endpoint (AtOrder): package the raw Toeplitz row-0 witness into the Type-level extract bundle. -/
+noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s := by
+  have hC : XiJetQuotRow0WitnessCAtOrder m s :=
+    xiJetQuotRow0WitnessCAtOrder (m := m) (s := s)
+  exact ⟨hC.hop_w0At, hC.hop_wp2At, hC.hop_wp3At⟩
 
 end XiPacket
 end Targets
