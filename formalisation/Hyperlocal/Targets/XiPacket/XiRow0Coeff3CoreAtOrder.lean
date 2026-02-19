@@ -2,7 +2,12 @@
   Hyperlocal/Targets/XiPacket/XiRow0Coeff3CoreAtOrder.lean
 
   Upstream interface for AtOrder coeff-3 identities.
-  Pure boundary layer.
+  Pure boundary layer (axioms only), DAG-safe.
+
+  IMPORTANT:
+  Do NOT import any frontier/concrete proof layers here, otherwise you
+  create a build cycle because the frontier currently depends (indirectly)
+  on this boundary via the Row0 convolution discharge.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
