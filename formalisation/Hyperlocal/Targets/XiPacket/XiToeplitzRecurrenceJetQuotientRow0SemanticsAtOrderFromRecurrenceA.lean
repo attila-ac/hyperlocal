@@ -14,15 +14,18 @@
   the already-available row normal forms (fin0/fin1/fin2).
 
   This keeps the analytic cliff isolated where you want it:
-    the only remaining axiom is `xiJetQuotRow012PropAtOrder_fromRecurrenceA`
-    (via the proof of `xiJetQuotRec2AtOrder_fromRecurrenceA` in
-    XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA.lean).
+    the only remaining axiom in the Route–A boundary is
+      `xiJetQuotRec2AtOrder_fromRecurrenceA`.
+
+  The manuscript-facing Prop payload is now theorem-level and downstream:
+    `xiJetQuotRow012PropAtOrder_fromRecurrenceA` is derived from the recurrence
+    payload by the bridge `xiJetQuotRow012PropAtOrder_of_rec2`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
 
--- Recurrence payload (now theorem-level, derived from manuscript-facing axiom)
+-- Recurrence payload (Route–A boundary; currently axiomatic)
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA
 
@@ -116,7 +119,7 @@ private lemma row2_eq_zero_of_rec2
 theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrder m s := by
   classical
-  -- theorem-level recurrence payload (derived from manuscript-facing axiom elsewhere)
+  -- recurrence payload (Route–A boundary)
   have Hrec : XiJetQuotRec2AtOrder m s :=
     xiJetQuotRec2AtOrder_fromRecurrenceA (m := m) (s := s)
 

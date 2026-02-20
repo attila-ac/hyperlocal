@@ -15,6 +15,7 @@
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_LeibnizSemantics
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -26,10 +27,31 @@ namespace XiPacket
 
 namespace JetQuotOp
 
+open Complex
+open Hyperlocal.Transport
+
 /-- Bridge: order-2 Leibniz jet semantics implies the Cauchy/jet-convolution predicate. -/
-axiom jetConvolutionAt_of_jetLeibnizAt
+theorem jetConvolutionAt_of_jetLeibnizAt
   (s : _root_.Hyperlocal.OffSeed Xi) (z : ℂ) (w : Transport.Window 3) :
-  _root_.Hyperlocal.Targets.XiPacket.JetLeibnizAt s z w → JetConvolutionAt s z w
+  _root_.Hyperlocal.Targets.XiPacket.JetLeibnizAt s z w → JetConvolutionAt s z w := by
+  intro hL
+  classical
+  rcases hL with ⟨G, hfac, hjet, h0, h1, h2⟩
+  refine ⟨G, hfac, hjet, ?_, ?_, ?_⟩
+  ·
+    -- unfold `Rfun` in the hypothesis (works under application)
+    have h0' := h0
+    dsimp [_root_.Hyperlocal.Targets.XiPacket.Rfun] at h0'
+    exact h0'
+  ·
+    -- critical point: force unfolding of `Rfun` under `deriv`
+    have h1' := h1
+    dsimp [_root_.Hyperlocal.Targets.XiPacket.Rfun] at h1'
+    exact h1'
+  ·
+    have h2' := h2
+    dsimp [_root_.Hyperlocal.Targets.XiPacket.Rfun] at h2'
+    exact h2'
 
 theorem xiJetConvolutionAt_w0  (s : _root_.Hyperlocal.OffSeed Xi) :
   JetConvolutionAt s (rho s) (w0 s) := by

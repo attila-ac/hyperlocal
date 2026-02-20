@@ -3,8 +3,6 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012PropAtOrderFromRecurrenceA
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012ToSequenceBridge
 
 set_option autoImplicit false
 noncomputable section
@@ -14,17 +12,19 @@ namespace Targets
 namespace XiPacket
 
 /--
-Derived recurrence payload on the padded AtOrder sequences.
+Cycle-safe recurrence API (Route–A boundary).
 
-Obtained from the manuscript-facing **Prop-valued** row012 axiom
-via `xiJetQuotRec2AtOrder_of_row012Prop`.
+This module is an *upstream* node that must remain independent of the analytic pipeline.
+Therefore it exports only the bundled padded-sequence recurrence payload
+`XiJetQuotRec2AtOrder m s` under a stable name.
+
+Current status: axiomatic.
+
+When the true analytic extractor proof is wired into the Route–A chain, replace this axiom
+by a theorem (without changing the exported name).
 -/
-theorem xiJetQuotRec2AtOrder_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
-  classical
-  have Hprop : XiJetQuotRow012PropAtOrder m s :=
-    xiJetQuotRow012PropAtOrder_fromRecurrenceA (m := m) (s := s)
-  exact xiJetQuotRec2AtOrder_of_row012Prop (m := m) (s := s) Hprop
+axiom xiJetQuotRec2AtOrder_fromRecurrenceA
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s
 
 end XiPacket
 end Targets
