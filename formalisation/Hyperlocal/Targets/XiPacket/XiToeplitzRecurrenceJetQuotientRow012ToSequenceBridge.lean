@@ -53,24 +53,24 @@ private lemma jetQuotRec2_of_rows
   cases n with
   | zero =>
       -- n = 0: row 0
-      -- `toeplitzL_two_apply_fin0` is the canonical normal form for row 0.
-      -- `padSeq3` at indices 0,1,2 is exactly `w`.
-      simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin0, add_assoc, add_left_comm, add_comm] using h0
+      simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin0,
+        add_assoc, add_left_comm, add_comm] using h0
   | succ n =>
       cases n with
       | zero =>
           -- n = 1: row 1, and the a2-term vanishes because padSeq3 w 3 = 0
-          simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin1, add_assoc, add_left_comm, add_comm] using h1
+          simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin1,
+            add_assoc, add_left_comm, add_comm] using h1
       | succ n =>
           cases n with
           | zero =>
               -- n = 2: row 2, and the a1/a2-terms vanish because padSeq3 w 3 = padSeq3 w 4 = 0
-              simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin2, add_assoc, add_left_comm, add_comm] using h2
+              simpa [JetQuotRec2, padSeq3, toeplitzL_two_apply_fin2,
+                add_assoc, add_left_comm, add_comm] using h2
           | succ n =>
               -- n ≥ 3: everything is padded to 0, so the recurrence is 0 = 0
-              -- This simp lemma appears elsewhere in your repo (and in earlier build logs):
-              -- `padSeq3_succ_succ_succ`.
-              simp [JetQuotRec2, padSeq3_succ_succ_succ, Nat.add_assoc, Nat.add_left_comm, Nat.add_comm]
+              simp [JetQuotRec2, padSeq3_succ_succ_succ,
+                Nat.add_assoc, Nat.add_left_comm, Nat.add_comm]
 
 /-- Convenience: Prop-level row012 Toeplitz payload implies the padded recurrence on `padSeq3`. -/
 theorem jetQuotRec2_padSeq3_of_toeplitzRow012Prop
@@ -86,8 +86,6 @@ Package-level corollaries: row012 payloads imply the *bundled* sequence recurren
 /--
 From the **Type-valued** row012 payload `XiJetQuotRow012AtOrder`, recover the bundled padded-sequence
 recurrence payload `XiJetQuotRec2AtOrder`.
-
-(Uses row0 witness fields from `H.h0` plus row1/row2 fields carried by `XiJetQuotRow012AtOrder`.)
 -/
 theorem xiJetQuotRec2AtOrder_of_row012
     (m : ℕ) (s : OffSeed Xi)
@@ -95,25 +93,20 @@ theorem xiJetQuotRec2AtOrder_of_row012
   classical
   refine ⟨?_, ?_, ?_⟩
   ·
-    -- w0At
     exact jetQuotRec2_of_rows (s := s) (w := w0At m s)
       (h0 := H.h0.hop_w0At) (h1 := H.h1_w0At) (h2 := H.h2_w0At)
   ·
-    -- wp2At
     exact jetQuotRec2_of_rows (s := s) (w := wp2At m s)
       (h0 := H.h0.hop_wp2At) (h1 := H.h1_wp2At) (h2 := H.h2_wp2At)
   ·
-    -- wp3At
     exact jetQuotRec2_of_rows (s := s) (w := wp3At m s)
       (h0 := H.h0.hop_wp3At) (h1 := H.h1_wp3At) (h2 := H.h2_wp3At)
 
 /--
 From the **Prop-valued** row012 payload `XiJetQuotRow012PropAtOrder`, recover the bundled padded-sequence
 recurrence payload `XiJetQuotRec2AtOrder`.
-
-This is the bridge you want if you’re avoiding `XiJetQuotRow012AtOrder` entirely.
 -/
-theorem xiJetQuotRec2AtOrder_of_row012Prop'
+theorem xiJetQuotRec2AtOrder_of_row012Prop
     (m : ℕ) (s : OffSeed Xi)
     (H : XiJetQuotRow012PropAtOrder m s) : XiJetQuotRec2AtOrder m s := by
   classical
