@@ -1,21 +1,15 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart.lean
+  General heart theorem provider (stable API for Frontier/Wrapper).
 
-  Heart contract (sigma-only).
+  This file may still import the global nondegeneracy boundary `a0_ne_zero`
+  so existing downstream modules (expecting `OffSeed Xi`) keep compiling.
 
-  NOTE (2026-02-21):
-  This file is no longer “cycle-safe”: it now DISCHARGES the former heart axiom from the
-  analytic extractor Rec2 triple (and the nondegeneracy axiom `a0_ne_zero`).
-
-  Net effect:
-  - removes the previous axiom `xiJetQuotRow0AtOrderHeartOut`
-  - provides theorem-level `row0Sigma = 0` for the three AtOrder windows.
+  Strip branch should NOT import this file; it should import:
+    `...HeartFromAnalyticStrip.lean`
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
-import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartDefs
 
--- Non-cycle-safe discharge inputs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy
@@ -30,22 +24,7 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-/--
-Heart output: the scalar Row0 goals (row0Sigma = 0) for the three AtOrder windows.
--/
-structure XiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) : Prop where
-  hw0AtSigma  : row0Sigma s (w0At m s)  = 0
-  hwp2AtSigma : row0Sigma s (wp2At m s) = 0
-  hwp3AtSigma : row0Sigma s (wp3At m s) = 0
-
-/--
-Theorem-level heart output: discharged from the analytic extractor Rec2 triple.
-
-Depends on:
-* the upstream analytic row012 landing axiom `xiJetQuotRow012AtOrder_analytic`
-  (via the analytic extractor endpoint),
-* the nondegeneracy axiom `a0_ne_zero`.
--/
+/-- Stable heart output: for any `OffSeed Xi` (used by Frontier). -/
 theorem xiJetQuotRow0AtOrderHeartOut
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderHeartOut m s := by
   classical
@@ -57,7 +36,6 @@ theorem xiJetQuotRow0AtOrderHeartOut
     xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor (m := m) (s := s)
 
   have ha0 : a0 s ≠ (0 : ℂ) := by
-    -- `a0` is abbrev in XiRow0Bridge_Rec2PadSeq3ToCoords
     simpa [a0] using a0_ne_zero (s := s)
 
   have Hw0 : (w0At m s) 0 = 0 ∧ (w0At m s) 1 = 0 ∧ (w0At m s) 2 = 0 :=
