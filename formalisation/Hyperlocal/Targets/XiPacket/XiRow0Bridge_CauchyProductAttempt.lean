@@ -6,7 +6,7 @@
 
   IMPORTANT:
   We introduce a NEW semantic gate name `JetConvolutionAtRev` which is genuinely
-  a `Convolution` statement, to avoid clashes with existing names in the repo.
+  a (tail) convolution statement, to avoid clashes with existing names in the repo.
 
   MOVE-1 (2026-02-18):
   Add the *minimal* Row--0 semantic gate `Row0ConvolutionAtRev`, which requires
@@ -66,20 +66,19 @@ def row0CoeffSeqRev (s : OffSeed Xi) : ℕ → ℂ
   | 3 => (-2 : ℂ)
   | _ => 0
 
-/-- `JetConvolutionAtRev` is the *Convolution* semantic gate (as a Prop). -/
+/--
+`JetConvolutionAtRev` is the *tail* convolution semantic gate (as a Prop):
+we only require the vanishing convolution constraints for `n ≥ 3`.
+
+This matches the intended Route--C usage: we care only about the high-index
+Cauchy coefficients (3,4,5,...) which are 0 in the canonical "jet padded by 0"
+output sequence.
+-/
 def JetConvolutionAtRev (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) : Prop :=
   ∃ (G : ℂ → ℂ),
     Hyperlocal.Factorization.FactorisedByQuartet Xi s.ρ 1 G ∧
     IsJet3At G z w ∧
-    Convolution
-      (row0CoeffSeqRev s)
-      (winSeqRev w)
-      (fun n =>
-        match n with
-        | 0 => Xi z
-        | 1 => deriv Xi z
-        | 2 => deriv (deriv Xi) z
-        | _ => 0)
+    ∀ n, 3 ≤ n → convCoeff (row0CoeffSeqRev s) (winSeqRev w) n = 0
 
 /--
 `Row0ConvolutionAtRev` is the *minimal* Route--C gate needed for Row--0:
@@ -101,15 +100,15 @@ theorem row0Sigma_eq_convCoeff_rev (s : OffSeed Xi) (w : Transport.Window 3) :
         Finset.range_succ, Finset.sum_range_succ]
   ring_nf
 
-/-- Projection: full convolution gate implies the minimal Row--0 gate. -/
+/-- Projection: full tail-convolution gate implies the minimal Row--0 gate. -/
 theorem row0ConvolutionAtRev_of_JetConvolutionAtRev
     (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3) :
     JetConvolutionAtRev s z w → Row0ConvolutionAtRev s z w := by
   classical
   intro H
-  rcases H with ⟨G, hfac, hjet, Hconv⟩
+  rcases H with ⟨G, hfac, hjet, Htail⟩
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0 := by
-    simpa using (Hconv 3)
+    exact Htail 3 (by decide)
   exact ⟨G, hfac, hjet, h3⟩
 
 /-- Core discharge (full gate): `JetConvolutionAtRev` implies `row0Sigma = 0`. -/

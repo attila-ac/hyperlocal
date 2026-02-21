@@ -1,8 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA.lean
+
+  Post-Task-A state (DAG-safe):
+  the former cycle-safe RecurrenceA axiom boundary is replaced by a theorem
+  re-exporting the downstream analytic→recurrence endpoint.
+
+  IMPORTANT:
+    This replacement is DAG-safe only once the analytic row012 landing proof
+    is independent of Row0SemanticsAtOrder / any RecurrenceA consumers.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor
 
 set_option autoImplicit false
 noncomputable section
@@ -11,20 +19,10 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/--
-Cycle-safe recurrence API (Route–A boundary).
-
-This module is an *upstream* node that must remain independent of the analytic pipeline.
-Therefore it exports only the bundled padded-sequence recurrence payload
-`XiJetQuotRec2AtOrder m s` under a stable name.
-
-Current status: axiomatic.
-
-When the true analytic extractor proof is wired into the Route–A chain, replace this axiom
-by a theorem (without changing the exported name).
--/
-axiom xiJetQuotRec2AtOrder_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s
+/-- Former Route–A boundary, now theorem-level: re-export the analytic extractor endpoint. -/
+theorem xiJetQuotRec2AtOrder_fromRecurrenceA
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
+  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor (m := m) (s := s)
 
 end XiPacket
 end Targets

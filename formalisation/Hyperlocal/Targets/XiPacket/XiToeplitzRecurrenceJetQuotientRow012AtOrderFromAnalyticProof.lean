@@ -1,17 +1,34 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderFromAnalyticProof.lean
 
-  Cycle-safe placeholder proof module.
+  Task A (2026-02-20): make the analytic row012 landing spot *independent*
+  of `Row0SemanticsAtOrder` / `...RecurrenceA`.
 
-  This file exists only to provide the symbol
-    xiJetQuotRow012AtOrder_fromAnalytic_proof
+  This file builds the Type-valued row012 target bundle
 
-  without importing the analytic pipeline (which would reintroduce cycles).
-  Later, replace the axiom by the real construction.
+    XiJetQuotRow012AtOrder m s
+
+  from the Route–C row012 reverse-convolution stencil payload plus the
+  shift-to-Toeplitz bridges:
+
+    Row012ConvolutionAtRev
+      → coordEqs_of_row012ConvolutionAtRev
+      → (Task 1) shifted row0Sigma vanishings
+      → Toeplitz row-1/row-2 vanishings
+      → package into XiJetQuotRow012AtOrder.
+
+  IMPORTANT:
+    The only admitted content used here is the cycle-safe boundary
+      `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
+    which is intentionally NOT the old RecurrenceA boundary.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
+
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionToToeplitzRow012Prop
+
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -24,47 +41,40 @@ open Complex
 open Hyperlocal.Transport
 
 /--
-Cycle-safe placeholder for the Type-valued analytic landing spot.
+Cycle-safe analytic landing construction (Type-valued row012 target bundle).
 
-Replace this proof term by the real analytic construction once the analytic extraction
-is available without importing Row0Semantics / SequenceAtOrderRecurrenceA.
+This is now independent of the old RecurrenceA/Row0Semantics path.
 -/
 noncomputable def xiJetQuotRow012AtOrder_fromAnalytic_proof
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder m s := by
   classical
 
-  -- full-window contract
-  have H0 : XiJetQuotOpZeroAtOrder m s :=
-    xiJetQuotOpZeroAtOrder (m := m) (s := s)
+  -- (A) obtain the row012-stencil payload for the three AtOrder windows
+  have Hst : XiRow012ConvolutionAtRevAtOrderOut m s :=
+    xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
 
-  -- row-0 bundle
-  have hrow0 : XiJetQuotRow0WitnessCAtOrder m s :=
-    xiJetQuotRow0WitnessCAtOrder_of_opZero (m := m) (s := s) H0
+  -- derive Prop-level row012 Toeplitz payloads for each AtOrder window
+  have Hw0  : ToeplitzRow012Prop s (w0At m s) :=
+    toeplitzRow012Prop_of_row012ConvolutionAtRev (s := s) (z := s.ρ) (w := w0At m s) Hst.hw0At
+  have Hwp2 : ToeplitzRow012Prop s (wp2At m s) :=
+    toeplitzRow012Prop_of_row012ConvolutionAtRev
+      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) Hst.hwp2At
+  have Hwp3 : ToeplitzRow012Prop s (wp3At m s) :=
+    toeplitzRow012Prop_of_row012ConvolutionAtRev
+      (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) Hst.hwp3At
 
-  -- row-1 / row-2 projections for each AtOrder window
-  have hw0_1 : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s)) (1 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (1 : Fin 3)) H0.hop_w0At
-  have hw0_2 : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s)) (2 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (2 : Fin 3)) H0.hop_w0At
-
-  have hwp2_1 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (1 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (1 : Fin 3)) H0.hop_wp2At
-  have hwp2_2 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (2 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (2 : Fin 3)) H0.hop_wp2At
-
-  have hwp3_1 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (1 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (1 : Fin 3)) H0.hop_wp3At
-  have hwp3_2 : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (2 : Fin 3) = 0 := by
-    simpa using congrArg (fun w => w (2 : Fin 3)) H0.hop_wp3At
+  -- (B) package the row-0 witness and the row-1/row-2 equalities
+  have hrow0 : XiJetQuotRow0WitnessCAtOrder m s := by
+    exact ⟨Hw0.h0, Hwp2.h0, Hwp3.h0⟩
 
   exact
     { h0 := hrow0
-      h1_w0At := hw0_1
-      h2_w0At := hw0_2
-      h1_wp2At := hwp2_1
-      h2_wp2At := hwp2_2
-      h1_wp3At := hwp3_1
-      h2_wp3At := hwp3_2 }
+      h1_w0At := Hw0.h1
+      h2_w0At := Hw0.h2
+      h1_wp2At := Hwp2.h1
+      h2_wp2At := Hwp2.h2
+      h1_wp3At := Hwp3.h1
+      h2_wp3At := Hwp3.h2 }
 
 end XiPacket
 end Targets
