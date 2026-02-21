@@ -3,16 +3,19 @@
 
   Heart contract (cycle-safe admitted boundary).
 
-  CHANGE (Row012 discharge plan):
-    Strengthen the heart output to carry, in addition to the row0Sigma equalities,
-    the two extra linear constraints (Row012ExtraLin) for each AtOrder window.
+  CHANGE (2026-02-21):
+  The heart admits ONLY the three scalar Row0 goals (row0Sigma = 0) for the
+  three AtOrder windows.
 
-  This file remains the *single* admitted boundary for the missing analytic content.
+  Coordinate vanishings (w 0 = 0 and w 1 = 0) have been moved OUT of the heart,
+  into a separate (cycle-safe) admitted boundary file and/or derived theorem-level
+  from the analytic extractor.
+
+  This keeps the heart small and avoids entangling it with the extractor loop.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinDefs
 
 set_option autoImplicit false
 noncomputable section
@@ -25,27 +28,17 @@ open Complex
 open Hyperlocal.Transport
 
 /--
-Heart output: the scalar Row0 goal plus the two extra linear constraints
-needed to upgrade Row0 reverse convolution to the Row012 stencil.
+Heart output: the scalar Row0 goals (row0Sigma = 0) for the three AtOrder windows.
 
-This is the *only* place we strengthen in the Route–B chain.
+This file is cycle-safe and should remain independent of the analytic extractor stack.
 -/
 structure XiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) : Prop where
-  -- existing scalar goals (already used by the frontier)
-  hw0AtSigma  : row0Sigma s (w0At m s) = 0
+  hw0AtSigma  : row0Sigma s (w0At m s)  = 0
   hwp2AtSigma : row0Sigma s (wp2At m s) = 0
   hwp3AtSigma : row0Sigma s (wp3At m s) = 0
 
-  -- NEW: extra linear constraints (what Row012 needs beyond row0Sigma)
-  hw0AtExtra  : Row012ExtraLin s (w0At m s)
-  hwp2AtExtra : Row012ExtraLin s (wp2At m s)
-  hwp3AtExtra : Row012ExtraLin s (wp3At m s)
-
 /--
-Admitted analytic heart output (current semantic cliff).
-
-Once the true analytic discharge is proven, replace this axiom by a theorem
-with no downstream changes.
+Admitted heart output (current semantic cliff for the Route–B scalar goals).
 -/
 axiom xiJetQuotRow0AtOrderHeartOut
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderHeartOut m s
