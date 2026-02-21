@@ -19,7 +19,7 @@
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
 
 set_option autoImplicit false
 noncomputable section

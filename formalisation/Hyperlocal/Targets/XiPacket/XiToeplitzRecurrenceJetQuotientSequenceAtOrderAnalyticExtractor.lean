@@ -4,11 +4,11 @@
   Route X extractor (analytic → recurrence):
   derive the padded-sequence JetQuotRec2 triple from the analytic row012 target.
 
-  No new axioms here. The ONLY axiom is in:
-    XiToeplitzRecurrenceJetQuotientRow012AtOrderFromAnalytic.lean
+  No new axioms here. The ONLY upstream analytic cliff is in:
+    XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom.lean
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderFromAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceToRow012Bridge
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 
@@ -31,9 +31,9 @@ theorem xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor
     JetQuotRec2 s (padSeq3 (w0At m s)) ∧
     JetQuotRec2 s (padSeq3 (wp2At m s)) ∧
     JetQuotRec2 s (padSeq3 (wp3At m s)) := by
-  -- 1) analytic row012 contract (currently axiom-backed, but exposed as a def)
+  -- 1) upstream analytic row012 contract (primitive endpoint)
   have Hrow012 : XiJetQuotRow012AtOrder m s :=
-    xiJetQuotRow012AtOrder_fromAnalytic (m := m) (s := s)
+    xiJetQuotRow012AtOrder_analytic (m := m) (s := s)
 
   -- 2) row012 → rec2 bundle (already green in your repo)
   have Hrec2 : XiJetQuotRec2AtOrder m s :=

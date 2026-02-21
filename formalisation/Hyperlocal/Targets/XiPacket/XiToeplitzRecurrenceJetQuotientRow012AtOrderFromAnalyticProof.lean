@@ -4,23 +4,16 @@
   Task A (2026-02-20): make the analytic row012 landing spot *independent*
   of `Row0SemanticsAtOrder` / `...RecurrenceA`.
 
-  This file builds the Type-valued row012 target bundle
+  Builds the Type-valued row012 target bundle
 
     XiJetQuotRow012AtOrder m s
 
   from the Route–C row012 reverse-convolution stencil payload plus the
-  shift-to-Toeplitz bridges:
-
-    Row012ConvolutionAtRev
-      → coordEqs_of_row012ConvolutionAtRev
-      → (Task 1) shifted row0Sigma vanishings
-      → Toeplitz row-1/row-2 vanishings
-      → package into XiJetQuotRow012AtOrder.
+  shift-to-Toeplitz bridges.
 
   IMPORTANT:
-    The only admitted content used here is the cycle-safe boundary
-      `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
-    which is intentionally NOT the old RecurrenceA boundary.
+    This file must NOT import itself (obviously), and must not introduce
+    the extractor stack.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
@@ -43,9 +36,9 @@ open Hyperlocal.Transport
 /--
 Cycle-safe analytic landing construction (Type-valued row012 target bundle).
 
-This is now independent of the old RecurrenceA/Row0Semantics path.
+This is independent of the old RecurrenceA/Row0Semantics path.
 -/
-noncomputable def xiJetQuotRow012AtOrder_fromAnalytic_proof
+noncomputable def xiJetQuotRow012AtOrder_fromAnalyticProof
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder m s := by
   classical
 
@@ -63,7 +56,7 @@ noncomputable def xiJetQuotRow012AtOrder_fromAnalytic_proof
     toeplitzRow012Prop_of_row012ConvolutionAtRev
       (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) Hst.hwp3At
 
-  -- (B) package the row-0 witness and the row-1/row-2 equalities
+  -- package the row-0 witness and the row-1/row-2 equalities
   have hrow0 : XiJetQuotRow0WitnessCAtOrder m s := by
     exact ⟨Hw0.h0, Hwp2.h0, Hwp3.h0⟩
 
