@@ -11,7 +11,7 @@
   If you try to define this from Route–C, you create an import cycle.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticProofUpstream
 
 set_option autoImplicit false
 noncomputable section
@@ -23,9 +23,15 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-/-- Upstream analytic endpoint: provide the Type-valued Row012 target bundle. -/
-axiom xiJetQuotRow012AtOrder_analytic
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder m s
+/-
+Upstream analytic endpoint: provide the Type-valued Row012 target bundle.
+
+This file is the *unique extractor-facing import*.
+Its implementation is delegated to `...AnalyticProofUpstream` to keep the dependency DAG cycle-free.
+-/
+noncomputable def xiJetQuotRow012AtOrder_analytic
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder m s :=
+  xiJetQuotRow012AtOrder_analytic_upstream (m := m) (s := s)
 
 end XiPacket
 end Targets
