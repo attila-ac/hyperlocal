@@ -1,10 +1,26 @@
 /-
-  Once `Row012ExtraLin` is proven for the three AtOrder windows, this file
-  discharges the remaining admitted boundary with no further refactors.
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Discharge.lean
+
+  Cycle-safe discharge of the Row012 boundary using:
+
+    (1) witnesses (G, hfac, hjet) from Route-A jet package `xiRouteA_jetPkg`
+    (2) row0Sigma=0 and Row012ExtraLin from the strengthened Route-B heart
+
+  IMPORTANT:
+    This file must NOT import the recurrence/analytic extractor stack.
+    It depends only on:
+      - the heart output
+      - the Route-A jet package
+      - algebraic convCoeff normal forms
+      - the Row012 bundle defs.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderFromHeart
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Reduce
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -15,25 +31,93 @@ namespace XiPacket
 
 open Complex
 open Hyperlocal.Transport
+open Hyperlocal.Cancellation
 
-/-- The remaining analytic obligation: the two extra linear constraints for each AtOrder window. -/
-structure XiRow012ExtraLinAtOrderOut (m : ℕ) (s : OffSeed Xi) : Prop where
-  hw0At  : Row012ExtraLin s (w0At m s)
-  hwp2At : Row012ExtraLin s (wp2At m s)
-  hwp3At : Row012ExtraLin s (wp3At m s)
+/-- Build Row012ConvolutionAtRev for `w0At m s` using heart constraints + Route-A witnesses. -/
+theorem row012ConvolutionAtRev_w0At_fromHeart
+    (m : ℕ) (s : OffSeed Xi) :
+    Row012ConvolutionAtRev s (s.ρ) (w0At m s) := by
+  classical
+  have H : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
 
-/--
-If you can prove `XiRow012ExtraLinAtOrderOut m s` from your analytic chain,
-then you get the full `Row012ConvolutionAtRev` payload and can delete the axiom.
--/
-theorem xiRow012ConvolutionAtRevAtOrderOut_of_extraLin
-    (m : ℕ) (s : OffSeed Xi)
-    (HL : XiRow012ExtraLinAtOrderOut m s) :
-    XiRow012ConvolutionAtRevAtOrderOut m s := by
+  -- Route-A witnesses
+  rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := s.ρ) (w := w0At m s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
+
+  -- coeff 3 from row0Sigma = 0
+  have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
+    have hs : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w0At m s)] using hs
+
+  -- coeff 4/5 from Row012ExtraLin
+  have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 := by
+    rw [convCoeff_rev_eq_n4 (s := s) (w := w0At m s)]
+    simpa using H.hw0AtExtra.h4
+
+  have h5 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 5 = 0 := by
+    rw [convCoeff_rev_eq_n5 (s := s) (w := w0At m s)]
+    simpa using H.hw0AtExtra.h5
+
+  exact ⟨G, hfac, hjet, h3, h4, h5⟩
+
+/-- Build Row012ConvolutionAtRev for `wp2At m s` using heart constraints + Route-A witnesses. -/
+theorem row012ConvolutionAtRev_wp2At_fromHeart
+    (m : ℕ) (s : OffSeed Xi) :
+    Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
+  classical
+  have H : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
+
+  rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
+
+  have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
+    have hs : row0Sigma s (wp2At m s) = 0 := H.hwp2AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp2At m s)] using hs
+
+  have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 := by
+    rw [convCoeff_rev_eq_n4 (s := s) (w := wp2At m s)]
+    simpa using H.hwp2AtExtra.h4
+
+  have h5 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 5 = 0 := by
+    rw [convCoeff_rev_eq_n5 (s := s) (w := wp2At m s)]
+    simpa using H.hwp2AtExtra.h5
+
+  exact ⟨G, hfac, hjet, h3, h4, h5⟩
+
+/-- Build Row012ConvolutionAtRev for `wp3At m s` using heart constraints + Route-A witnesses. -/
+theorem row012ConvolutionAtRev_wp3At_fromHeart
+    (m : ℕ) (s : OffSeed Xi) :
+    Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
+  classical
+  have H : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
+
+  rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
+
+  have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by
+    have hs : row0Sigma s (wp3At m s) = 0 := H.hwp3AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp3At m s)] using hs
+
+  have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 := by
+    rw [convCoeff_rev_eq_n4 (s := s) (w := wp3At m s)]
+    simpa using H.hwp3AtExtra.h4
+
+  have h5 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 5 = 0 := by
+    rw [convCoeff_rev_eq_n5 (s := s) (w := wp3At m s)]
+    simpa using H.hwp3AtExtra.h5
+
+  exact ⟨G, hfac, hjet, h3, h4, h5⟩
+
+/-- Final discharge: build the AtOrder Row012 bundle. -/
+theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_discharge
+    (m : ℕ) (s : OffSeed Xi) : XiRow012ConvolutionAtRevAtOrderOut m s := by
   refine ⟨?_, ?_, ?_⟩
-  · exact row012ConvolutionAtRev_w0At_fromAnalytic_of_extraLin (m := m) (s := s) HL.hw0At
-  · exact row012ConvolutionAtRev_wp2At_fromAnalytic_of_extraLin (m := m) (s := s) HL.hwp2At
-  · exact row012ConvolutionAtRev_wp3At_fromAnalytic_of_extraLin (m := m) (s := s) HL.hwp3At
+  · exact row012ConvolutionAtRev_w0At_fromHeart (m := m) (s := s)
+  · exact row012ConvolutionAtRev_wp2At_fromHeart (m := m) (s := s)
+  · exact row012ConvolutionAtRev_wp3At_fromHeart (m := m) (s := s)
 
 end XiPacket
 end Targets

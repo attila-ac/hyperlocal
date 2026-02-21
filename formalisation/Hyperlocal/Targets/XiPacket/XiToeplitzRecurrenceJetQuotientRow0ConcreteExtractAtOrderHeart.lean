@@ -1,20 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart.lean
 
-  Cycle-safe “analytic heart” interface for the AtOrder row--0 jet-quotient recurrence
-  extraction.
+  Heart contract (cycle-safe admitted boundary).
 
-  CHANGE (2026-02-19):
-  The heart contract is derived from the cycle-safe Gate module (Row0ConvolutionAtRev axiom),
-  not from the old Recurrence endpoint (which was importing the outer frontier and causing cycles).
+  CHANGE (Row012 discharge plan):
+    Strengthen the heart output to carry, in addition to the row0Sigma equalities,
+    the two extra linear constraints (Row012ExtraLin) for each AtOrder window.
 
-  This file carries NO axiom: it packages the scalar heart contract (row0Sigma = 0) as the
-  analytically natural output. The only remaining semantic insertion is the single axiom
-  inside the Gate module.
+  This file remains the *single* admitted boundary for the missing analytic content.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGate
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Scalarize
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
+import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinDefs
 
 set_option autoImplicit false
 noncomputable section
@@ -24,30 +22,33 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-open scoped BigOperators
 open Hyperlocal.Transport
 
 /--
-Scalar output shape of the concrete order-`m` jet-quotient recurrence extraction theorem.
+Heart output: the scalar Row0 goal plus the two extra linear constraints
+needed to upgrade Row0 reverse convolution to the Row012 stencil.
+
+This is the *only* place we strengthen in the Route–B chain.
 -/
 structure XiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) : Prop where
-  hw0AtSigma  : row0Sigma s (w0At m s)  = 0
+  -- existing scalar goals (already used by the frontier)
+  hw0AtSigma  : row0Sigma s (w0At m s) = 0
   hwp2AtSigma : row0Sigma s (wp2At m s) = 0
   hwp3AtSigma : row0Sigma s (wp3At m s) = 0
 
-/--
-The AtOrder heart contract, derived from the cycle-safe Gate scalar goals.
+  -- NEW: extra linear constraints (what Row012 needs beyond row0Sigma)
+  hw0AtExtra  : Row012ExtraLin s (w0At m s)
+  hwp2AtExtra : Row012ExtraLin s (wp2At m s)
+  hwp3AtExtra : Row012ExtraLin s (wp3At m s)
 
-Field-name agnostic: we destruct the scalar-goals structure by pattern matching,
-so changes in the field names of `XiJetQuotRow0ScalarGoalsAtOrder` cannot break this file.
+/--
+Admitted analytic heart output (current semantic cliff).
+
+Once the true analytic discharge is proven, replace this axiom by a theorem
+with no downstream changes.
 -/
-theorem xiJetQuotRow0AtOrderHeartOut (m : ℕ) (s : OffSeed Xi) :
-    XiJetQuotRow0AtOrderHeartOut m s := by
-  classical
-  -- Gate gives the scalar goals bundle directly.
-  -- IMPORTANT: do not access fields by name; destruct the constructor.
-  rcases (xiJetQuotRow0ScalarGoalsAtOrder_fromGate (m := m) (s := s)) with ⟨h0, h2, h3⟩
-  exact ⟨h0, h2, h3⟩
+axiom xiJetQuotRow0AtOrderHeartOut
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderHeartOut m s
 
 end XiPacket
 end Targets
