@@ -39,7 +39,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
   refine ⟨?_, ?_, ?_⟩
 
   · -- w0At
-    rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := s.ρ) (w := w0At m s) with
+    rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
       have hs : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
@@ -51,8 +51,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (s := s) (z := s.ρ) (w := w0At m s) H0 HL
 
   · -- wp2At
-    rcases JetQuotOp.xiRouteA_jetPkg
-        (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) with
+    rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
       have hs : row0Sigma s (wp2At m s) = 0 := H.hwp2AtSigma
@@ -64,8 +63,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) H0 HL
 
   · -- wp3At
-    rcases JetQuotOp.xiRouteA_jetPkg
-        (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) with
+    rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by
       have hs : row0Sigma s (wp3At m s) = 0 := H.hwp3AtSigma

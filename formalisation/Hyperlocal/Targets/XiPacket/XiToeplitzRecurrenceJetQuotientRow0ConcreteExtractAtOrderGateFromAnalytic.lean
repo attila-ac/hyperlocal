@@ -40,7 +40,8 @@ noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic
 theorem row0ConvolutionAtRev_w0At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s (s.ρ) (w0At m s) := by
   classical
-  rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := s.ρ) (w := w0At m s) with
+  -- NEW: specialised Route–A package (old `xiRouteA_jetPkg` is gone)
+  rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=
@@ -58,8 +59,7 @@ theorem row0ConvolutionAtRev_w0At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
 theorem row0ConvolutionAtRev_wp2At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) with
+  rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=
@@ -77,8 +77,7 @@ theorem row0ConvolutionAtRev_wp2At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
 theorem row0ConvolutionAtRev_wp3At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) with
+  rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=

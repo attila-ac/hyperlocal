@@ -52,8 +52,8 @@ theorem row012ConvolutionAtRev_w0At_fromHeart
     xiRow012ExtraLinAtOrderOut_fromHeart (m := m) (s := s)
   have HL : Row012ExtraLin s (w0At m s) := HLall.hw0At
 
-  -- Route–A witnesses
-  rcases JetQuotOp.xiRouteA_jetPkg (s := s) (z := s.ρ) (w := w0At m s) with
+  -- Route–A witnesses (NEW API; old `xiRouteA_jetPkg` is gone)
+  rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   -- coeff 3 from row0Sigma = 0
@@ -84,8 +84,7 @@ theorem row012ConvolutionAtRev_wp2At_fromHeart
     xiRow012ExtraLinAtOrderOut_fromHeart (m := m) (s := s)
   have HL : Row012ExtraLin s (wp2At m s) := HLall.hwp2At
 
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) with
+  rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
@@ -114,8 +113,7 @@ theorem row012ConvolutionAtRev_wp3At_fromHeart
     xiRow012ExtraLinAtOrderOut_fromHeart (m := m) (s := s)
   have HL : Row012ExtraLin s (wp3At m s) := HLall.hwp3At
 
-  rcases JetQuotOp.xiRouteA_jetPkg
-      (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) with
+  rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by

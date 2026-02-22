@@ -7,7 +7,7 @@
   the nine convCoeff equalities at n = 3,4,5 for the three canonical AtOrder windows.
 
   Witness data (∃G, factorisation, IsJet3At) is supplied separately by Route–A
-  (`JetQuotOp.xiRouteA_jetPkg`), so it should not be part of the upstream "hard" goal.
+ (JetQuotOp.xiRouteA_jetPkg_w0At/wp2At/wp3At, i.e. the Route–A jet packages), so it should not be part of the upstream "hard" goal.
 -/
 
 import Hyperlocal.Cancellation.Recurrence
