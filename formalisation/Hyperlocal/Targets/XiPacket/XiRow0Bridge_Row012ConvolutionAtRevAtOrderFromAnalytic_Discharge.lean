@@ -6,14 +6,19 @@
   DESIGN:
   * Use strengthened Route–B heart output for:
       - row0Sigma = 0  (gives convCoeff n=3)
-      - coordinate vanishings (w0=0 and w1=0) for each window
-  * Rebuild `Row012ExtraLin` theorem-level from coordinates via
-      `xiRow012ExtraLinAtOrderOut_fromHeart`.
+  * Rebuild `Row012ExtraLin` theorem-level via `...FromHeart`.
   * Use Route–A jet package for witnesses (G, FactorisedByQuartet, IsJet3At).
   * Use algebraic closed forms from the pure-algebra Reduce file.
 
-  CRITICAL:
-  This file MUST NOT import the RecurrenceA / analytic extractor stack.
+  CRITICAL (cycle safety):
+  * MUST NOT import the RecurrenceA / analytic extractor stack.
+  * MUST NOT import any sigma-provider *instance* modules here.
+    (No `...SigmaProviderAnalytic`, no `...SigmaProviderFromRow0FrontierAtOrder`.)
+  * We only *consume* sigma via the provider interface required by the heart theorem.
+
+  CYCLE FIX (2026-02-22):
+  `xiJetQuotRow0AtOrderHeartOut` requires `[XiAtOrderSigmaProvider]`.
+  This file stays parametric in that instance.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
@@ -36,7 +41,7 @@ open Hyperlocal.Cancellation
 
 /-- Build Row012ConvolutionAtRev for `w0At m s` using heart constraints + Route–A witnesses. -/
 theorem row012ConvolutionAtRev_w0At_fromHeart
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
     Row012ConvolutionAtRev s (s.ρ) (w0At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
@@ -69,7 +74,7 @@ theorem row012ConvolutionAtRev_w0At_fromHeart
 
 /-- Build Row012ConvolutionAtRev for `wp2At m s` using heart constraints + Route–A witnesses. -/
 theorem row012ConvolutionAtRev_wp2At_fromHeart
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
     Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
@@ -99,7 +104,7 @@ theorem row012ConvolutionAtRev_wp2At_fromHeart
 
 /-- Build Row012ConvolutionAtRev for `wp3At m s` using heart constraints + Route–A witnesses. -/
 theorem row012ConvolutionAtRev_wp3At_fromHeart
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
     Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
@@ -129,7 +134,8 @@ theorem row012ConvolutionAtRev_wp3At_fromHeart
 
 /-- Final discharge: build the AtOrder Row012 bundle. -/
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_discharge
-    (m : ℕ) (s : OffSeed Xi) : XiRow012ConvolutionAtRevAtOrderOut m s := by
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    XiRow012ConvolutionAtRevAtOrderOut m s := by
   refine ⟨?_, ?_, ?_⟩
   · exact row012ConvolutionAtRev_w0At_fromHeart (m := m) (s := s)
   · exact row012ConvolutionAtRev_wp2At_fromHeart (m := m) (s := s)

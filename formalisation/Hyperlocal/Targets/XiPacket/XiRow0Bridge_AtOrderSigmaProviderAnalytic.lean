@@ -3,19 +3,20 @@
 
   Analytic-only landing pad for the sigma provider instance (FULL R0 Path A).
 
-  Goal: replace the remaining sigma axiom instance by a theorem-level instance:
-    instance : XiAtOrderSigmaProvider
+  2026-02-22 correction:
+  `row0Sigma` depends on coordinate 2 (at least), so it is NOT derivable from coords01 alone.
+  Instead we use the intended extractor-free bridge:
 
-  DAG contract:
-  * Only "true analytic" imports (FE/RC/factorisation/jet identities).
-  * MUST NOT import extractor/heart/Route–C landing/discharge modules.
+      Row0 frontier at order  ⇒  sigma goals
 
-  Today this file contains three local axioms (one per window) to keep the API stable.
-  Replace them one-by-one by real analytic theorems, then delete the axioms.
+  via:
+      XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder.lean
+
+  This deletes the three sigma axioms while keeping the DAG clean.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
 
 set_option autoImplicit false
 noncomputable section
@@ -26,36 +27,32 @@ namespace XiPacket
 
 open Complex
 open Hyperlocal.Transport
-open Hyperlocal.Cancellation
 
 /-!
-## The three analytic sigma subgoals (true analytic surface)
+## The three sigma goals
 
-These are exactly what must be proven theorem-level (no extractor imports):
-  row0Sigma s (w0At m s)  = 0
-  row0Sigma s (wp2At m s) = 0
-  row0Sigma s (wp3At m s) = 0
+These are exported under stable names.
+They are now obtained from the theorem-level provider instance
+installed by `...FromRow0FrontierAtOrder`.
 -/
 
-axiom sigma_w0At_analytic
-    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (w0At m s) = 0
+theorem sigma_w0At_analytic
+    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (w0At m s) = 0 := by
+  -- Instance is provided by the imported bridge file.
+  simpa using (xiAtOrderSigmaOut_provided (m := m) (s := s)).hw0AtSigma
 
-axiom sigma_wp2At_analytic
-    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (wp2At m s) = 0
+theorem sigma_wp2At_analytic
+    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (wp2At m s) = 0 := by
+  simpa using (xiAtOrderSigmaOut_provided (m := m) (s := s)).hwp2AtSigma
 
-axiom sigma_wp3At_analytic
-    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (wp3At m s) = 0
+theorem sigma_wp3At_analytic
+    (m : ℕ) (s : OffSeed Xi) : row0Sigma s (wp3At m s) = 0 := by
+  simpa using (xiAtOrderSigmaOut_provided (m := m) (s := s)).hwp3AtSigma
 
-/-- Theorem-level sigma bundle (once axioms above are discharged, this is too). -/
+/-- Re-exported sigma payload (theorem-level if the imported provider is). -/
 theorem xiAtOrderSigmaOut_fromAnalytic
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s :=
-  ⟨sigma_w0At_analytic (m := m) (s := s),
-   sigma_wp2At_analytic (m := m) (s := s),
-   sigma_wp3At_analytic (m := m) (s := s)⟩
-
-/-- The theorem-level analytic sigma provider instance (currently staged). -/
-instance : XiAtOrderSigmaProvider where
-  sigma := xiAtOrderSigmaOut_fromAnalytic
+  xiAtOrderSigmaOut_provided (m := m) (s := s)
 
 end XiPacket
 end Targets

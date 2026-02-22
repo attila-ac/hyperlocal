@@ -17,7 +17,8 @@ namespace Targets
 namespace XiPacket
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) : XiRow012ConvolutionAtRevAtOrderOut m s :=
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    XiRow012ConvolutionAtRevAtOrderOut m s :=
   xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_discharge (m := m) (s := s)
 
 end XiPacket
