@@ -1,33 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA.lean
 
-  Landing pad (CLI-proof):
+  Landing pad (cycle-safe, provider-based):
 
-  DO NOT reference any “row012 builder” name (it was renamed / not exported in your
-  current untracked bridge file, hence the Unknown identifier error).
+  This file no longer imports the Route–A recurrence axiom module directly.
+  Instead it consumes the recurrence payload via the typeclass provider:
 
-  Instead, derive everything directly from the *theorem-level* recurrence payload
+    [XiJetQuotRec2AtOrderProvider]  ⟹  XiJetQuotRec2AtOrder m s
 
-    xiJetQuotRec2AtOrder_fromRecurrenceA : XiJetQuotRec2AtOrder m s
-
-  and convert that recurrence into the needed row-0/1/2 Toeplitz equalities using
-  the already-available row normal forms (fin0/fin1/fin2).
-
-  This keeps the analytic cliff isolated where you want it:
-    the only remaining axiom in the Route–A boundary is
-      `xiJetQuotRec2AtOrder_fromRecurrenceA`.
-
-  The manuscript-facing Prop payload is now theorem-level and downstream:
-    `xiJetQuotRow012PropAtOrder_fromRecurrenceA` is derived from the recurrence
-    payload by the bridge `xiJetQuotRow012PropAtOrder_of_rec2`.
+  This concentrates the remaining semantic cliff into a small provider instance file.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
 
--- Recurrence payload (Route–A boundary; currently axiomatic)
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA
+-- Recurrence payload interface (provider)
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
 
 -- Toeplitz row normal forms: toeplitzL_two_apply_fin0/fin1/fin2
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
@@ -80,12 +68,6 @@ theorem xiJetQuotOpZeroAtOrder_of_row012
     exact toeplitzL_eq_zero_of_rows (s := s) (w := wp3At m s)
       h0.hop_wp3At h1_wp3At h2_wp3At
 
-/-
-Bridge lemmas: JetQuotRec2 on the padded Window-3 sequence implies Toeplitz rows 0/1/2 = 0.
-These are the same computations you had in the “SequenceToRow012Bridge”, but localised here
-so we do not depend on any particular exported def name.
--/
-
 private lemma row0_eq_zero_of_rec2
     (s : OffSeed Xi) (w : Window 3)
     (hrec : JetQuotRec2 s (padSeq3 w)) :
@@ -115,15 +97,18 @@ private lemma row2_eq_zero_of_rec2
     simpa [JetQuotRec2, padSeq3, Nat.add_assoc] using (hrec 2)
   simpa [toeplitzL_two_apply_fin2] using h2'
 
-/-- Route–A discharge point: theorem-level, derived from the recurrence payload. -/
-theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrder m s := by
-  classical
-  -- recurrence payload (Route–A boundary)
-  have Hrec : XiJetQuotRec2AtOrder m s :=
-    xiJetQuotRec2AtOrder_fromRecurrenceA (m := m) (s := s)
+/--
+Route–A discharge point: theorem-level, derived from the *provided* recurrence payload.
 
-  -- row-0 witness package
+No axiom imports here; the only remaining cliff is the provider instance.
+-/
+theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
+    (m : ℕ) (s : OffSeed Xi) [XiJetQuotRec2AtOrderProvider] :
+    XiJetQuotOpZeroAtOrder m s := by
+  classical
+  have Hrec : XiJetQuotRec2AtOrder m s :=
+    xiJetQuotRec2AtOrder_provided (m := m) (s := s)
+
   have h0_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (0 : Fin 3) = 0 :=
     row0_eq_zero_of_rec2 (s := s) (w := w0At m s) Hrec.h_w0At
   have h0_wp2At : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (0 : Fin 3) = 0 :=
@@ -133,7 +118,6 @@ theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
 
   have h0 : XiJetQuotRow0WitnessCAtOrder m s := ⟨h0_w0At, h0_wp2At, h0_wp3At⟩
 
-  -- remaining rows from the same recurrence payload
   have h1_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (1 : Fin 3) = 0 :=
     row1_eq_zero_of_rec2 (s := s) (w := w0At m s)  Hrec.h_w0At
   have h2_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (2 : Fin 3) = 0 :=

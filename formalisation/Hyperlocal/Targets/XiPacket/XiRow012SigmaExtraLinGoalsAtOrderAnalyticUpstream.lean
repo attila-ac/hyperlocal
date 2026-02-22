@@ -6,13 +6,15 @@
   DAG-clean refinement:
   * The three ExtraLin goals are derived purely algebraically from a coords01 provider
     (`XiAtOrderCoords01Out m s`) via `row012ExtraLin_of_coords`.
+  * The three sigma goals are supplied by a sigma provider
+    (`XiAtOrderSigmaOut m s`) via a provider instance.
   * We do NOT import extractor-facing modules here.
-  * Coords01 data is supplied via the typeclass `XiAtOrderCoords01Provider`, so we can
-    swap instances (axiom / extractor glue / future true analytic proof) without changing
-    this file.
+  * Both bundles are supplied via typeclasses so we can swap instances
+    (axiom / extractor glue / future true analytic proof) without changing this file.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinToCoords
 import Hyperlocal.Targets.XiPacket.XiRow012SigmaExtraLinGoalsAtOrderDefs
 
@@ -30,9 +32,9 @@ open Hyperlocal.Cancellation
 /-!
 ## Named subgoals (the true analytic surface)
 
-* row0Sigma = 0  for w0At/wp2At/wp3At
-* coordinate vanishings (0/1) for w0At/wp2At/wp3At (packaged as `XiAtOrderCoords01Out`),
-  supplied by a provider instance.
+* row0Sigma = 0  for w0At/wp2At/wp3At (supplied by `XiAtOrderSigmaProvider`)
+* coordinate vanishings (0/1) for w0At/wp2At/wp3At (supplied by `XiAtOrderCoords01Provider`)
+* ExtraLin is derived algebraically from coords01 via `row012ExtraLin_of_coords`.
 
 Everything downstream remains purely algebraic/bridges.
 -/
@@ -56,29 +58,33 @@ abbrev ExtraLinGoal_wp3At (m : ℕ) (s : OffSeed Xi) : Prop :=
   Row012ExtraLin s (wp3At m s)
 
 /-!
-## Temporary placeholders (replace one-by-one by real analytic proofs)
-
-Only the three sigma facts remain axiomatized here.
-Coords01 is supplied by the typeclass `XiAtOrderCoords01Provider`.
+## Sigma goals (supplied by provider instance, DAG-clean).
+Keep the names stable: other files may reference these.
 -/
 
-axiom sigmaGoal_w0At_analytic
-    (m : ℕ) (s : OffSeed Xi) : SigmaGoal_w0At m s
+theorem sigmaGoal_w0At_analytic
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] : SigmaGoal_w0At m s := by
+  exact (xiAtOrderSigmaOut_provided (m := m) (s := s)).hw0AtSigma
 
-axiom sigmaGoal_wp2At_analytic
-    (m : ℕ) (s : OffSeed Xi) : SigmaGoal_wp2At m s
+theorem sigmaGoal_wp2At_analytic
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] : SigmaGoal_wp2At m s := by
+  exact (xiAtOrderSigmaOut_provided (m := m) (s := s)).hwp2AtSigma
 
-axiom sigmaGoal_wp3At_analytic
-    (m : ℕ) (s : OffSeed Xi) : SigmaGoal_wp3At m s
+theorem sigmaGoal_wp3At_analytic
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] : SigmaGoal_wp3At m s := by
+  exact (xiAtOrderSigmaOut_provided (m := m) (s := s)).hwp3AtSigma
 
-/-- Coords01 goal, obtained from the provider instance (DAG-clean). -/
+/-!
+## Coords01 goal (supplied by provider instance, DAG-clean).
+-/
+
 theorem coords01Goal_analytic
     (m : ℕ) (s : OffSeed Xi) [XiAtOrderCoords01Provider] :
     XiAtOrderCoords01Out m s :=
   xiAtOrderCoords01Out_provided (m := m) (s := s)
 
 /-!
-## Derived ExtraLin goals (pure algebra from coords01)
+## Derived ExtraLin goals (pure algebra from coords01).
 -/
 
 theorem extraLinGoal_w0At_analytic
@@ -103,11 +109,12 @@ theorem extraLinGoal_wp3At_analytic
   exact row012ExtraLin_of_coords (s := s) (w := wp3At m s) HC.hwp3At0 HC.hwp3At1
 
 /-!
-## Final packaging theorem
+## Final packaging theorem (DAG-clean).
 -/
 
 theorem xiRow012SigmaExtraLinGoalsAtOrder_analytic_upstream
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderCoords01Provider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     XiRow012SigmaExtraLinGoalsAtOrder m s := by
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · simpa [SigmaGoal_w0At] using (sigmaGoal_w0At_analytic (m := m) (s := s))

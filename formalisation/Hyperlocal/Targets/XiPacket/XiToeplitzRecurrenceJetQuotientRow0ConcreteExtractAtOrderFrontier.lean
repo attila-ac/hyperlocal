@@ -3,17 +3,21 @@
 
   Frontier discharge module (cycle-safe).
 
-  CHANGE (2026-02-18):
-  Build the Type-level Toeplitz witness from the *scalar* heart contract
-  using `...AtOrderScalarize.lean`.
+  CHANGE (2026-02-22, Path-A refactor follow-up):
+  The frontier witness is now delegated to the cycle-safe Gate-from-analytic alias,
+  instead of importing the Heart module.
+
+  Motivation:
+  * The Heart module may depend on the analytic extractor stack.
+  * The GateFromAnalytic module is explicitly designed to avoid importing Heart/Frontier/extractor,
+    and to depend only on GateDefs + the Route–B endpoint.
 
   IMPORTANT (Lean 4.23):
   `XiJetQuotRow0ConcreteExtractAtOrder m s : Type`, so this frontier is a `def`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderScalarize
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGateFromAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -27,24 +31,15 @@ open scoped BigOperators
 open Hyperlocal.Transport
 
 /--
-Frontier witness (Type-level): build the extraction witness from the analytic heart output.
+Frontier witness (Type-level): delegated to the cycle-safe gate-from-analytic alias.
 
-Once the recurrence extraction endpoint is theorem-level, this `def` becomes axiom-free
+This avoids importing the Heart/extractor stack into the frontier module.
+Once the Route–B endpoint is theorem-level, this definition becomes axiom-free
 without downstream edits.
 -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_frontier
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s := by
-  classical
-  -- bind the heart output once (robust against elaboration/projection brittleness)
-  have H : XiJetQuotRow0AtOrderHeartOut m s :=
-    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
-
-  -- package scalar equalities into the Type-level Toeplitz witness
-  exact
-    xiJetQuotRow0ConcreteExtractAtOrder_of_row0Sigma (m := m) (s := s)
-      (hw0At := H.hw0AtSigma)
-      (hwp2At := H.hwp2AtSigma)
-      (hwp3At := H.hwp3AtSigma)
+    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
+  xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic (m := m) (s := s)
 
 end XiPacket
 end Targets

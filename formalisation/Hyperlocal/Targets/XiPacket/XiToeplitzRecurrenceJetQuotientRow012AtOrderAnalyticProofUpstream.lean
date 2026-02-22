@@ -11,7 +11,7 @@
   Current status:
   * The remaining analytic obligation is packaged in
       `xiRow012SigmaExtraLinGoalsAtOrder_analytic_upstream`
-    (proved in the analytic-only module
+    (proved in the analytic-only scaffold
       `XiRow012SigmaExtraLinGoalsAtOrderAnalyticUpstream.lean`).
 
   Everything downstream is now purely algebraic:
@@ -21,9 +21,12 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderFromPropBridge
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
--- analytic-only upstream target (currently staged via 6 local axioms inside that module)
+-- provider axiom instances (DAG-clean placeholders)
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAxiom
+
+-- analytic-only upstream target (DAG-clean; consumes providers via typeclasses)
 import Hyperlocal.Targets.XiPacket.XiRow012SigmaExtraLinGoalsAtOrderAnalyticUpstream
 
 -- algebraic bridges
