@@ -1,18 +1,13 @@
 /-
   Hyperlocal/Targets/XiPacket/TACTransportTruncated_JetQuotShiftBridgeAtOrderInstancesFromAnalyticExtractor.lean
 
-  Provide JetQuotShiftBridge3AtOrder instances for the three canonical windows
-  using ONLY the minimal window-equality axiom surface.
-
-  Design:
-  * Non-cycle-safe (imports the analytic axiom layer),
-    but keeps the semantic cliff minimal.
-  * These instances allow cycle-safe downstream code to consume the bridge class
-    without ever mentioning the analytic endpoint structures.
+  Step 4 refactor:
+  Instances now depend on the explicit provider `[XiJetWindowEqAtOrderProvider]`
+  rather than a hidden global axiom.
 -/
 
 import Hyperlocal.Targets.XiPacket.TACTransportTruncated_JetQuotShiftBridgeAtOrder
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetAxiom
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProvider
 
 set_option autoImplicit false
 noncomputable section
@@ -31,7 +26,7 @@ open Hyperlocal.Targets.XiTransport
 
 /-- Instance for `w0At`: from `JetQuotRec2` we can view it as an order-m jet at `z_w0At`. -/
 instance jetQuotShiftBridge3AtOrder_w0At
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
     JetQuotShiftBridge3AtOrder m s (z_w0At s) (w0At m s) where
   jet_of_rec2 := by
     intro _Hrec2
@@ -43,7 +38,7 @@ instance jetQuotShiftBridge3AtOrder_w0At
 
 /-- Instance for `wp2At`. -/
 instance jetQuotShiftBridge3AtOrder_wp2At
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
     JetQuotShiftBridge3AtOrder m s (z_wp2At s) (wp2At m s) where
   jet_of_rec2 := by
     intro _Hrec2
@@ -55,7 +50,7 @@ instance jetQuotShiftBridge3AtOrder_wp2At
 
 /-- Instance for `wp3At`. -/
 instance jetQuotShiftBridge3AtOrder_wp3At
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
     JetQuotShiftBridge3AtOrder m s (z_wp3At s) (wp3At m s) where
   jet_of_rec2 := by
     intro _Hrec2

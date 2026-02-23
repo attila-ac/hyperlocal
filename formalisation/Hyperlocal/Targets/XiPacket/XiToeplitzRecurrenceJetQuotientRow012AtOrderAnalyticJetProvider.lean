@@ -1,21 +1,12 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetAxiom.lean
+  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProvider.lean
 
-  Non-cycle-safe analytic axiom layer (refined):
+  Step 4 refactor target:
+  Replace the hidden global axiom `xiJetWindowEqAtOrder` by an explicit typeclass provider.
 
-  OLD: axiomatized a whole structure containing both:
-    * the Row012 target bundle `XiJetQuotRow012AtOrder m s`
-    * plus the three window=jet equalities.
+  This file contains NO axioms.
 
-  NEW: the Row012 target bundle is already theorem-level from the upstream analytic proof
-  stack (`...AnalyticProofUpstream.lean`).  So we *define* `base` from that theorem-level
-  provider, and axiomatize only the minimal remaining semantic cliff:
-
-    w0At m s  = xiJet3AtOrder m (z_w0At s)
-    wp2At m s = xiJet3AtOrder m (z_wp2At s)
-    wp3At m s = xiJet3AtOrder m (z_wp3At s)
-
-  This matches the recommended “shrink the cliff to window equality” playbook.
+  Downstream code should import this file (provider surface) rather than the axiom installer.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticProofUpstream
@@ -46,8 +37,6 @@ abbrev z_wp3At (s : OffSeed Xi) : ℂ := 1 - (starRingEnd ℂ) s.ρ
 
 /--
 Minimal remaining semantic cliff: the three window=canonical-jet equalities.
-
-We keep this as a dedicated *axiom surface* so the rest of the file can be theorem-level.
 -/
 structure XiJetWindowEqAtOrder (m : ℕ) (s : OffSeed Xi) : Prop where
   w0At_eq_xiJet3AtOrder  : w0At m s  = xiJet3AtOrder m (z_w0At s)
@@ -55,10 +44,24 @@ structure XiJetWindowEqAtOrder (m : ℕ) (s : OffSeed Xi) : Prop where
   wp3At_eq_xiJet3AtOrder : wp3At m s = xiJet3AtOrder m (z_wp3At s)
 
 /--
+Step 4: explicit provider surface (typeclass).
+
+This replaces the old global axiom `xiJetWindowEqAtOrder`.
+-/
+class XiJetWindowEqAtOrderProvider : Type where
+  windowEqAtOrder : ∀ (m : ℕ) (s : OffSeed Xi), XiJetWindowEqAtOrder m s
+
+/-- The canonical accessor (now explicit in the typeclass). -/
+noncomputable def xiJetWindowEqAtOrder
+    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
+    XiJetWindowEqAtOrder m s :=
+  XiJetWindowEqAtOrderProvider.windowEqAtOrder m s
+
+/--
 The combined package used downstream:
 
-* `base` is now theorem-level from the analytic-upstream pipeline.
-* The only remaining axioms are the three window equalities.
+* `base` is theorem-level from the analytic-upstream pipeline.
+* window equalities come from `[XiJetWindowEqAtOrderProvider]`.
 -/
 structure XiJetQuotRow012AtOrder_AnalyticJet (m : ℕ) (s : OffSeed Xi) : Type where
   base : XiJetQuotRow012AtOrder m s
@@ -88,18 +91,14 @@ theorem jet_wp3At (P : XiJetQuotRow012AtOrder_AnalyticJet m s) :
 end XiJetQuotRow012AtOrder_AnalyticJet
 
 /--
-Primitive axiom: only the window=jet equalities remain axiomatic.
--/
-axiom xiJetWindowEqAtOrder (m : ℕ) (s : OffSeed Xi) : XiJetWindowEqAtOrder m s
+Exported endpoint (same name intent as before):
 
-/--
-Exported endpoint (same name as before; downstream unchanged):
-
-Now **definitionally** uses the theorem-level upstream base payload, and
-the only remaining axiom use is `xiJetWindowEqAtOrder`.
+Now definitionally uses the theorem-level upstream base payload,
+and depends on `[XiJetWindowEqAtOrderProvider]` for the window equalities.
 -/
 noncomputable def xiJetQuotRow012AtOrder_analyticJet
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder_AnalyticJet m s :=
+    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
+    XiJetQuotRow012AtOrder_AnalyticJet m s :=
   { base := Hyperlocal.Targets.XiPacket.xiJetQuotRow012AtOrder_analytic_upstream (m := m) (s := s)
     w0At_eq_xiJet3AtOrder  := (xiJetWindowEqAtOrder (m := m) (s := s)).w0At_eq_xiJet3AtOrder
     wp2At_eq_xiJet3AtOrder := (xiJetWindowEqAtOrder (m := m) (s := s)).wp2At_eq_xiJet3AtOrder

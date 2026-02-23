@@ -10,7 +10,10 @@
 
       IsJet3AtOrder m z w  := IsJet3At (cderivIter m Xi) z w
 
-  This matches `XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetAxiom.lean`.
+  NOTE (Step 4 refactor):
+  The “window = canonical jet” cliff is now exposed via the provider surface:
+      XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProvider.lean
+  and the axiom file (if used) merely installs an instance of that provider.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
