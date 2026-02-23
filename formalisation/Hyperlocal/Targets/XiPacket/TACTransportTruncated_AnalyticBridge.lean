@@ -47,20 +47,29 @@ Purely finite expansion lemma (algebraic target):
 `∑_{r=0}^{N-1-j} f^(j+r)(z) * δ^r / r!`.
 
 This lemma is *pure algebra* about `transportMat` and `mulVec`.
-You can keep it as `sorry` initially and later finish it as a standalone
-matrix/Finset reindexing exercise.
+
+NOTE (snapshot reality):
+In this Mathlib snapshot, unfolding `Matrix.mulVec` goes through the dot-product notation `⬝ᵥ`.
+The reindexing from `Fin N` to a `range` sum is a pure finitary exercise, but it is
+not currently needed downstream. We keep it as the single, explicit `sorry` in this file.
 -/
 theorem transport_apply_eq_truncSum
     (N : ℕ) (f : ℂ → ℂ) (z δ : ℂ) (j : Fin N) :
     transport N δ (jetVec N f z) j
       =
-    Finset.sum (Finset.range (N - (j : ℕ))) (fun r =>
+    (Finset.range (N - (j : ℕ))).sum (fun r =>
       (cderivIter ((j : ℕ) + r) f z) * (δ ^ r) / (Nat.factorial r : ℂ)) := by
   classical
-  -- This is a reindexing of `mulVec` over `m : Fin N`,
-  -- splitting into `m ≥ j` and setting `r = m - j`.
+  -- This is purely finite algebra:
+  --   unfold `transport` as `transportMat.mulVec`,
+  --   unfold `mulVec`/dotProduct into a finite sum,
+  --   rewrite `transportMat` entries as an `ite`,
+  --   filter by `j ≤ m`,
+  --   reindex by `r := m - j`.
   --
-  -- Keeping as `sorry` is fine for now: the *analytic* bridge does not depend on it yet.
+  -- The *only* reason this proof is not filled in here is the amount of
+  -- snapshot-dependent glue (`Matrix.dotProduct` unfolding + `Fin` reindex lemmas).
+  -- Downstream code does not depend on this lemma yet.
   sorry
 
 /-

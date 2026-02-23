@@ -1,23 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetQuotShiftBridgeInstancesFromAnalyticExtractor.lean
 
-  Step B (non-cycle-safe discharge layer, theorem-level *given* the analytic-jet axiom package):
-
-  We install instances of `TAC.JetQuotShiftBridge3AtOrder` for:
-    * w0At m s
-    * wp2At m s
-    * wp3At m s
-
-  These instances are now *sorriless* because the only semantic cliff is
-  concentrated in the single primitive endpoint:
-
-    `xiJetQuotRow012AtOrder_analyticJet`
+  Refactor (name-robust):
+  * Do NOT depend on the `XiJetQuotRow012AtOrder_AnalyticJet` structure fields.
+  * Do NOT depend on helper lemma names (avoids namespace/import brittleness).
+  * Depend only on:
+      - theorem-level analytic upstream base (elsewhere)
+      - minimal axiom surface: `xiJetWindowEqAtOrder`
+      - canonical theorem: `isJet3AtOrder_xiJet3AtOrder`
 -/
 
-import Hyperlocal.Targets.XiPacket.TACTransportTruncated_JetQuotShiftBridgeAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetAxiom
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -32,56 +25,46 @@ open Hyperlocal.Transport
 
 namespace TAC
 
-/-
-  IMPORTANT:
-  Do NOT redeclare `z_w0At/z_wp2At/z_wp3At` here.
-  They are defined in `...Row012AtOrderAnalyticJetAxiom.lean` in this same namespace `TAC`.
--/
+open Hyperlocal.Targets.XiTransport
 
-/-- Step-B instance for `w0At` (order-m jet). -/
-instance jetQuotShiftBridge3AtOrder_w0At (m : ℕ) (s : OffSeed Xi) :
-    JetQuotShiftBridge3AtOrder m s (z_w0At s) (w0At m s) where
-  jet_of_rec2 := by
-    intro _Hrec
-    exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_w0At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+theorem isJet3AtOrder_w0At_fromAnalyticExtractor
+    (m : ℕ) (s : OffSeed Xi) :
+    IsJet3AtOrder m (z_w0At s) (w0At m s) := by
+  -- window equality is the only axiom surface
+  have hw :
+      w0At m s = xiJet3AtOrder m (z_w0At s) :=
+    (xiJetWindowEqAtOrder (m := m) (s := s)).w0At_eq_xiJet3AtOrder
+  -- derive jet fact by rewriting to canonical jet window
+  simpa [IsJet3AtOrder, hw] using
+    (isJet3AtOrder_xiJet3AtOrder (m := m) (z := z_w0At s))
 
-/-- Step-B instance for `wp2At` (order-m jet). -/
-instance jetQuotShiftBridge3AtOrder_wp2At (m : ℕ) (s : OffSeed Xi) :
-    JetQuotShiftBridge3AtOrder m s (z_wp2At s) (wp2At m s) where
-  jet_of_rec2 := by
-    intro _Hrec
-    exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp2At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+theorem isJet3AtOrder_wp2At_fromAnalyticExtractor
+    (m : ℕ) (s : OffSeed Xi) :
+    IsJet3AtOrder m (z_wp2At s) (wp2At m s) := by
+  have hw :
+      wp2At m s = xiJet3AtOrder m (z_wp2At s) :=
+    (xiJetWindowEqAtOrder (m := m) (s := s)).wp2At_eq_xiJet3AtOrder
+  simpa [IsJet3AtOrder, hw] using
+    (isJet3AtOrder_xiJet3AtOrder (m := m) (z := z_wp2At s))
 
-/-- Step-B instance for `wp3At` (order-m jet). -/
-instance jetQuotShiftBridge3AtOrder_wp3At (m : ℕ) (s : OffSeed Xi) :
-    JetQuotShiftBridge3AtOrder m s (z_wp3At s) (wp3At m s) where
-  jet_of_rec2 := by
-    intro _Hrec
-    exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp3At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+theorem isJet3AtOrder_wp3At_fromAnalyticExtractor
+    (m : ℕ) (s : OffSeed Xi) :
+    IsJet3AtOrder m (z_wp3At s) (wp3At m s) := by
+  have hw :
+      wp3At m s = xiJet3AtOrder m (z_wp3At s) :=
+    (xiJetWindowEqAtOrder (m := m) (s := s)).wp3At_eq_xiJet3AtOrder
+  simpa [IsJet3AtOrder, hw] using
+    (isJet3AtOrder_xiJet3AtOrder (m := m) (z := z_wp3At s))
 
-/--
-Convenience lemma: the three order-m Jet3 facts.
-
-(Shown in the “extractor style” too, to keep usage patterns consistent.)
--/
 theorem isJet3AtOrder_triple_fromAnalyticExtractor
     (m : ℕ) (s : OffSeed Xi) :
     IsJet3AtOrder m (z_w0At s) (w0At m s) ∧
     IsJet3AtOrder m (z_wp2At s) (wp2At m s) ∧
     IsJet3AtOrder m (z_wp3At s) (wp3At m s) := by
-  classical
-  have _Hrec2 :=
-    xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor (m := m) (s := s)
   refine ⟨?_, ?_, ?_⟩
-  · exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_w0At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
-  · exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp2At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
-  · exact (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp3At
-      (m := m) (s := s) (xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+  · exact isJet3AtOrder_w0At_fromAnalyticExtractor (m := m) (s := s)
+  · exact isJet3AtOrder_wp2At_fromAnalyticExtractor (m := m) (s := s)
+  · exact isJet3AtOrder_wp3At_fromAnalyticExtractor (m := m) (s := s)
 
 end TAC
 
