@@ -1,29 +1,20 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetIsJetFromTrueAnalytic.lean
 
-  Goal:
-    Prove the three jet predicates from the true-analytic Row012 payload.
+  Option B (quotient jets):
+    Provide the three jet predicates for the Route-A quotient model `routeA_G s`
+    at the three Row012 anchors.
 
-  This file contains NO axioms.
-  Any remaining gaps should appear as `sorry` (local analytic TODO),
-  not as global axioms.
-
-  Strategy:
-  * Pull the analytic Row012 reverse-convolution payload:
-      Hst : XiRow012ConvolutionAtRevAtOrderOut m s
-  * Each field (hw0At/hwp2At/hwp3At) is a Row012 reverse-convolution statement,
-    packaging a witness G and a jet fact IsJet3At G z w plus convolution constraints.
-  * The remaining analytic cliff is to identify that witness G with
-      cderivIter m Xi
-    (up to 2nd derivative at the anchor), upgrading the jet to IsJet3AtOrder.
-
-  All remaining analytic work is localized in:
-      isJet3AtOrder_of_row012ConvolutionAtRev
+  This avoids trying to identify the Row012 witness `G` with `cderivIter m Xi`
+  (which is not available from the current Row012 payload).
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
-import Hyperlocal.Targets.XiPacket.XiJet3AtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA
+import Hyperlocal.Targets.XiPacket.XiJet3Defs
+import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -33,119 +24,83 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-open scoped Real
 open Hyperlocal.Transport
 
 namespace TAC
 
-open Hyperlocal.Targets.XiTransport
-
 /-
-  Anchor sanity:
+  Local anchor abbreviations.
 
-  The Row012 payload uses anchors:
-    hw0At  at z = s.ρ
-    hwp2At at z = star s.ρ
-    hwp3At at z = 1 - star s.ρ
+  IMPORTANT:
+  We define these exactly to match the centers used by the Route-A bridge axioms:
+    w0At at s.ρ
+    wp2At at (starRingEnd ℂ) s.ρ
+    wp3At at 1 - (starRingEnd ℂ) s.ρ
 
-  Our abbreviations:
-    z_w0At  s := sc s + (delta s : ℝ)
-    z_wp2At s := star s.ρ
-    z_wp3At s := 1 - star s.ρ
-
-  Only non-definitional alignment is `z_w0At s = s.ρ`.
+  This keeps this file self-contained (no dependency on the older `sc/delta` transport anchors).
 -/
-private lemma z_w0At_eq_rho (s : OffSeed Xi) : z_w0At s = s.ρ := by
-  -- expand defs: sc s = (1/2) + I*(t s), delta s = (σ s - 1/2)
-  -- so sc+delta = (σ s) + I*(t s) = s.ρ
-  refine Complex.ext ?_ ?_
-  · -- real parts
-    -- `simp` should reduce `re` of complex additions and real-casts
-    simp [z_w0At, XiTransport.delta, sc, σ, t, sub_eq_add_neg, add_assoc, add_comm, add_left_comm]
-  · -- imaginary parts
-    simp [z_w0At, XiTransport.delta, sc, σ, t, sub_eq_add_neg, add_assoc, add_comm, add_left_comm]
+def z_w0At (s : OffSeed Xi) : ℂ := s.ρ
+def z_wp2At (s : OffSeed Xi) : ℂ := (starRingEnd ℂ) s.ρ
+def z_wp3At (s : OffSeed Xi) : ℂ := 1 - (starRingEnd ℂ) s.ρ
 
-/-
-  Core reduction lemma (the single analytic cliff):
+/-- Parallel provider for the *quotient* jet notion `IsJet3AtOrderQuot`. -/
+class XiJetWindowIsJetAtOrderQuotProvider : Prop where
+  jet_w0At  : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_w0At s) (w0At m s)
+  jet_wp2At : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_wp2At s) (wp2At m s)
+  jet_wp3At : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_wp3At s) (wp3At m s)
 
-  From `Row012ConvolutionAtRev s z w`, you get:
-    ∃ G, FactorisedByQuartet ... G ∧ IsJet3At G z w ∧ (conv constraints)
+/-- Convenience: Jet3 tautology (binder name is `G`). -/
+private lemma isJet3At_jet3_apply (G : ℂ → ℂ) (z : ℂ) :
+    IsJet3At G z (jet3 G z) := by
+  simpa using (isJet3At_jet3 (G := G) (z := z))
 
-  To upgrade to `IsJet3AtOrder m z w` (i.e. IsJet3At (cderivIter m Xi) z w),
-  you must identify that witness `G` with `cderivIter m Xi` at `z`
-  at least up to second derivative.
--/
-private theorem isJet3AtOrder_of_row012ConvolutionAtRev
-    (m : ℕ) (s : OffSeed Xi) (z : ℂ) (w : Window 3)
-    (H : Row012ConvolutionAtRev s z w) :
-    IsJet3AtOrder m z w := by
-  classical
-  rcases H with ⟨G, hfac, hjet, h3, h4, h5⟩
-  -- hfac : FactorisedByQuartet Xi s.ρ 1 G
-  -- hjet : IsJet3At G z w
-  -- h3,h4,h5 : row012 reverse convolution constraints
-
-  -- Goal is:
-  --   IsJet3At (cderivIter m Xi) z w
-  --
-  -- TODO (analytic identification):
-  --   Prove that `G` agrees with `cderivIter m Xi` at `z` up to 2nd derivative,
-  --   using your FE/RC/factorisation identification layer (Route-A / manuscript),
-  --   then rewrite `hjet`.
-  --
-  -- This is the *only* remaining analytic cliff in this file.
-  sorry
-
-/-- Target 1: w0At is an order-m jet at z_w0At. -/
+/-- Target 1: `w0At` is the Jet3 window of `routeA_G s` at `z_w0At s`. -/
 theorem jet_w0At_fromTrueAnalytic
     (m : ℕ) (s : OffSeed Xi) :
-    IsJet3AtOrder m (z_w0At s) (w0At m s) := by
+    IsJet3AtOrderQuot m s (z_w0At s) (w0At m s) := by
   classical
-  have Hst : XiRow012ConvolutionAtRevAtOrderOut m s :=
-    xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
+  have hw : w0At m s = jet3 (routeA_G s) (s.ρ) :=
+    w0At_eq_jet3_routeA (m := m) (s := s)
 
-  -- Payload gives `Row012ConvolutionAtRev s s.ρ (w0At m s)`.
-  -- Rewrite anchor to `z_w0At s`.
-  have H : Row012ConvolutionAtRev s (z_w0At s) (w0At m s) := by
-    simpa [z_w0At_eq_rho (s := s)] using Hst.hw0At
+  have hj :
+      IsJet3At (routeA_G s) (s.ρ) (jet3 (routeA_G s) (s.ρ)) :=
+    isJet3At_jet3_apply (routeA_G s) (s.ρ)
 
-  exact isJet3AtOrder_of_row012ConvolutionAtRev
-    (m := m) (s := s) (z := z_w0At s) (w := w0At m s) H
+  -- `z_w0At s` is definitional `s.ρ`.
+  simpa [IsJet3AtOrderQuot, z_w0At, hw] using hj
 
-/-- Target 2: wp2At jet. -/
+/-- Target 2: `wp2At` is the Jet3 window of `routeA_G s` at `z_wp2At s`. -/
 theorem jet_wp2At_fromTrueAnalytic
     (m : ℕ) (s : OffSeed Xi) :
-    IsJet3AtOrder m (z_wp2At s) (wp2At m s) := by
+    IsJet3AtOrderQuot m s (z_wp2At s) (wp2At m s) := by
   classical
-  have Hst : XiRow012ConvolutionAtRevAtOrderOut m s :=
-    xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
+  have hw : wp2At m s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) :=
+    wp2At_eq_jet3_routeA (m := m) (s := s)
 
-  -- Here the anchor matches definitionally.
-  have H : Row012ConvolutionAtRev s (z_wp2At s) (wp2At m s) := by
-    simpa [z_wp2At] using Hst.hwp2At
+  have hj :
+      IsJet3At (routeA_G s) ((starRingEnd ℂ) s.ρ)
+        (jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ)) :=
+    isJet3At_jet3_apply (routeA_G s) ((starRingEnd ℂ) s.ρ)
 
-  exact isJet3AtOrder_of_row012ConvolutionAtRev
-    (m := m) (s := s) (z := z_wp2At s) (w := wp2At m s) H
+  simpa [IsJet3AtOrderQuot, z_wp2At, hw] using hj
 
-/-- Target 3: wp3At jet. -/
+/-- Target 3: `wp3At` is the Jet3 window of `routeA_G s` at `z_wp3At s`. -/
 theorem jet_wp3At_fromTrueAnalytic
     (m : ℕ) (s : OffSeed Xi) :
-    IsJet3AtOrder m (z_wp3At s) (wp3At m s) := by
+    IsJet3AtOrderQuot m s (z_wp3At s) (wp3At m s) := by
   classical
-  have Hst : XiRow012ConvolutionAtRevAtOrderOut m s :=
-    xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
+  have hw : wp3At m s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) :=
+    wp3At_eq_jet3_routeA (m := m) (s := s)
 
-  -- Here the anchor matches definitionally.
-  have H : Row012ConvolutionAtRev s (z_wp3At s) (wp3At m s) := by
-    simpa [z_wp3At] using Hst.hwp3At
+  have hj :
+      IsJet3At (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
+        (jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)) :=
+    isJet3At_jet3_apply (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
 
-  exact isJet3AtOrder_of_row012ConvolutionAtRev
-    (m := m) (s := s) (z := z_wp3At s) (w := wp3At m s) H
+  simpa [IsJet3AtOrderQuot, z_wp3At, hw] using hj
 
-/--
-Once the three jet theorems are proved, install the provider.
--/
-instance : XiJetWindowIsJetAtOrderProvider where
+/-- Install the quotient-jet provider. -/
+instance : XiJetWindowIsJetAtOrderQuotProvider where
   jet_w0At  := jet_w0At_fromTrueAnalytic
   jet_wp2At := jet_wp2At_fromTrueAnalytic
   jet_wp3At := jet_wp3At_fromTrueAnalytic

@@ -1,6 +1,8 @@
--- formalisation/Hyperlocal/Factorization.lean
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.Polynomial.Basic
+import Mathlib.Topology.Algebra.Polynomial
+import Mathlib.Tactic
+
 import Hyperlocal.Core
 import Hyperlocal.MinimalModel
 
@@ -10,6 +12,7 @@ import Hyperlocal.MinimalModel
 
 noncomputable section
 open Polynomial
+open scoped Topology
 
 namespace Hyperlocal
 namespace Factorization
@@ -41,11 +44,28 @@ lemma cancel_scalar_mul_left {a b c : ℂ} (ha : a ≠ 0)
     (h : a * b = a * c) : b = c :=
   (mul_left_cancel₀ ha) h
 
+/-!
+### Quotient uniqueness off the zero set
+-/
+
+/-- If two functions factorise the same `H` by the same quartet polynomial, then they agree at any point where the polynomial factor is nonzero. -/
+lemma factorisedByQuartet_eq_of_eval_ne_zero
+    {H G G' : ℂ → ℂ} {ρ : ℂ} {k : ℕ}
+    (hfac  : FactorisedByQuartet H ρ k G)
+    (hfac' : FactorisedByQuartet H ρ k G')
+    {z : ℂ} (hz : (Rρk ρ k).eval z ≠ 0) :
+    G z = G' z := by
+  have h1 := hfac z
+  have h2 := hfac' z
+  have hmul :
+      (Rρk ρ k).eval z * G z = (Rρk ρ k).eval z * G' z := by
+    calc
+      (Rρk ρ k).eval z * G z = H z := by simpa [h1] using h1.symm
+      _ = (Rρk ρ k).eval z * G' z := by simpa [h2] using h2
+  exact cancel_scalar_mul_left hz hmul
+
 /--
 FE inheritance off the zero set of the polynomial factor.
-
-If `H` satisfies FE, and `H = Rρk * G`, and `Rρk` itself respects FE at the level of values,
-then for any `s` with `(Rρk ρ k).eval s ≠ 0` we have `G s = G (1 - s)`.
 -/
 lemma G_inherits_FE_off_zeros
     {H G : ℂ → ℂ} {ρ : ℂ} {k : ℕ}
@@ -54,12 +74,10 @@ lemma G_inherits_FE_off_zeros
     (RFE  : FE_R ρ k) :
     ∀ ⦃s : ℂ⦄, (Rρk ρ k).eval s ≠ 0 → G s = G (Hyperlocal.oneMinus s) := by
   intro s hR
-  -- Name the factorisation equalities at s and (1 - s)
   have hfac_s   := hfac s
   have hfac_1ms := hfac (Hyperlocal.oneMinus s)
   have hH       := HFE s
   have hRFE     := RFE s
-  -- Get: R(s)*G(s) = R(s)*G(1-s)
   have eq_prod :
       (Rρk ρ k).eval s * G s
         = (Rρk ρ k).eval s * G (Hyperlocal.oneMinus s) := by
@@ -71,8 +89,34 @@ lemma G_inherits_FE_off_zeros
               simpa [hfac_1ms]
       _   = (Rρk ρ k).eval s * G (Hyperlocal.oneMinus s) := by
               simpa [hRFE]
-  -- Cancel the nonzero factor `R(s)`
   exact cancel_scalar_mul_left hR eq_prod
+
+/-!
+### Local division off the zero set (the rigidity hammer)
+-/
+
+/-- Off the zero set, the quotient is locally equal to `H / R`. -/
+lemma factorisedByQuartet_eventuallyEq_div
+    {H G : ℂ → ℂ} {ρ : ℂ} {k : ℕ}
+    (hfac : FactorisedByQuartet H ρ k G)
+    {z : ℂ} (hz : (Rρk ρ k).eval z ≠ 0) :
+    (∀ᶠ w in 𝓝 z, G w = H w / (Rρk ρ k).eval w) := by
+  -- continuityAt ⇒ eventually nonzero near z (proved via `fun_prop` for snapshot robustness)
+  have hne : ∀ᶠ w in 𝓝 z, (Rρk ρ k).eval w ≠ 0 := by
+    have hcont : ContinuousAt (fun w : ℂ => (Rρk ρ k).eval w) z := by
+      fun_prop
+    simpa using hcont.eventually_ne hz
+
+  refine hne.mono ?_
+  intro w hw
+  have h := hfac w
+  -- from H w = R(w) * G w, rearrange to G w = H w / R(w)
+  apply (eq_div_iff hw).2
+  -- goal: G w * R(w) = H w
+  calc
+    G w * (Rρk ρ k).eval w
+        = (Rρk ρ k).eval w * G w := by simpa [mul_comm]
+    _ = H w := by simpa using h.symm
 
 end Factorization
 end Hyperlocal
