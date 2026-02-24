@@ -4,10 +4,13 @@
   Step 4 refactor:
   This helper layer now depends on the explicit provider `[XiJetWindowEqAtOrderProvider]`,
   not on a hidden global axiom installer.
+
+  NOTE:
+  This file is for the *order* arm (`IsJet3AtOrder` / `xiJet3AtOrder`), so it should not
+  import quotient-bridge instance layers.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProvider
-import Hyperlocal.Targets.XiPacket.TACTransportTruncated_JetQuotShiftBridgeAtOrderInstancesFromAnalyticExtractor
 
 set_option autoImplicit false
 noncomputable section

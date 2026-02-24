@@ -37,6 +37,37 @@ def jet3 (G : ℂ → ℂ) (z : ℂ) : Transport.Window 3 :=
     | 1 => deriv G z
     | _ => deriv (deriv G) z
 
+/-- Coordinate simp lemma: index 0 of `jet3`. -/
+@[simp] lemma jet3_coord0 (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z ⟨0, by decide⟩ = G z := by
+  simp [jet3]
+
+/-- Coordinate simp lemma: index 1 of `jet3`. -/
+@[simp] lemma jet3_coord1 (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z ⟨1, by decide⟩ = deriv G z := by
+  simp [jet3]
+
+/-- Coordinate simp lemma: index 2 of `jet3`. -/
+@[simp] lemma jet3_coord2 (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z ⟨2, by decide⟩ = deriv (deriv G) z := by
+  simp [jet3]
+
+/-- `jet3` coordinate simp lemma at index `0 : Fin 3`. -/
+@[simp] lemma jet3_coord0' (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z (0 : Fin 3) = G z := by
+  -- works because `0 : Fin 3` is definitional to `⟨0, _⟩`
+  simpa using (jet3_coord0 (G := G) (z := z))
+
+/-- `jet3` coordinate simp lemma at index `1 : Fin 3`. -/
+@[simp] lemma jet3_coord1' (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z (1 : Fin 3) = deriv G z := by
+  simpa using (jet3_coord1 (G := G) (z := z))
+
+/-- `jet3` coordinate simp lemma at index `2 : Fin 3`. -/
+@[simp] lemma jet3_coord2' (G : ℂ → ℂ) (z : ℂ) :
+    jet3 G z (2 : Fin 3) = deriv (deriv G) z := by
+  simpa using (jet3_coord2 (G := G) (z := z))
+
 lemma isJet3At_jet3 (G : ℂ → ℂ) (z : ℂ) :
     IsJet3At G z (jet3 G z) := by
   constructor

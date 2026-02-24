@@ -29,6 +29,21 @@ The parameter `m` is retained for downstream API compatibility. -/
 def IsJet3AtOrderQuot (m : ℕ) (s : OffSeed Xi) (z : ℂ) (w : Window 3) : Prop :=
   IsJet3At (routeA_G s) z w
 
+/--
+Unindexed (hygienic) Route-A quotient jet predicate.
+
+This is the semantic core of `IsJet3AtOrderQuot`; keeping it separate avoids the
+illusion that `m` plays a role for quotient jets.
+-/
+def IsJet3AtQuot (s : OffSeed Xi) (z : ℂ) (w : Window 3) : Prop :=
+  IsJet3At (routeA_G s) z w
+
+@[simp] lemma isJet3AtOrderQuot_eq (m : ℕ) (s : OffSeed Xi) (z : ℂ) (w : Window 3) :
+    IsJet3AtOrderQuot m s z w = IsJet3AtQuot s z w := rfl
+
+@[simp] lemma isJet3AtOrderQuot_iff (m : ℕ) (s : OffSeed Xi) (z : ℂ) (w : Window 3) :
+    IsJet3AtOrderQuot m s z w ↔ IsJet3AtQuot s z w := Iff.rfl
+
 end XiPacket
 end Targets
 end Hyperlocal

@@ -1,29 +1,11 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA.lean
-
-  Bridge layer to *reduce* the Route-A jet-package axiom surface.
-
-  Context:
-  * We already have a theorem-level analytic construction of a quartet quotient `G`
-    (via `G_Xi_entire` in `XiAnalyticInputs`) and a theorem-level discharge of
-    `JetLeibnizAt` for the *canonical* raw jet window `jet3 G z`.
-  * What is still missing to remove the old axiom
-      `JetQuotOp.xiRouteA_jetPkg (s) (z) (w)`
-    is a proof that the concrete ξ-windows used downstream (`w0/wc/wp2/wp3`, and
-    the jet-pivot variants `w0At/wp2At/wp3At`) are *equal* to those canonical
-    jet windows of the quotient.
-
-  This file isolates that missing content as *small, explicit axioms* for the
-  specific windows actually used by Route-A consumers.
-
-  Later, these axioms should be replaced by genuine theorems derived from:
-    - the definition of the ξ-windows (Plan C++ and C++J),
-    - the quotient definition `G = Xi / Rfun s` (or your factorisation API),
-    - transport/shift lemmas for `XiTransportOp`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAt_Discharge
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiRouteA_GDefs
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -33,26 +15,83 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-
-/-- A fixed choice of Route-A quotient `G` from `G_Xi_entire`. -/
-noncomputable def routeA_G (s : OffSeed Xi) : ℂ → ℂ :=
-  Classical.choose (G_Xi_entire s)
-
-lemma routeA_G_factorised (s : OffSeed Xi) :
-    Hyperlocal.Factorization.FactorisedByQuartet Xi s.ρ 1 (routeA_G s) :=
-  (Classical.choose_spec (G_Xi_entire s)).1
-
-lemma routeA_G_entire (s : OffSeed Xi) :
-    Hyperlocal.GrowthOrder.EntireFun (routeA_G s) :=
-  (Classical.choose_spec (G_Xi_entire s)).2
+open Hyperlocal.Transport
 
 /-!
-  ### The remaining Route-A bridge obligations (currently axiomatic)
+  ### Coordinatewise reduction lemmas (theorem-level, no axioms)
+-/
 
-  These say that the concrete ξ-windows are the canonical jet windows of the
-  chosen quotient `routeA_G s` at the relevant centers.
+/-- Generic 3-coordinate reduction: prove `w = jet3 G z` from scalar coordinate equalities. -/
+theorem window_eq_jet3_of_coords
+    (G : ℂ → ℂ) (z : ℂ) (w : Window 3)
+    (h0 : w ⟨0, by decide⟩ = G z)
+    (h1 : w ⟨1, by decide⟩ = deriv G z)
+    (h2 : w ⟨2, by decide⟩ = deriv (deriv G) z) :
+    w = jet3 G z := by
+  -- normalize hypotheses to numeral indices (0/1/2 : Fin 3)
+  have h0' : w (0 : Fin 3) = G z := by simpa using h0
+  have h1' : w (1 : Fin 3) = deriv G z := by simpa using h1
+  have h2' : w (2 : Fin 3) = deriv (deriv G) z := by simpa using h2
+  ext i
+  fin_cases i <;> simp [h0', h1', h2']
 
-  Once these are theorem-level, the old axiom `xiRouteA_jetPkg` can be deleted.
+/-- Specialized reducers. -/
+theorem w0_eq_jet3_routeA_of_coords (s : OffSeed Xi)
+    (h0 : w0 s ⟨0, by decide⟩ = (routeA_G s) (s.ρ))
+    (h1 : w0 s ⟨1, by decide⟩ = deriv (routeA_G s) (s.ρ))
+    (h2 : w0 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (s.ρ)) :
+    w0 s = jet3 (routeA_G s) (s.ρ) :=
+  window_eq_jet3_of_coords (G := routeA_G s) (z := s.ρ) (w := w0 s) h0 h1 h2
+
+theorem wc_eq_jet3_routeA_of_coords (s : OffSeed Xi)
+    (h0 : wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ))
+    (h1 : wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ))
+    (h2 : wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ)) :
+    wc s = jet3 (routeA_G s) (1 - s.ρ) :=
+  window_eq_jet3_of_coords (G := routeA_G s) (z := (1 - s.ρ)) (w := wc s) h0 h1 h2
+
+theorem wp2_eq_jet3_routeA_of_coords (s : OffSeed Xi)
+    (h0 : wp2 s ⟨0, by decide⟩ = (routeA_G s) ((starRingEnd ℂ) s.ρ))
+    (h1 : wp2 s ⟨1, by decide⟩ = deriv (routeA_G s) ((starRingEnd ℂ) s.ρ))
+    (h2 : wp2 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) ((starRingEnd ℂ) s.ρ)) :
+    wp2 s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) :=
+  window_eq_jet3_of_coords (G := routeA_G s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s) h0 h1 h2
+
+theorem wp3_eq_jet3_routeA_of_coords (s : OffSeed Xi)
+    (h0 : wp3 s ⟨0, by decide⟩ = (routeA_G s) (1 - (starRingEnd ℂ) s.ρ))
+    (h1 : wp3 s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - (starRingEnd ℂ) s.ρ))
+    (h2 : wp3 s ⟨2, by decide⟩ =
+          deriv (deriv (routeA_G s)) (1 - (starRingEnd ℂ) s.ρ)) :
+    wp3 s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) :=
+  window_eq_jet3_of_coords
+    (G := routeA_G s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3 s) h0 h1 h2
+
+theorem w0At_eq_jet3_routeA_of_coords (m : ℕ) (s : OffSeed Xi)
+    (h0 : w0At m s ⟨0, by decide⟩ = (routeA_G s) (s.ρ))
+    (h1 : w0At m s ⟨1, by decide⟩ = deriv (routeA_G s) (s.ρ))
+    (h2 : w0At m s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (s.ρ)) :
+    w0At m s = jet3 (routeA_G s) (s.ρ) :=
+  window_eq_jet3_of_coords (G := routeA_G s) (z := s.ρ) (w := w0At m s) h0 h1 h2
+
+theorem wp2At_eq_jet3_routeA_of_coords (m : ℕ) (s : OffSeed Xi)
+    (h0 : wp2At m s ⟨0, by decide⟩ = (routeA_G s) ((starRingEnd ℂ) s.ρ))
+    (h1 : wp2At m s ⟨1, by decide⟩ = deriv (routeA_G s) ((starRingEnd ℂ) s.ρ))
+    (h2 : wp2At m s ⟨2, by decide⟩ =
+          deriv (deriv (routeA_G s)) ((starRingEnd ℂ) s.ρ)) :
+    wp2At m s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) :=
+  window_eq_jet3_of_coords (G := routeA_G s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) h0 h1 h2
+
+theorem wp3At_eq_jet3_routeA_of_coords (m : ℕ) (s : OffSeed Xi)
+    (h0 : wp3At m s ⟨0, by decide⟩ = (routeA_G s) (1 - (starRingEnd ℂ) s.ρ))
+    (h1 : wp3At m s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - (starRingEnd ℂ) s.ρ))
+    (h2 : wp3At m s ⟨2, by decide⟩ =
+          deriv (deriv (routeA_G s)) (1 - (starRingEnd ℂ) s.ρ)) :
+    wp3At m s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) :=
+  window_eq_jet3_of_coords
+    (G := routeA_G s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) h0 h1 h2
+
+/-!
+  ### Remaining Route-A bridge obligations (still axiomatic)
 -/
 
 axiom w0_eq_jet3_routeA (s : OffSeed Xi) :
@@ -66,14 +105,6 @@ axiom wp2_eq_jet3_routeA (s : OffSeed Xi) :
 
 axiom wp3_eq_jet3_routeA (s : OffSeed Xi) :
     wp3 s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
-
-/-!
-  Jet-pivot windows (Plan C++J).
-
-  These are the ones used by the Row012/Rec2 extraction chain.
-  They are indexed by the jet-pivot order `m` and are still (currently)
-  provided by axioms.
--/
 
 axiom w0At_eq_jet3_routeA (m : ℕ) (s : OffSeed Xi) :
     w0At m s = jet3 (routeA_G s) (s.ρ)
