@@ -10,7 +10,7 @@
   parameter for API compatibility but does not use it.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRouteA_GDefs
 import Hyperlocal.Targets.XiPacket.XiJet3Defs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 
