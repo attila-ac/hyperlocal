@@ -1,18 +1,24 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetIsJetFromTrueAnalytic.lean
 
-  Option B (quotient jets):
-    Provide the three jet predicates for the Route-A quotient model `routeA_G s`
-    at the three Row012 anchors.
+  True-analytic source of quotient-jet facts for the three pivot windows.
 
-  This avoids trying to identify the Row012 witness `G` with `cderivIter m Xi`
-  (which is not available from the current Row012 payload).
+  IMPORTANT FIX (2026-02-25):
+  * Do NOT define `Hyperlocal.Targets.XiPacket.TAC.z_w0At/z_wp2At/z_wp3At` here
+    (those are introduced by the JetProvider/ProviderFromJets layers).
+  * If you want local anchor names, define them in the *XiPacket* namespace.
+
+  This file is intentionally *parametric* in the bridge instances:
+  it proves the jet facts from:
+      (true-analytic) JetQuotRec2 on padSeq3(w?At)
+    + (bridge)       [TAC.JetQuotShiftBridge3AtOrderQuot ...]
 -/
 
-import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA
-import Hyperlocal.Targets.XiPacket.XiJet3Defs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiRouteA_GDefs
+import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
+import Hyperlocal.Targets.XiPacket.TACTransportTruncated_JetQuotShiftBridgeAtOrderQuot
 
 import Mathlib.Tactic
 
@@ -26,86 +32,52 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-namespace TAC
-
-/-
-  Local anchor abbreviations.
-
-  IMPORTANT:
-  We define these exactly to match the centers used by the Route-A bridge axioms:
-    w0At at s.ρ
-    wp2At at (starRingEnd ℂ) s.ρ
-    wp3At at 1 - (starRingEnd ℂ) s.ρ
-
-  This keeps this file self-contained (no dependency on the older `sc/delta` transport anchors).
--/
+/-- Canonical quotient anchor for `w0At`: the Route–A point `ρ`. -/
 def z_w0At (s : OffSeed Xi) : ℂ := s.ρ
+
+/-- Canonical quotient anchor for `wp2At`: the Route–A point `conj ρ`. -/
 def z_wp2At (s : OffSeed Xi) : ℂ := (starRingEnd ℂ) s.ρ
+
+/-- Canonical quotient anchor for `wp3At`: the Route–A point `1 - conj ρ`. -/
 def z_wp3At (s : OffSeed Xi) : ℂ := 1 - (starRingEnd ℂ) s.ρ
 
-/-- Parallel provider for the *quotient* jet notion `IsJet3AtOrderQuot`. -/
-class XiJetWindowIsJetAtOrderQuotProvider : Prop where
-  jet_w0At  : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_w0At s) (w0At m s)
-  jet_wp2At : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_wp2At s) (wp2At m s)
-  jet_wp3At : ∀ (m : ℕ) (s : OffSeed Xi), IsJet3AtOrderQuot m s (z_wp3At s) (wp3At m s)
+/-
+  === The three true-analytic jet facts (parametric in the bridge instances) ===
+-/
 
-/-- Convenience: Jet3 tautology (binder name is `G`). -/
-private lemma isJet3At_jet3_apply (G : ℂ → ℂ) (z : ℂ) :
-    IsJet3At G z (jet3 G z) := by
-  simpa using (isJet3At_jet3 (G := G) (z := z))
-
-/-- Target 1: `w0At` is the Jet3 window of `routeA_G s` at `z_w0At s`. -/
-theorem jet_w0At_fromTrueAnalytic
-    (m : ℕ) (s : OffSeed Xi) :
+/-- Target 1: `w0At` is a quotient Jet3 window of `routeA_G s` at `z_w0At s`. -/
+theorem jet_w0At_trueAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.JetQuotShiftBridge3AtOrderQuot m s (z_w0At s) (w0At m s)] :
     IsJet3AtOrderQuot m s (z_w0At s) (w0At m s) := by
-  classical
-  have hw : w0At m s = jet3 (routeA_G s) (s.ρ) :=
-    w0At_eq_jet3_routeA (m := m) (s := s)
+  have hw : JetQuotRec2 s (padSeq3 (w0At m s)) :=
+    rec2_w0At_trueAnalytic (m := m) (s := s)
+  -- IMPORTANT: use the dedicated lemma (this is the stable API in your tree).
+  simpa [z_w0At] using
+    (TAC.isJet3AtOrderQuot_w0At_of_rec2 (m := m) (s := s) (z := z_w0At s) hw)
 
-  have hj :
-      IsJet3At (routeA_G s) (s.ρ) (jet3 (routeA_G s) (s.ρ)) :=
-    isJet3At_jet3_apply (routeA_G s) (s.ρ)
-
-  -- `z_w0At s` is definitional `s.ρ`.
-  simpa [IsJet3AtOrderQuot, z_w0At, hw] using hj
-
-/-- Target 2: `wp2At` is the Jet3 window of `routeA_G s` at `z_wp2At s`. -/
-theorem jet_wp2At_fromTrueAnalytic
-    (m : ℕ) (s : OffSeed Xi) :
+/-- Target 2: `wp2At` is a quotient Jet3 window of `routeA_G s` at `z_wp2At s`. -/
+theorem jet_wp2At_trueAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.JetQuotShiftBridge3AtOrderQuot m s (z_wp2At s) (wp2At m s)] :
     IsJet3AtOrderQuot m s (z_wp2At s) (wp2At m s) := by
-  classical
-  have hw : wp2At m s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) :=
-    wp2At_eq_jet3_routeA (m := m) (s := s)
+  have hw : JetQuotRec2 s (padSeq3 (wp2At m s)) :=
+    rec2_wp2At_trueAnalytic (m := m) (s := s)
+  simpa [z_wp2At] using
+    (TAC.isJet3AtOrderQuot_wp2At_of_rec2 (m := m) (s := s) (z := z_wp2At s) hw)
 
-  have hj :
-      IsJet3At (routeA_G s) ((starRingEnd ℂ) s.ρ)
-        (jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ)) :=
-    isJet3At_jet3_apply (routeA_G s) ((starRingEnd ℂ) s.ρ)
-
-  simpa [IsJet3AtOrderQuot, z_wp2At, hw] using hj
-
-/-- Target 3: `wp3At` is the Jet3 window of `routeA_G s` at `z_wp3At s`. -/
-theorem jet_wp3At_fromTrueAnalytic
-    (m : ℕ) (s : OffSeed Xi) :
+/-- Target 3: `wp3At` is a quotient Jet3 window of `routeA_G s` at `z_wp3At s`. -/
+theorem jet_wp3At_trueAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.JetQuotShiftBridge3AtOrderQuot m s (z_wp3At s) (wp3At m s)] :
     IsJet3AtOrderQuot m s (z_wp3At s) (wp3At m s) := by
-  classical
-  have hw : wp3At m s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) :=
-    wp3At_eq_jet3_routeA (m := m) (s := s)
-
-  have hj :
-      IsJet3At (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
-        (jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)) :=
-    isJet3At_jet3_apply (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
-
-  simpa [IsJet3AtOrderQuot, z_wp3At, hw] using hj
-
-/-- Install the quotient-jet provider. -/
-instance : XiJetWindowIsJetAtOrderQuotProvider where
-  jet_w0At  := jet_w0At_fromTrueAnalytic
-  jet_wp2At := jet_wp2At_fromTrueAnalytic
-  jet_wp3At := jet_wp3At_fromTrueAnalytic
-
-end TAC
+  have hw : JetQuotRec2 s (padSeq3 (wp3At m s)) :=
+    rec2_wp3At_trueAnalytic (m := m) (s := s)
+  simpa [z_wp3At] using
+    (TAC.isJet3AtOrderQuot_wp3At_of_rec2 (m := m) (s := s) (z := z_wp3At s) hw)
 
 end XiPacket
 end Targets

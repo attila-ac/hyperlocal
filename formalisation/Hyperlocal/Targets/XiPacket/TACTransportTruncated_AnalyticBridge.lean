@@ -17,7 +17,9 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.TACTransportTruncated
+import Hyperlocal.Targets.XiPacket.TACTransportTruncated_RangeReindex
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -47,11 +49,6 @@ Purely finite expansion lemma (algebraic target):
 `∑_{r=0}^{N-1-j} f^(j+r)(z) * δ^r / r!`.
 
 This lemma is *pure algebra* about `transportMat` and `mulVec`.
-
-NOTE (snapshot reality):
-In this Mathlib snapshot, unfolding `Matrix.mulVec` goes through the dot-product notation `⬝ᵥ`.
-The reindexing from `Fin N` to a `range` sum is a pure finitary exercise, but it is
-not currently needed downstream. We keep it as the single, explicit `sorry` in this file.
 -/
 theorem transport_apply_eq_truncSum
     (N : ℕ) (f : ℂ → ℂ) (z δ : ℂ) (j : Fin N) :
@@ -60,17 +57,55 @@ theorem transport_apply_eq_truncSum
     (Finset.range (N - (j : ℕ))).sum (fun r =>
       (cderivIter ((j : ℕ) + r) f z) * (δ ^ r) / (Nat.factorial r : ℂ)) := by
   classical
-  -- This is purely finite algebra:
-  --   unfold `transport` as `transportMat.mulVec`,
-  --   unfold `mulVec`/dotProduct into a finite sum,
-  --   rewrite `transportMat` entries as an `ite`,
-  --   filter by `j ≤ m`,
-  --   reindex by `r := m - j`.
-  --
-  -- The *only* reason this proof is not filled in here is the amount of
-  -- snapshot-dependent glue (`Matrix.dotProduct` unfolding + `Fin` reindex lemmas).
-  -- Downstream code does not depend on this lemma yet.
-  sorry
+  -- Start from the snapshot-robust finitary endpoint proved in
+  -- `TACTransportTruncated_RangeReindex.lean`.
+  have h :=
+    (transport_apply_eq_truncSum_finite_attach
+      (N := N) (Γ := jetVec N f z) (δ := δ) (j := j))
+
+  -- Simplify the summand to an expression only in terms of `r.1 : ℕ`.
+  have h' :
+      transport N δ (jetVec N f z) j
+        =
+      ((Finset.range (N - (j : ℕ))).attach).sum (fun r =>
+        (cderivIter ((j : ℕ) + r.1) f z) * (δ ^ r.1) / (Nat.factorial r.1 : ℂ)) := by
+    -- In `transport_apply_eq_truncSum_finite_attach`, the factor is
+    -- `((δ^r)/r!) * Γ (j+r)`. Here `Γ = jetVec`, so `Γ (j+r) = cderivIter (j+r) f z`.
+    -- We also commute the multiplication to match the preferred order.
+    simpa [jetVec, cderivIter, mul_assoc, mul_left_comm, mul_comm, div_eq_mul_inv] using h
+
+  -- Eliminate `.attach` by a bijection `r ↦ r.1`.
+  have hsum :
+      ((Finset.range (N - (j : ℕ))).attach).sum (fun r =>
+          (cderivIter ((j : ℕ) + r.1) f z) * (δ ^ r.1) / (Nat.factorial r.1 : ℂ))
+        =
+      (Finset.range (N - (j : ℕ))).sum (fun r =>
+          (cderivIter ((j : ℕ) + r) f z) * (δ ^ r) / (Nat.factorial r : ℂ)) := by
+    let s : Finset { r // r ∈ Finset.range (N - (j : ℕ)) } :=
+      (Finset.range (N - (j : ℕ))).attach
+    let t : Finset ℕ := Finset.range (N - (j : ℕ))
+    refine Finset.sum_bij
+      (s := s) (t := t)
+      (i := fun r _ => r.1)
+      (f := fun r => (cderivIter ((j : ℕ) + r.1) f z) * (δ ^ r.1) /
+        (Nat.factorial r.1 : ℂ))
+      (g := fun r => (cderivIter ((j : ℕ) + r) f z) * (δ ^ r) /
+        (Nat.factorial r : ℂ))
+      ?_ ?_ ?_ ?_
+    · intro r hr
+      -- membership of `r.1` in the underlying range is exactly `r.2`.
+      simpa [s, t] using r.2
+    · intro r₁ hr₁ r₂ hr₂ hEq
+      apply Subtype.ext
+      exact hEq
+    · intro r hr
+      refine ⟨⟨r, hr⟩, ?_, rfl⟩
+      simp [s]
+    · intro r hr
+      rfl
+
+  -- Finish.
+  simpa [h'] using (h'.trans hsum)
 
 /-
   === The real analytic bridge you need (future discharge site) ===
