@@ -25,14 +25,13 @@
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 
--- Install theorem-level provider instance (non-cycle-safe glue, extractor-facing).
---
--- 2026-02-22 (Task A3): switch the default provider to the (now theorem-level)
--- true-analytic provider instance.
---
--- This keeps the public Route–B semantics chain extractor-free by default.
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
-
+/-
+  DISCHARGE STEP (2026-02-25):
+  This public surface installs the recurrence payload via the Prop-interface gate
+  `XiJetQuotRec2AtOrderTrueAnalytic` (adapter-from-provider).
+  This keeps the default Route–B semantics extractor-free by imports.
+-/
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticAdapterFromProvider
 -- Theorem-level construction of OpZero from the provided recurrence payload.
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
 
