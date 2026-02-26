@@ -38,8 +38,8 @@ private theorem z_w0At_eq_rho (s : OffSeed Xi) : TAC.z_w0At s = s.ρ := by
   · simp [TAC.z_w0At, sc, σ, t, Hyperlocal.Targets.XiTransport.delta]
 
 /--
-A smaller theorem-level interface for the 9 AtOrder coordinate equalities.
-(Useful as a stepping stone towards full E1.)
+AtOrder-only part of `RouteAJetCoordProvider`:
+the 9 coordinate equalities for the three canonical AtOrder windows.
 -/
 class RouteAJetCoordProviderAt : Prop :=
   (w0At_0 : ∀ m : ℕ, ∀ s : OffSeed Xi, w0At m s ⟨0, by decide⟩ = (routeA_G s) (s.ρ))
@@ -70,7 +70,6 @@ instance (priority := 1000)
       TAC.XiJetWindowIsJetAtOrderQuotProvider.jet_w0At (m := m) (s := s)
     have h : IsJet3At (routeA_G s) (s.ρ) (w0At m s) := by
       simpa [IsJet3AtOrderQuot, z_w0At_eq_rho (s := s)] using hq
-    -- `IsJet3At` is `A ∧ B ∧ C`
     simpa using h.1
   w0At_1 := by
     intro m s
