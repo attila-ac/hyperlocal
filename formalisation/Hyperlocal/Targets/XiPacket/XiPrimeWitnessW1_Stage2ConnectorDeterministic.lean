@@ -127,8 +127,9 @@ private lemma wc_eq_zero_of_three_zeros_and_det
       have hwc_only' :
           (A2 * B3) • (L wc) - (A3 * B2) • (L wc) = 0 := by
         simpa [mul_assoc, mul_left_comm, mul_comm] using hwc_only
+      -- `sub_smul` is flaky across snapshots; keep it brutally direct.
       simpa using (show (A2 * B3 - A3 * B2) • (L wc) = 0 from by
-        simpa [sub_smul] using (congrArg (fun z => z) hwc_only'))
+        simpa [sub_smul] using hwc_only')
 
     exact hwc_det
 
@@ -139,21 +140,24 @@ private lemma wc_eq_zero_of_three_zeros_and_det
 /--
 **Guardrails-facing API**:
 
-If both wired outputs vanish at wp2/wp3, and the explicit sine micro-gate holds,
+If both wired outputs vanish at wp2/wp3, and `tval ≠ 0` where
+
+  tval := ((sin(t(s) * log(3/2)) : ℝ) : ℂ),
+
 then we manufacture a concrete nonzero real stencil `c` and prove it annihilates `wc s`.
 
 Notes:
-- We keep `{ht : delta s ≠ 0}` in the signature for compatibility with downstream callers;
-  it is not used for the determinant (the determinant depends on `t s`).
-- The determinant nondegeneracy now comes from the axiom-free closed form in
-  `XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean`.
+- We keep `{ht : delta s ≠ 0}` for compatibility with older call sites; it is not used here.
+- The determinant nondegeneracy is discharged via the axiom-free closed form:
+  `W1.det23C_ne_zero_of_tval_ne_zero`.
 -/
 theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     {ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0}
     (h2 : (FWired (m := m) (s := s)) (wp2At m s) = 0)
     (h3 : (FWired (m := m) (s := s)) (wp3At m s) = 0)
-    (hsin : Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) ≠ 0) :
+    (htv :
+      ((Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
     ∃ c : Fin 3 → ℝ, c ≠ 0 ∧ toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wc s) = 0 := by
   classical
 
@@ -222,19 +226,11 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     funext i
     simp [wp3At_apply, A3, B3, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
 
-  -- determinant nonzero: reduce to det23R ≠ 0, then cast to ℂ
-  have hdetR : W1.det23R (σ s) (t s) ≠ 0 :=
-    W1.det23R_ne_zero_of_sin_log_ratio_ne_zero (σ := (σ s)) (t := (t s)) hsin
-
+  -- determinant nonzero: now **directly** from `tval ≠ 0`
   have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
-    -- show the ℂ-expression is exactly (det23R : ℂ), then use exact_mod_cast
-    have hcast :
-        (A2 * B3 - A3 * B2) = (W1.det23R (σ s) (t s) : ℂ) := by
-      simp [A2, B2, A3, B3, W1.det23R, sub_eq_add_neg, mul_assoc, mul_left_comm, mul_comm]
-    intro h0
-    have : (W1.det23R (σ s) (t s) : ℂ) = 0 := by simpa [hcast] using h0
-    -- push back to ℝ
-    exact hdetR (by exact_mod_cast this)
+    -- The expression is literally `det23C` at (σ s, t s).
+    simpa [A2, B2, A3, B3, sub_eq_add_neg] using
+      (W1.det23C_ne_zero_of_tval_ne_zero (σ := σ s) (t := t s) htv)
 
   have hwc :
       toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wc s) = 0 := by
