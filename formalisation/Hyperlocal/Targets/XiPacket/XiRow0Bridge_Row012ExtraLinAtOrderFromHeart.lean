@@ -16,6 +16,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinToCoords
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
 
 set_option autoImplicit false
 noncomputable section
@@ -34,7 +35,7 @@ structure XiRow012ExtraLinAtOrderOut (m : ℕ) (s : OffSeed Xi) : Prop where
 
 /-- Projection: coordinate vanishings imply the extra-lin bundle. -/
 theorem xiRow012ExtraLinAtOrderOut_fromHeart
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi) [A0Nonzero (s := s)] :
     XiRow012ExtraLinAtOrderOut m s := by
   have HC : XiAtOrderCoords01Out m s :=
     xiAtOrderCoords01Out_fromAnalytic (m := m) (s := s)

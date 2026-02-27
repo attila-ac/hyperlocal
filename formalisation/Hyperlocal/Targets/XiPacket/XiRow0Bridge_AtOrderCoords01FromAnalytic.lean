@@ -1,22 +1,17 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderCoords01FromAnalytic.lean
 
-  Theorem-level discharge of the AtOrder coordinate vanishings bundle.
+  Analytic-branch wrapper (general OffSeed branch).
 
-  This module defines the public name:
-
-    `xiAtOrderCoords01Out_fromAnalytic : ∀ m s, XiAtOrderCoords01Out m s`
-
-  by importing the extractor-side derivation
-    `xiAtOrderCoords01Out_fromAnalyticExtractor`.
-
-  NOTE:
-  This file is intentionally NOT cycle-safe: it lives on the extractor/analytic side.
-  Cycle-safe downstream modules should only depend on `...AtOrderCoords01Defs.lean`.
+  IMPORTANT:
+  Anything that divides by `JetQuotOp.aRk1 s 0` must assume it explicitly.
+  Therefore this wrapper requires `[A0Nonzero (s := s)]` and delegates to the
+  extractor-side theorem.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalyticExtractor
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
 
 set_option autoImplicit false
 noncomputable section
@@ -25,13 +20,11 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open Complex
-open Hyperlocal.Transport
-
-/-- Discharged coords bundle from the analytic extractor. -/
+/-- General analytic branch: coordinates 0/1 bundle, assuming the `A0Nonzero` boundary. -/
 theorem xiAtOrderCoords01Out_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) : XiAtOrderCoords01Out m s :=
-  xiAtOrderCoords01Out_fromAnalyticExtractor (m := m) (s := s)
+    (m : ℕ) (s : OffSeed Xi) [A0Nonzero (s := s)] :
+    XiAtOrderCoords01Out m s := by
+  simpa using (xiAtOrderCoords01Out_fromAnalyticExtractor (m := m) (s := s))
 
 end XiPacket
 end Targets

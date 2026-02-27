@@ -8,6 +8,11 @@
     manufacture ∃ c ≠ 0, toeplitzL 2 (coeffsNat3 c) (wc s) = 0.
 
   Purely finite algebra (no analytic content).
+
+  UPDATE (2026-02-27+):
+  - We removed the det23 axiom. This file now *reduces* the needed 2×2 determinant
+    to the explicit sine micro-gate via the axiom-free closed form in
+    `XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean`.
 -/
 
 import Hyperlocal.Targets.XiPacket.WindowPayload
@@ -16,9 +21,9 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivot_wpAtExpand
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy
 
 import Hyperlocal.Transport.PrimeTrigPacket
-
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -29,6 +34,7 @@ namespace Targets
 namespace XiPacket
 
 open scoped BigOperators
+open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
@@ -105,66 +111,49 @@ private lemma wc_eq_zero_of_three_zeros_and_det
           - B2 • (A3 • (L wc) + B3 • (L ws)) = 0 := by
       simp [eq2, eq3]
 
-    -- First expand hcomb to isolate wc/ws pieces.
     have hcomb_exp :
         (B3 * A2) • (L wc) + (B3 * B2) • (L ws)
           - ((B2 * A3) • (L wc) + (B2 * B3) • (L ws)) = 0 := by
-      -- This is just distributivity of smul over + and scalar multiplication associativity.
       simpa [sub_eq_add_neg, smul_add, smul_smul, mul_assoc, add_assoc, add_left_comm, add_comm]
         using hcomb
 
-    -- Cancel the ws term (using commutativity B3*B2 = B2*B3).
     have hwc_only :
         (B3 * A2) • (L wc) - (B2 * A3) • (L wc) = 0 := by
-      -- Rewrite subtraction as + neg, then simp-cancel the ws part.
-      -- The only "math" is commutativity of multiplication in ℂ.
       simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm, mul_assoc, mul_left_comm, mul_comm]
         using hcomb_exp
 
-    -- Rewrite scalars into the exact determinant form and fold back via sub_smul.
-    -- We go through: (B3*A2) = (A2*B3) and (B2*A3) = (A3*B2),
-    -- then use (sub_smul ...).symm to turn (a•x - b•x) into (a-b)•x.
     have hwc_det :
         (A2 * B3 - A3 * B2) • (L wc) = 0 := by
-      -- change the coefficients
       have hwc_only' :
           (A2 * B3) • (L wc) - (A3 * B2) • (L wc) = 0 := by
         simpa [mul_assoc, mul_left_comm, mul_comm] using hwc_only
-      -- now fold using sub_smul
-      -- (a - b) • x = a • x - b • x, so we use .symm
       simpa using (show (A2 * B3 - A3 * B2) • (L wc) = 0 from by
-        -- rewrite goal using hwc_only' and (sub_smul ...).symm
-        simpa [sub_smul] using (congrArg (fun z => z) hwc_only' ) )
+        simpa [sub_smul] using (congrArg (fun z => z) hwc_only'))
 
     exact hwc_det
-
 
   rcases smul_eq_zero.mp hdet_smul with hdet0 | hwc
   · exact False.elim (hdet (by simpa using hdet0))
   · exact hwc
 
-/-
-Cycle-safe boundary: det at primes 2 and 3 from tval ≠ 0.
-
-(If you already have a theorem for this, replace this axiom by your theorem and delete it.)
--/
-axiom det23_ne_zero_of_tval_ne_zero (s : OffSeed Xi)
-    (ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0) :
-    (aCoeff (σ s) (t s) (2 : ℝ) : ℂ) * (bCoeff (σ s) (t s) (3 : ℝ) : ℂ)
-      -
-    (aCoeff (σ s) (t s) (3 : ℝ) : ℂ) * (bCoeff (σ s) (t s) (2 : ℝ) : ℂ) ≠ 0
-
 /--
 **Guardrails-facing API**:
 
-If both wired outputs vanish at wp2/wp3 (and `tval ≠ 0`), then we manufacture
-a concrete nonzero real stencil `c` and prove it annihilates `wc s`.
+If both wired outputs vanish at wp2/wp3, and the explicit sine micro-gate holds,
+then we manufacture a concrete nonzero real stencil `c` and prove it annihilates `wc s`.
+
+Notes:
+- We keep `{ht : delta s ≠ 0}` in the signature for compatibility with downstream callers;
+  it is not used for the determinant (the determinant depends on `t s`).
+- The determinant nondegeneracy now comes from the axiom-free closed form in
+  `XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean`.
 -/
 theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     {ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0}
     (h2 : (FWired (m := m) (s := s)) (wp2At m s) = 0)
-    (h3 : (FWired (m := m) (s := s)) (wp3At m s) = 0) :
+    (h3 : (FWired (m := m) (s := s)) (wp3At m s) = 0)
+    (hsin : Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) ≠ 0) :
     ∃ c : Fin 3 → ℝ, c ≠ 0 ∧ toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wc s) = 0 := by
   classical
 
@@ -179,14 +168,12 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     have : c (2 : Fin 3) = 0 := by simpa [hcz]
     have h2re : (JetQuotOp.aRk1 s 2).re = (-2 : ℝ) := by
       simpa [JetQuotOp.aRk1_nat2_eq_neg_two (s := s)]
-    -- contradiction: 0 = -2
     simpa [c, h2re] using this
 
   -- Show coeffsNat3(c) agrees with aRk1(s) on {0,1,2}.
   have hcoeff0 : ToeplitzLToRow3.coeffsNat3 c 0 = JetQuotOp.aRk1 s 0 := by
     have hre : ((JetQuotOp.aRk1 s 0).re : ℂ) = JetQuotOp.aRk1 s 0 := by
       apply Complex.ext <;> simp [JetQuotOp.aRk1_im0 (s := s)]
-    -- coeffsNat3 c 0 = (c 0 : ℂ) = ((aRk1 0).re : ℂ)
     simpa [ToeplitzLToRow3.coeffsNat3, c, hre]
 
   have hcoeff1 : ToeplitzLToRow3.coeffsNat3 c 1 = JetQuotOp.aRk1 s 1 := by
@@ -214,8 +201,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     simpa [htoe_eq (w := w0At m s)] using Hop.hop_w0At
 
   have hwp2 : toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wp2At m s) = 0 := by
-    -- You can derive this either from h2 via FWired_def, or directly from Hop:
-    -- use Hop to avoid any FWired API drift.
     simpa [htoe_eq (w := wp2At m s)] using Hop.hop_wp2At
 
   have hwp3 : toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wp3At m s) = 0 := by
@@ -230,18 +215,26 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
   have hwp2exp :
       wp2At m s = w0At m s + A2 • wc s + B2 • ws s := by
     funext i
-    -- wp2At_apply is in JetPivot (opened above)
-    simp [wp2At_apply, A2, B2, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm,
-      mul_left_comm]
+    simp [wp2At_apply, A2, B2, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
 
   have hwp3exp :
       wp3At m s = w0At m s + A3 • wc s + B3 • ws s := by
     funext i
-    simp [wp3At_apply, A3, B3, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm,
-      mul_left_comm]
+    simp [wp3At_apply, A3, B3, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
+
+  -- determinant nonzero: reduce to det23R ≠ 0, then cast to ℂ
+  have hdetR : W1.det23R (σ s) (t s) ≠ 0 :=
+    W1.det23R_ne_zero_of_sin_log_ratio_ne_zero (σ := (σ s)) (t := (t s)) hsin
 
   have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
-    simpa [A2, B2, A3, B3] using det23_ne_zero_of_tval_ne_zero (s := s) ht
+    -- show the ℂ-expression is exactly (det23R : ℂ), then use exact_mod_cast
+    have hcast :
+        (A2 * B3 - A3 * B2) = (W1.det23R (σ s) (t s) : ℂ) := by
+      simp [A2, B2, A3, B3, W1.det23R, sub_eq_add_neg, mul_assoc, mul_left_comm, mul_comm]
+    intro h0
+    have : (W1.det23R (σ s) (t s) : ℂ) = 0 := by simpa [hcast] using h0
+    -- push back to ℝ
+    exact hdetR (by exact_mod_cast this)
 
   have hwc :
       toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wc s) = 0 := by

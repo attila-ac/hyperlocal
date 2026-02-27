@@ -24,38 +24,39 @@ instance instXiPrimeWitnessW1TwoPrimeNondegeneracy_fromGuardrails
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     XiPrimeWitnessW1TwoPrimeNondegeneracy
       (m := m) (s := s)
-      (tval := Hyperlocal.Targets.XiTransport.delta s) :=
+      (tval := Complex.ofReal (Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))))) :=
 by
   classical
-  refine ⟨?_⟩
-  intro htv
+  refine ⟨by
+    intro htv
 
-  -- Convert htv : (↑(delta s)) ≠ 0 into ht : (delta s) ≠ 0.
-  -- This is the only real issue in this file.
-  have ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0 := by
-    -- Most coercions support this:
-    -- (If this fails in your snapshot, replace `exact_mod_cast` by the `simpa` line below.)
-    first
-      | exact_mod_cast htv
-      | -- fallback: try to push the coercion back by simp/norm_cast
-        -- This works if the coercion is `Subtype.val`-like or a ring coercion simp can see.
-        -- In many cases `simp` alone reduces `((↑x : α) = 0)` to `(x = 0)`.
-        -- We use contrapositive style.
-        intro hx
-        apply htv
-        simpa [hx]
+    -- Convert `tval ≠ 0` (in ℂ) into the real sine nonzero hypothesis.
+    have hsin :
+        Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) ≠ 0 := by
+      intro h0
+      apply htv
+      -- (h0 : sin(...) = 0) ⇒ Complex.ofReal (sin(...)) = 0
+      simpa [h0]
 
-  by_contra hOr
-  push_neg at hOr
-  rcases hOr with ⟨h2, h3⟩
+    -- Provide the missing implicit `{ht : XiTransport.delta s ≠ 0}` from OffSeed.
+    have ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0 := by
+      -- delta s = s.ρ.re - 1/2, and OffSeed has `s.hσ : s.ρ.re ≠ 1/2`
+      simpa [Hyperlocal.Targets.XiTransport.delta] using (sub_ne_zero.mpr s.hσ)
 
-  rcases
-      (toeplitzL_wc_of_Fwp2_Fwp3_zero (m := m) (s := s) (ht := ht) h2 h3)
-    with ⟨c, hc, hToe⟩
+    -- If both wired outputs were zero, Stage-2 would manufacture a nonzero Toeplitz annihilator for wc,
+    -- contradicting guardrails.
+    by_contra hOr
+    push_neg at hOr
+    rcases hOr with ⟨h2, h3⟩
 
-  exact
-    (ToeplitzGuardrails.no_nonzero_toeplitzL_annihilator_for_wc (s := s))
-      ⟨c, hc, hToe⟩
+    rcases
+        (toeplitzL_wc_of_Fwp2_Fwp3_zero (m := m) (s := s) (ht := ht) h2 h3 hsin)
+      with ⟨c, hc, hToe⟩
+
+    exact
+      (ToeplitzGuardrails.no_nonzero_toeplitzL_annihilator_for_wc (s := s))
+        ⟨c, hc, hToe⟩
+  ⟩
 
 end W1
 
