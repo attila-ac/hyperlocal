@@ -110,17 +110,19 @@ lemma toeplitzL_two_apply_fin1 (coeffs : ℕ → ℂ) (w : Window 3) :
     (toeplitzL 2 coeffs w) (1 : Fin 3) =
       (coeffs 0 * w 1) + (coeffs 1 * w 2) := by
   classical
+  -- linter: `add_assoc` is unused here in your pin, so omit it.
   simp [toeplitzL, shiftCombo, Finset.sum_range_succ, compPow,
         LinearMap.smul_apply, LinearMap.add_apply, LinearMap.comp_apply, LinearMap.id_apply,
-        add_assoc, add_left_comm, add_comm]
+        add_left_comm, add_comm]
 
 /-- Row-2 of `toeplitzL 2 coeffs` only sees the last coordinate of the input window. -/
 lemma toeplitzL_two_apply_fin2 (coeffs : ℕ → ℂ) (w : Window 3) :
     (toeplitzL 2 coeffs w) (2 : Fin 3) = (coeffs 0 * w 2) := by
   classical
+  -- linter: `add_assoc` is unused here in your pin, so omit it.
   simp [toeplitzL, shiftCombo, Finset.sum_range_succ, compPow,
         LinearMap.smul_apply, LinearMap.add_apply, LinearMap.comp_apply, LinearMap.id_apply,
-        add_assoc, add_left_comm, add_comm]
+        add_left_comm, add_comm]
 
 /--
 NEW bridge:
@@ -163,7 +165,8 @@ lemma toeplitzRow3_reVec3_of_toeplitzL_two_eq_zero
     (h : toeplitzL 2 (coeffsNat3 c) w = 0) :
     toeplitzRow3 c (reVec3 w) := by
   have h0 : (toeplitzL 2 (coeffsNat3 c) w) (0 : Fin 3) = 0 := by
-    simpa using congrArg (fun x => x (0 : Fin 3)) h
+    -- linter: prefer `simp` (not `simpa`) here
+    simp [h]
   exact toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c w h0
 
 end ToeplitzLToRow3

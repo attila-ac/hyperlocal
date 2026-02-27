@@ -81,13 +81,13 @@ lemma ell_of_trigSplit
         = ell u0 uc (u0 + a • uc) + ell u0 uc (b • us) := by
             simpa [add_assoc] using (ell_add u0 uc (u0 + a • uc) (b • us))
     _ = (ell u0 uc u0 + ell u0 uc (a • uc)) + b * ell u0 uc us := by
-            simp [ell_add, ell_smul, add_assoc, add_left_comm, add_comm]
+            simp [ell_add, ell_smul, add_assoc]
     _ = b * kappa u0 uc us := by
           have hu0 : ell u0 uc u0 = 0 := by
             simpa using (ell_u0 (u0 := u0) (uc := uc))
           have huc : ell u0 uc (a • uc) = 0 := by
             simp [ell_smul, ell_uc]
-          simp [hu0, huc, ell_us_eq_kappa, add_assoc, add_left_comm, add_comm]
+          simp [hu0, huc, ell_us_eq_kappa]
 
 /-- Determinant identity: `ell(..., wp2At)` equals `bCoeff * kappa`. -/
 lemma ell_wp2At_eq_b_mul_kappa (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
