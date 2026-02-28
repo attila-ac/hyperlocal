@@ -8,7 +8,9 @@
   * The only remaining axioms in this file are the 12 *base-window* coordinate equalities
     (w0/wc/wp2/wp3 at coords 0/1/2).
 
-  This file stays extractor-free and avoids importing Row012 analytic endpoint modules.
+  AXIOM COMPRESSION (2026-02-28):
+  Replace those 12 separate axioms by ONE bundled axiom record, and keep the old
+  names as theorem projections.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
@@ -33,42 +35,63 @@ These are the only axioms left here: the 12 coordinate equalities for the base w
 AtOrder facts are *not* axiomatized here anymore.
 -/
 
-namespace RouteAJetCoordAxioms
+namespace RouteAJetCoordAxioms.Discharge
 
-axiom ax_w0_0  (s : OffSeed Xi) :
-  w0 s ⟨0, by decide⟩ = (routeA_G s) (s.ρ)
-axiom ax_w0_1  (s : OffSeed Xi) :
-  w0 s ⟨1, by decide⟩ = deriv (routeA_G s) (s.ρ)
-axiom ax_w0_2  (s : OffSeed Xi) :
-  w0 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (s.ρ)
+/-- Bundle the 12 base-window equalities into one object. -/
+structure Base where
+  w0_0  : ∀ s : OffSeed Xi, w0 s ⟨0, by decide⟩ = (routeA_G s) (s.ρ)
+  w0_1  : ∀ s : OffSeed Xi, w0 s ⟨1, by decide⟩ = deriv (routeA_G s) (s.ρ)
+  w0_2  : ∀ s : OffSeed Xi, w0 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (s.ρ)
 
-axiom ax_wc_0  (s : OffSeed Xi) :
-  wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ)
-axiom ax_wc_1  (s : OffSeed Xi) :
-  wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ)
-axiom ax_wc_2  (s : OffSeed Xi) :
-  wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ)
+  wc_0  : ∀ s : OffSeed Xi, wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ)
+  wc_1  : ∀ s : OffSeed Xi, wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ)
+  wc_2  : ∀ s : OffSeed Xi, wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ)
 
-axiom ax_wp2_0 (s : OffSeed Xi) :
-  wp2 s ⟨0, by decide⟩ = (routeA_G s) ((starRingEnd ℂ) s.ρ)
-axiom ax_wp2_1 (s : OffSeed Xi) :
-  wp2 s ⟨1, by decide⟩ = deriv (routeA_G s) ((starRingEnd ℂ) s.ρ)
-axiom ax_wp2_2 (s : OffSeed Xi) :
-  wp2 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) ((starRingEnd ℂ) s.ρ)
+  wp2_0 : ∀ s : OffSeed Xi, wp2 s ⟨0, by decide⟩ = (routeA_G s) ((starRingEnd ℂ) s.ρ)
+  wp2_1 : ∀ s : OffSeed Xi, wp2 s ⟨1, by decide⟩ = deriv (routeA_G s) ((starRingEnd ℂ) s.ρ)
+  wp2_2 : ∀ s : OffSeed Xi, wp2 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) ((starRingEnd ℂ) s.ρ)
 
-axiom ax_wp3_0 (s : OffSeed Xi) :
-  wp3 s ⟨0, by decide⟩ = (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
-axiom ax_wp3_1 (s : OffSeed Xi) :
-  wp3 s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
-axiom ax_wp3_2 (s : OffSeed Xi) :
-  wp3 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - (starRingEnd ℂ) s.ρ)
+  wp3_0 : ∀ s : OffSeed Xi, wp3 s ⟨0, by decide⟩ = (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
+  wp3_1 : ∀ s : OffSeed Xi, wp3 s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - (starRingEnd ℂ) s.ρ)
+  wp3_2 : ∀ s : OffSeed Xi, wp3 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - (starRingEnd ℂ) s.ρ)
 
-end RouteAJetCoordAxioms
+/-- The single base-window axiom payload. -/
+axiom base : Base
+
+theorem ax_w0_0  (s : OffSeed Xi) :
+  w0 s ⟨0, by decide⟩ = (routeA_G s) (s.ρ) := base.w0_0 s
+theorem ax_w0_1  (s : OffSeed Xi) :
+  w0 s ⟨1, by decide⟩ = deriv (routeA_G s) (s.ρ) := base.w0_1 s
+theorem ax_w0_2  (s : OffSeed Xi) :
+  w0 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (s.ρ) := base.w0_2 s
+
+theorem ax_wc_0  (s : OffSeed Xi) :
+  wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ) := base.wc_0 s
+theorem ax_wc_1  (s : OffSeed Xi) :
+  wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ) := base.wc_1 s
+theorem ax_wc_2  (s : OffSeed Xi) :
+  wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ) := base.wc_2 s
+
+theorem ax_wp2_0 (s : OffSeed Xi) :
+  wp2 s ⟨0, by decide⟩ = (routeA_G s) ((starRingEnd ℂ) s.ρ) := base.wp2_0 s
+theorem ax_wp2_1 (s : OffSeed Xi) :
+  wp2 s ⟨1, by decide⟩ = deriv (routeA_G s) ((starRingEnd ℂ) s.ρ) := base.wp2_1 s
+theorem ax_wp2_2 (s : OffSeed Xi) :
+  wp2 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) ((starRingEnd ℂ) s.ρ) := base.wp2_2 s
+
+theorem ax_wp3_0 (s : OffSeed Xi) :
+  wp3 s ⟨0, by decide⟩ = (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) := base.wp3_0 s
+theorem ax_wp3_1 (s : OffSeed Xi) :
+  wp3 s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) := base.wp3_1 s
+theorem ax_wp3_2 (s : OffSeed Xi) :
+  wp3 s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - (starRingEnd ℂ) s.ρ) := base.wp3_2 s
+
+end RouteAJetCoordAxioms.Discharge
 
 /-!
 ## Main instance: RouteAJetCoordProvider
 
-* Base windows: from the 12 axioms above.
+* Base windows: from the bundled base axiom above.
 * AtOrder windows: from quotient jets, via `RouteAJetCoordProviderAt` built from
   `[TAC.XiJetWindowIsJetAtOrderQuotProvider]`.
 -/
@@ -77,13 +100,10 @@ instance (priority := 900)
     [TAC.XiJetWindowIsJetAtOrderQuotProvider] :
     RouteAJetCoordProvider := by
   classical
-
-  -- Ensure the AtOrder coordinate provider instance is available (it is provided
-  -- in `...AtCoordsFromQuotJets.lean` from the quotient-jet IsJet provider).
   haveI : RouteAJetCoordProviderAt := inferInstance
 
   refine
-    { -- base windows (axioms)
+    { -- base windows (compressed axiom payload)
       w0_0  := RouteAJetCoordAxioms.ax_w0_0
       w0_1  := RouteAJetCoordAxioms.ax_w0_1
       w0_2  := RouteAJetCoordAxioms.ax_w0_2
