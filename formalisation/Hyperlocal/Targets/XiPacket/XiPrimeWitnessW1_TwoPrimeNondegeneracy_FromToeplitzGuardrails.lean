@@ -30,25 +30,12 @@ by
   refine ⟨?_⟩
   intro htv
 
-  -- compatibility: keep ht around for older signatures (not used by the determinant now)
-  have ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0 := by
-    -- delta(s) = (Re ρ) - 1/2 ; OffSeed has `hσ : s.ρ.re = 1/2 → False`
-    intro h0
-    have : (s.ρ.re : ℝ) = (1 / 2 : ℝ) := by
-      -- unfold delta and solve the linear equation
-      -- delta = re - 1/2 = 0 -> re = 1/2
-      -- keep it `ring`-robust:
-      have : (s.ρ.re : ℝ) - (1 / 2 : ℝ) = 0 := by
-        simpa [Hyperlocal.Targets.XiTransport.delta] using h0
-      linarith
-    exact s.hσ this
-
   by_contra hOr
   push_neg at hOr
   rcases hOr with ⟨h2, h3⟩
 
   rcases
-      (toeplitzL_wc_of_Fwp2_Fwp3_zero (m := m) (s := s) (ht := ht) h2 h3 htv)
+      (toeplitzL_wc_of_Fwp2_Fwp3_zero (m := m) (s := s) h2 h3 htv)
     with ⟨c, hc, hToe⟩
 
   exact

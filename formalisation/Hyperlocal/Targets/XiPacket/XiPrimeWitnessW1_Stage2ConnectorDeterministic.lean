@@ -127,7 +127,6 @@ private lemma wc_eq_zero_of_three_zeros_and_det
       have hwc_only' :
           (A2 * B3) • (L wc) - (A3 * B2) • (L wc) = 0 := by
         simpa [mul_assoc, mul_left_comm, mul_comm] using hwc_only
-      -- `sub_smul` is flaky across snapshots; keep it brutally direct.
       simpa using (show (A2 * B3 - A3 * B2) • (L wc) = 0 from by
         simpa [sub_smul] using hwc_only')
 
@@ -146,14 +145,11 @@ If both wired outputs vanish at wp2/wp3, and `tval ≠ 0` where
 
 then we manufacture a concrete nonzero real stencil `c` and prove it annihilates `wc s`.
 
-Notes:
-- We keep `{ht : delta s ≠ 0}` for compatibility with older call sites; it is not used here.
-- The determinant nondegeneracy is discharged via the axiom-free closed form:
+The determinant nondegeneracy is discharged via the axiom-free closed form:
   `W1.det23C_ne_zero_of_tval_ne_zero`.
 -/
 theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
-    {ht : Hyperlocal.Targets.XiTransport.delta s ≠ 0}
     (h2 : (FWired (m := m) (s := s)) (wp2At m s) = 0)
     (h3 : (FWired (m := m) (s := s)) (wp3At m s) = 0)
     (htv :
@@ -228,7 +224,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
 
   -- determinant nonzero: now **directly** from `tval ≠ 0`
   have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
-    -- The expression is literally `det23C` at (σ s, t s).
     simpa [A2, B2, A3, B3, sub_eq_add_neg] using
       (W1.det23C_ne_zero_of_tval_ne_zero (σ := σ s) (t := t s) htv)
 
