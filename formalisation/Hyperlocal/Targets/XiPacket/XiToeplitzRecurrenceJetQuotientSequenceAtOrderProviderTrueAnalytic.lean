@@ -1,42 +1,24 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic.lean
 
-  Push B (TRUE-ANALYTIC, boundary-free Rec2AtOrder discharge).
+  Front R2: TRUE-ANALYTIC Rec2AtOrder discharge.
 
-  Goal:
-    prove directly (no extractor modules, no boundary hypotheses)
+  New (2026-02-28):
+  Make Rec2 depend only on the JetConvolution-driven Row012 convolution gate:
 
-      JetQuotRec2 s (padSeq3 (w0At  m s))
-      JetQuotRec2 s (padSeq3 (wp2At m s))
-      JetQuotRec2 s (padSeq3 (wp3At m s))
+      [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
+        ⇒ Rec2 payload
+        ⇒ [XiJetQuotRec2AtOrderTrueAnalytic]
 
-  and install them as the interface:
-
-      [XiJetQuotRec2AtOrderTrueAnalytic]
-
-  Pipeline used (all theorem-level, cycle-safe):
-
-    [XiRow012UpstreamTrueAnalytic]
-        ⇒ XiJetQuotRow012PropAtOrder            (JetConvolution-driven firewall)
-        ⇒ XiJetQuotRec2AtOrder                  (row012Prop ⇒ Rec2 bridge)
-        ⇒ XiJetQuotRec2AtOrderTrueAnalytic      (this file)
-        ⇒ XiJetQuotRec2AtOrderProvider          (via interface glue)
-
-  This replaces the older path that went through Row012 reverse-stencil closed-forms
-  and therefore needed the auxiliary boundary `[A0Nonzero (s := s)]`.
+  (Upstream/installer layers are handled by the root import file.)
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
--- JetConvolution-driven upstream Row012 payload ⇒ Rec2 bundle (no A0Nonzero).
+-- This bundles Rec2 from the Row012Upstream payload; we’ll let typeclass search build Upstream if needed.
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012UpstreamTrueAnalytic
--- Extractor-free true-analytic upstream chain:
---   tail345 ⇒ JetConvolution ⇒ Row012 ⇒ Row012Upstream
 import Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalyticFromJetConvolution
-import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionDischarge
-import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345ManuscriptFromSigmaAndRow012
 
 set_option autoImplicit false
 noncomputable section
@@ -49,46 +31,48 @@ open Complex
 open Hyperlocal.Transport
 
 /-!
-## Push B: the three direct Rec2 lemmas (boundary-free)
+## Front R2.1: the three direct Rec2 lemmas (now Row012Convolution-driven)
 
-These are the exact three statements requested in the progress report.
-They are obtained by projecting the bundled payload
-`xiJetQuotRec2AtOrder_fromRow012UpstreamTrueAnalytic`.
+We assume only `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.
+Then we let typeclass search install `[XiRow012UpstreamTrueAnalytic]` (via its
+priority-1000 instance) and project the bundled Rec2 payload.
 -/
 
 theorem rec2_w0At_trueAnalytic
-    [XiRow012UpstreamTrueAnalytic]
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     (m : ℕ) (s : OffSeed Xi) :
     JetQuotRec2 s (padSeq3 (w0At m s)) := by
   classical
+  haveI : XiRow012UpstreamTrueAnalytic := inferInstance
   simpa using
     (xiJetQuotRec2AtOrder_fromRow012UpstreamTrueAnalytic (m := m) (s := s)).h_w0At
 
 theorem rec2_wp2At_trueAnalytic
-    [XiRow012UpstreamTrueAnalytic]
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     (m : ℕ) (s : OffSeed Xi) :
     JetQuotRec2 s (padSeq3 (wp2At m s)) := by
   classical
+  haveI : XiRow012UpstreamTrueAnalytic := inferInstance
   simpa using
     (xiJetQuotRec2AtOrder_fromRow012UpstreamTrueAnalytic (m := m) (s := s)).h_wp2At
 
 theorem rec2_wp3At_trueAnalytic
-    [XiRow012UpstreamTrueAnalytic]
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     (m : ℕ) (s : OffSeed Xi) :
     JetQuotRec2 s (padSeq3 (wp3At m s)) := by
   classical
+  haveI : XiRow012UpstreamTrueAnalytic := inferInstance
   simpa using
     (xiJetQuotRec2AtOrder_fromRow012UpstreamTrueAnalytic (m := m) (s := s)).h_wp3At
 
 /--
-Install the Push-B interface (legacy path via `[XiRow012UpstreamTrueAnalytic]`).
+Front R2.3: strict true-analytic Rec2 instance.
 
-NOTE:
-  Task A installs a strictly more upstream instance without assuming
-  `[XiRow012UpstreamTrueAnalytic]`. We keep this instance at lower priority so it
-  does not create instance-search ambiguity when both are available.
+Priority 1000 so it wins over any legacy/axiom shims.
 -/
-instance (priority := 900) [XiRow012UpstreamTrueAnalytic] : XiJetQuotRec2AtOrderTrueAnalytic where
+instance (priority := 1000)
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic] :
+    XiJetQuotRec2AtOrderTrueAnalytic where
   rec2_w0At  := rec2_w0At_trueAnalytic
   rec2_wp2At := rec2_wp2At_trueAnalytic
   rec2_wp3At := rec2_wp3At_trueAnalytic

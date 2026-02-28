@@ -12,6 +12,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAt_Discharge
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA
 import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRec2TrueAnalyticRoot
 
 set_option pp.universes true
 set_option pp.all true
@@ -26,6 +27,9 @@ open Hyperlocal.Targets
 open Hyperlocal.Targets.XiPacket
 open Complex
 
+#synth Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic
+#synth Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic
+#synth Hyperlocal.Targets.XiPacket.XiJetConvolutionAtRevAtOrderTrueAnalytic
 
 #check Hyperlocal.Targets.XiPacket.JetQuotOp.xiJetLeibnizAt_wc
 #check Hyperlocal.Targets.XiPacket.JetQuotOp.xiRouteA_jetPkg_wc
