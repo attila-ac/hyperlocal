@@ -1,18 +1,17 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticAdapterFromProvider.lean
 
-  Adapter (no refactor):
-  Use the existing theorem-level true-analytic Rec2 lemmas to instantiate the
-  new Prop-class interface `XiJetQuotRec2AtOrderTrueAnalytic`.
+  Task-A wiring point:
+  Downstream files historically imported this module to obtain an instance of
+  `[XiJetQuotRec2AtOrderTrueAnalytic]`.
 
-  This keeps downstream code free to depend on the class (interface),
-  while you can keep the actual analytic proofs living where they already are.
+  The instance is now provided in the dedicated landing pad:
+    `XiToeplitzRecurrenceJetQuotientRec2AtOrderTrueAnalytic.lean`.
 
-  No axioms introduced.
+  This file remains as a stable import path, but contains no additional logic.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRec2AtOrderTrueAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -21,11 +20,7 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Adapter: existing theorem-level true-analytic Rec2 lemmas ⇒ new interface class. -/
-instance (priority := 1000) : XiJetQuotRec2AtOrderTrueAnalytic where
-  rec2_w0At  := by intro m s; simpa using rec2_w0At_trueAnalytic (m := m) (s := s)
-  rec2_wp2At := by intro m s; simpa using rec2_wp2At_trueAnalytic (m := m) (s := s)
-  rec2_wp3At := by intro m s; simpa using rec2_wp3At_trueAnalytic (m := m) (s := s)
+-- Intentionally empty: importing the landing pad installs the instance.
 
 end XiPacket
 end Targets

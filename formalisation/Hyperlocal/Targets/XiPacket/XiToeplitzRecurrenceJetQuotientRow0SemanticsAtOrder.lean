@@ -23,6 +23,7 @@
   may import extractor-facing glue. Analytic-only upstream modules must not import it.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderAnalytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 
 /-

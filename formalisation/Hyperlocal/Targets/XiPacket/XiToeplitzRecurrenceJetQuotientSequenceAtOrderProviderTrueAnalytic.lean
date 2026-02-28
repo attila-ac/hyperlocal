@@ -31,6 +31,12 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrde
 
 -- JetConvolution-driven upstream Row012 payload ⇒ Rec2 bundle (no A0Nonzero).
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012UpstreamTrueAnalytic
+-- Extractor-free true-analytic upstream chain:
+--   tail345 ⇒ JetConvolution ⇒ Row012 ⇒ Row012Upstream
+import Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalyticFromJetConvolution
+import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionDischarge
+import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345ManuscriptFromSigmaAndRow012
 
 set_option autoImplicit false
 noncomputable section
@@ -74,8 +80,15 @@ theorem rec2_wp3At_trueAnalytic
   simpa using
     (xiJetQuotRec2AtOrder_fromRow012UpstreamTrueAnalytic (m := m) (s := s)).h_wp3At
 
-/-- Install the Push-B interface (and let the interface-glue provide the provider instance). -/
-instance (priority := 1000) [XiRow012UpstreamTrueAnalytic] : XiJetQuotRec2AtOrderTrueAnalytic where
+/--
+Install the Push-B interface (legacy path via `[XiRow012UpstreamTrueAnalytic]`).
+
+NOTE:
+  Task A installs a strictly more upstream instance without assuming
+  `[XiRow012UpstreamTrueAnalytic]`. We keep this instance at lower priority so it
+  does not create instance-search ambiguity when both are available.
+-/
+instance (priority := 900) [XiRow012UpstreamTrueAnalytic] : XiJetQuotRec2AtOrderTrueAnalytic where
   rec2_w0At  := rec2_w0At_trueAnalytic
   rec2_wp2At := rec2_wp2At_trueAnalytic
   rec2_wp3At := rec2_wp3At_trueAnalytic
