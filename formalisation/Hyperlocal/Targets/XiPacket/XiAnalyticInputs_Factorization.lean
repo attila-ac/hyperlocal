@@ -1,14 +1,19 @@
-import Mathlib.Data.Complex.Basic
-import Mathlib.Algebra.Polynomial.Basic
+/-
+  Hyperlocal/Targets/XiPacket/XiAnalyticInputs_Factorization.lean
 
-import Hyperlocal.Targets.RiemannXi
-import Hyperlocal.Core
-import Hyperlocal.Factorization
-import Hyperlocal.FactorizationRC
-import Hyperlocal.MinimalModel
-import Hyperlocal.FactorizationGofSEntire
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.GrowthOrder
+  Route-A factorisation handoff layer.
+
+  Purpose:
+  * isolate the (currently axiomatic) existence of the quartet-quotient G
+    for Xi, and provide a stable theorem name `G_Xi_entire` used downstream.
+
+  IMPORTANT:
+  * This file MUST NOT redefine `Rquartet` or any other constants already
+    provided by `XiAnalyticInputs.lean`.
+  * It is intentionally minimal to avoid namespace collisions.
+-/
+
+import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 
 set_option autoImplicit false
 noncomputable section
@@ -18,39 +23,19 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-open Polynomial
-open Hyperlocal.MinimalModel
 open Hyperlocal.Factorization
+open Hyperlocal.GrowthOrder
 
-/-!
-  Factorisation handoff (Route A):
-  keep this axiom isolated until you later replace it by Mathlib-level structure.
+/--
+Axiom boundary: existence of a quartet-factorised quotient `G` which is entire.
+
+This is the same A1 “local analytic factorisation” hinge, but housed in a dedicated file
+so downstream modules can depend on a stable name without importing extra lemmas.
 -/
-
-/-- Route-A handoff: existence of an entire quotient after factoring out the quartet. -/
 axiom Xi_exists_factorisedByQuartet_entire (s : OffSeed Xi) :
   ∃ G : ℂ → ℂ, FactorisedByQuartet Xi s.ρ 1 G ∧ GrowthOrder.EntireFun G
 
-/-- The explicit FE/RC quartet polynomial (order 1). -/
-def Rquartet (ρ : ℂ) : Polynomial ℂ :=
-  (X - C ρ) * (X - C (star ρ)) * (X - C (1 - ρ)) * (X - C (1 - star ρ))
-
-lemma Rquartet_eval_rho (ρ : ℂ) : (Rquartet ρ).eval ρ = 0 := by simp [Rquartet]
-lemma Rquartet_eval_star (ρ : ℂ) : (Rquartet ρ).eval (star ρ) = 0 := by simp [Rquartet]
-lemma Rquartet_eval_oneMinus (ρ : ℂ) : (Rquartet ρ).eval (1 - ρ) = 0 := by simp [Rquartet]
-lemma Rquartet_eval_oneMinus_star (ρ : ℂ) : (Rquartet ρ).eval (1 - star ρ) = 0 := by simp [Rquartet]
-
-lemma R_quartet_zeros (s : OffSeed Xi) :
-    (Rquartet s.ρ).eval s.ρ = 0 ∧
-    (Rquartet s.ρ).eval (star s.ρ) = 0 ∧
-    (Rquartet s.ρ).eval (1 - s.ρ) = 0 ∧
-    (Rquartet s.ρ).eval (1 - star s.ρ) = 0 := by
-  refine And.intro (Rquartet_eval_rho s.ρ) ?_
-  refine And.intro (Rquartet_eval_star s.ρ) ?_
-  refine And.intro (Rquartet_eval_oneMinus s.ρ) ?_
-  exact Rquartet_eval_oneMinus_star s.ρ
-
-/-- Packaged handoff. -/
+/-- Stable wrapper name used downstream. -/
 theorem G_Xi_entire (s : OffSeed Xi) :
     ∃ G : ℂ → ℂ, FactorisedByQuartet Xi s.ρ 1 G ∧ GrowthOrder.EntireFun G := by
   exact Xi_exists_factorisedByQuartet_entire s

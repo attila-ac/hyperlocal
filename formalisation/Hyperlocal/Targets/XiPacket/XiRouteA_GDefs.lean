@@ -6,10 +6,12 @@
   entire-ness proofs.
 
   IMPORTANT:
-  This file intentionally contains NO window=jet axioms.
+  * This file intentionally contains NO window=jet axioms.
+  * It depends only on the Route-A analytic input shims.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
+import Hyperlocal.Targets.XiPacket.XiAnalyticInputs_Factorization
 
 set_option autoImplicit false
 noncomputable section

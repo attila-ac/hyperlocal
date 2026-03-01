@@ -15,7 +15,7 @@
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_LeibnizSemantics
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
-import Hyperlocal.FactorizationGofSAnalytic
+import Hyperlocal.Targets.XiPacket.XiAnalyticInputs_Factorization
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Tactic
 
