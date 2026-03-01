@@ -27,6 +27,11 @@ open Hyperlocal.Targets
 open Hyperlocal.Targets.XiPacket
 open Complex
 
+#check Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_Row0ConvolutionAtRev
+#check Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_from_JetConvolutionRev
+#check Hyperlocal.Targets.XiPacket.Row0ConvolutionAtRev
+#check Hyperlocal.Targets.XiPacket.JetConvolutionAtRev
+
 #synth Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic
 #synth Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic
 #synth Hyperlocal.Targets.XiPacket.XiJetConvolutionAtRevAtOrderTrueAnalytic
