@@ -1,3 +1,15 @@
+/-
+  Hyperlocal/Targets/XiPacket/XiAnalyticInputs.lean
+
+  Analytic Inputs for Xi (Route A) — Single-file shim
+
+  Snapshot-robust:
+  * FE is theorem-level from Mathlib.
+  * RC and AnalyticAt(Λ) are local shields until you wire exact lemma names.
+  * Entirety of xi is proved from those shields by analytic closure.
+  * Route-A quartet factorisation handoff stays as a single local axiom.
+-/
+
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Data.Complex.Basic
@@ -25,98 +37,99 @@ open Hyperlocal.MinimalModel
 open Hyperlocal.Factorization
 
 /-!
-  # Analytic Inputs for Xi (Route A)
-
-  This file provides the analytic assumptions/inputs about the target `Xi`
-  required by the Route-A recurrence extraction.
+# Analytic Inputs for Xi (Route A) — Single-file shim
 -/
 
+-- IMPORTANT: avoid name collision with your existing `Xi`.
+private abbrev XiFn : ℂ → ℂ := Hyperlocal.xi
+
 /-! ---------------------------------------------------------------------------
-  0. Local "name-drift shields" (replace by theorems once names are confirmed)
+0. Mathlib facts / local shields
 ---------------------------------------------------------------------------- -/
 
-/-- FE for the completed zeta: replace by the actual Mathlib lemma you have. -/
-axiom completedRiemannZeta_FE (s : ℂ) :
-  completedRiemannZeta (1 - s) = completedRiemannZeta s
+/-- FE for completed zeta (Mathlib). -/
+theorem completedRiemannZeta_FE (s : ℂ) :
+    completedRiemannZeta (1 - s) = completedRiemannZeta s := by
+  simpa using (completedRiemannZeta_one_sub (s := s))
 
-/-- RC for the completed zeta: replace by the actual Mathlib lemma you have. -/
-axiom completedRiemannZeta_RC (s : ℂ) :
-  completedRiemannZeta (star s) = star (completedRiemannZeta s)
+/--
+RC shield for completed zeta, in `starRingEnd` form (safe for your simp regime).
 
-/-- Analyticity of the completed zeta: replace by the actual Mathlib lemma you have. -/
+Replace later once you locate the right Mathlib lemma name.
+-/
+axiom completedRiemannZeta_RC' (s : ℂ) :
+    completedRiemannZeta ((starRingEnd ℂ) s) =
+      (starRingEnd ℂ) (completedRiemannZeta s)
+
+/--
+Analyticity shield for completed zeta.
+
+Replace later once you pin down the `AnalyticAt` lemma name in your snapshot.
+-/
 axiom completedRiemannZeta_analyticAt (z : ℂ) :
-  AnalyticAt ℂ completedRiemannZeta z
+    AnalyticAt ℂ completedRiemannZeta z
 
 /-- Route-A handoff: existence of an entire quotient after factoring out the quartet. -/
-axiom Xi_exists_factorisedByQuartet_entire (s : OffSeed Xi) :
-  ∃ G : ℂ → ℂ, FactorisedByQuartet Xi s.ρ 1 G ∧ GrowthOrder.EntireFun G
-
-/-! ## 1. Functional Equation (FE) -/
-
-/--
-**FE**: `Xi (1 - s) = Xi s`.
--/
-theorem Xi_FE : Factorization.FunFE Xi := by
-  intro s
-  dsimp [Xi, xi, oneMinus]
-  rw [completedRiemannZeta_FE s]
-  generalize completedRiemannZeta s = Z
-  ring
-
-/-! ## 2. Reality Condition (RC) -/
-
-/--
-**RC**: `Xi (conj s) = conj (Xi s)`.
--/
-theorem Xi_RC : FactorizationRC.FunRC Xi := by
-  intro s
-  dsimp [Xi, xi]
-
-  -- Explicitly align syntax for the axiom rewrite
-  change star s * (star s - 1) * completedRiemannZeta (star s) = star (s * (s - 1) * completedRiemannZeta s)
-
-  -- Rewrite zeta term
-  rw [completedRiemannZeta_RC s]
-
-  -- Trick: Convert the RHS `star (...)` to `starRingEnd ℂ (...)`
-  -- This allows us to use `map_mul`, `map_sub`, `map_one` which only work on RingHoms.
-  rw [←starRingEnd_apply (s * (s - 1) * completedRiemannZeta s)]
-
-  -- Now expand the structure using the map lemmas
-  simp only [map_mul, map_sub, map_one]
-
-  -- Convert back from starRingEnd to star for the final match
-  simp only [starRingEnd_apply]
-
-/-! ## 3. Entirety -/
-
-/-- **Entirety**: `Xi` is analytic everywhere. -/
-theorem Xi_entire : GrowthOrder.EntireFun Xi := by
-  intro z
-  dsimp [Xi, xi]
-
-  -- Atomic analyticities with EXPLICIT types
-  have h_s : AnalyticAt ℂ (fun w => w) z := analyticAt_id
-  have h_const : AnalyticAt ℂ (fun w => (1 : ℂ)) z := analyticAt_const
-  have h_sub : AnalyticAt ℂ (fun w => w - (1 : ℂ)) z := h_s.sub h_const
-  have h_poly : AnalyticAt ℂ (fun w => w * (w - (1 : ℂ))) z := h_s.mul h_sub
-  have h_zeta : AnalyticAt ℂ completedRiemannZeta z := completedRiemannZeta_analyticAt z
-
-  -- Combine
-  have h_prod : AnalyticAt ℂ (fun w => (w * (w - (1 : ℂ))) * completedRiemannZeta w) z :=
-    h_poly.mul h_zeta
-
-  -- Use 'convert' to match up to associativity
-  convert h_prod using 1
+axiom Xi_exists_factorisedByQuartet_entire (s : OffSeed XiFn) :
+  ∃ G : ℂ → ℂ, FactorisedByQuartet XiFn s.ρ 1 G ∧ GrowthOrder.EntireFun G
 
 /-! ---------------------------------------------------------------------------
-  4. Quartet polynomial: defined explicitly here
+1. Functional Equation (FE)
 ---------------------------------------------------------------------------- -/
 
-/--
-The explicit FE/RC quartet polynomial (order 1): roots are
-`ρ`, `conj ρ`, `1-ρ`, `1-conj ρ`.
--/
+/-- **FE**: `XiFn (1 - s) = XiFn s`. -/
+theorem Xi_FE : Factorization.FunFE XiFn := by
+  intro s
+  dsimp [XiFn, Hyperlocal.xi]
+  -- normalize `oneMinus` convention
+  simp [oneMinus]
+  rw [completedRiemannZeta_FE (s := s)]
+  ring
+
+/-! ---------------------------------------------------------------------------
+2. Reality Condition (RC)
+---------------------------------------------------------------------------- -/
+
+/-- **RC**: `XiFn (conj s) = conj (XiFn s)` (here conj = `starRingEnd`). -/
+theorem Xi_RC : FactorizationRC.FunRC XiFn := by
+  intro s
+  dsimp [XiFn, Hyperlocal.xi]
+  -- rewrite only the zeta term
+  rw [completedRiemannZeta_RC' (s := s)]
+  -- expand ring-hom image safely (NO simp loops)
+  simp only [map_mul, map_sub, map_one, mul_assoc]
+
+/-! ---------------------------------------------------------------------------
+3. Entirety
+---------------------------------------------------------------------------- -/
+
+/-- **Entirety**: `XiFn` is analytic everywhere (as used by `GrowthOrder`). -/
+theorem Xi_entire : GrowthOrder.EntireFun XiFn := by
+  intro z
+
+  -- Force the goal into the exact unfolded shape of your `Hyperlocal.xi`.
+  -- (This avoids definitional-parentheses mismatch entirely.)
+  change AnalyticAt ℂ (fun w : ℂ => w * (w - (1 : ℂ)) * completedRiemannZeta w) z
+
+  have h_id  : AnalyticAt ℂ (fun w : ℂ => w) z := analyticAt_id
+  have h_one : AnalyticAt ℂ (fun _w : ℂ => (1 : ℂ)) z := analyticAt_const
+  have h_sub : AnalyticAt ℂ (fun w : ℂ => w - (1 : ℂ)) z := h_id.sub h_one
+  have h_poly : AnalyticAt ℂ (fun w : ℂ => w * (w - (1 : ℂ))) z := h_id.mul h_sub
+  have h_zeta : AnalyticAt ℂ completedRiemannZeta z :=
+    completedRiemannZeta_analyticAt (z := z)
+
+  have h_prod :
+      AnalyticAt ℂ (fun w : ℂ => (w * (w - (1 : ℂ))) * completedRiemannZeta w) z :=
+    h_poly.mul h_zeta
+
+  -- Only reassociate; DO NOT rewrite `w - 1` into `w + -1`.
+  simpa [mul_assoc] using h_prod
+
+/-! ---------------------------------------------------------------------------
+4. Quartet polynomial
+---------------------------------------------------------------------------- -/
+
+/-- Explicit FE/RC quartet polynomial (order 1). -/
 def Rquartet (ρ : ℂ) : Polynomial ℂ :=
   (X - C ρ) * (X - C (star ρ)) * (X - C (1 - ρ)) * (X - C (1 - star ρ))
 
@@ -125,8 +138,7 @@ lemma Rquartet_eval_star (ρ : ℂ) : (Rquartet ρ).eval (star ρ) = 0 := by sim
 lemma Rquartet_eval_oneMinus (ρ : ℂ) : (Rquartet ρ).eval (1 - ρ) = 0 := by simp [Rquartet]
 lemma Rquartet_eval_oneMinus_star (ρ : ℂ) : (Rquartet ρ).eval (1 - star ρ) = 0 := by simp [Rquartet]
 
-/-- Packaged quartet-root statement. -/
-lemma R_quartet_zeros (s : OffSeed Xi) :
+lemma R_quartet_zeros (s : OffSeed XiFn) :
     (Rquartet s.ρ).eval s.ρ = 0 ∧
     (Rquartet s.ρ).eval (star s.ρ) = 0 ∧
     (Rquartet s.ρ).eval (1 - s.ρ) = 0 ∧
@@ -136,14 +148,12 @@ lemma R_quartet_zeros (s : OffSeed Xi) :
   refine And.intro (Rquartet_eval_oneMinus s.ρ) ?_
   exact Rquartet_eval_oneMinus_star s.ρ
 
-/-! ## 5. Factorisation and entire quotient G (Route A handoff) -/
+/-! ---------------------------------------------------------------------------
+5. Factorisation handoff
+---------------------------------------------------------------------------- -/
 
-/--
-**Crucial Route-A handoff**: factor out the quartet polynomial and obtain an entire `G`.
-Uses the local axiom `Xi_exists_factorisedByQuartet_entire`.
--/
-theorem G_Xi_entire (s : OffSeed Xi) :
-    ∃ G : ℂ → ℂ, FactorisedByQuartet Xi s.ρ 1 G ∧ GrowthOrder.EntireFun G := by
+theorem G_Xi_entire (s : OffSeed XiFn) :
+    ∃ G : ℂ → ℂ, FactorisedByQuartet XiFn s.ρ 1 G ∧ GrowthOrder.EntireFun G := by
   exact Xi_exists_factorisedByQuartet_entire s
 
 end XiPacket
