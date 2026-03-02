@@ -1,24 +1,27 @@
 /-
   Hyperlocal/Targets/RiemannXi.lean
-
-  Target definition of the Riemann ξ-function used by the v4.0/v4.1 track.
-
-  We use the classical multiplicative completion (up to the standard nonzero
-  scalar factors already inside `completedRiemannZeta`):
-
-      ξ(s) := s * (s - 1) * completedRiemannZeta s.
-
-  This shares the same nontrivial zeros as ζ (away from the real axis).
 -/
 
-import Hyperlocal.Targets.RiemannZeta
-import Mathlib.Tactic
+import Mathlib.NumberTheory.LSeries.RiemannZeta
 
+set_option autoImplicit false
 noncomputable section
 
 namespace Hyperlocal
 
-/-- Riemann ξ-function target: `s * (s - 1) * completedRiemannZeta s`. -/
-abbrev xi : ℂ → ℂ := fun s => s * (s - 1) * completedRiemannZeta s
+open Complex
+
+/--
+Riemann xi-function used by the Hyperlocal development.
+
+IMPORTANT:
+We use the **entire extension** of the pole-cancelled product:
+  xi(s) := s (s - 1) Λ₀(s) + 1.
+
+This agrees with the raw product `s(s-1)Λ(s)` on `s ≠ 0, 1`,
+but unlike the raw product it is analytic at `0` and `1` in Lean
+(avoids the `inv 0 = 0` definitional pathology).
+-/
+abbrev xi : ℂ → ℂ := fun s => s * (s - 1) * completedRiemannZeta₀ s + 1
 
 end Hyperlocal

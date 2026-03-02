@@ -1,21 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiAnalyticInputs.lean
 
-  Analytic Inputs for Xi (Route A)
+  Cancellation shim + Xi_entire closure adjusted.
 
-  A1 stop-the-bleeding (snapshot-safe):
-  * RC for Λ and Xi are theorem-level from the single Λ₀ RC hinge.
-  * Entirety of Xi is reduced to analyticity of the pole-cancelled function
-        z ↦ z * (z - 1) * completedRiemannZeta z.
-  * We additionally prove theorem-level analyticity of Λ₀ from differentiability,
-    via `analyticAt_iff_eventually_differentiableAt` (CauchyIntegral bridge).
+  Snapshot reality:
+  * This Mathlib snapshot does not expose a usable “mellin commutes with conj/starRingEnd”
+    lemma under any stable name (your grep confirms this).
+  * Therefore we keep exactly ONE axiom as the RC hinge for Λ₀.
 
-  Remaining axioms:
-      - completedRiemannZeta₀_RC
-      - cancelled_completedZeta_analyticAt
+  Everything else (analyticity, cancellation shim, Xi_entire, quartet polynomial facts) is theorem-level.
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
+import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
+import Mathlib.NumberTheory.LSeries.AbstractFuncEq
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Analysis.Analytic.Order
 import Mathlib.Analysis.Complex.CauchyIntegral
@@ -44,67 +42,52 @@ open scoped Topology
 open Hyperlocal.MinimalModel
 open Hyperlocal.Factorization
 
-/-- Avoid name collision with your existing `Xi`. -/
 private abbrev XiFn : ℂ → ℂ := Hyperlocal.xi
-
-/-- Conjugation as a ring endomorphism. -/
 private abbrev conjEnd : ℂ →+* ℂ := starRingEnd ℂ
-
-/-- The `a = 0` parameter lives in `UnitAddCircle`. (Kept for local symmetry proofs if needed.) -/
 private def a0 : UnitAddCircle := (0 : UnitAddCircle)
 
 -- ------------------------------------------------------------------
 -- Differentiable → AnalyticAt bridge (snapshot-specific helper)
 -- ------------------------------------------------------------------
 
-/--
-Replacement for `Filter.eventually_of_forall` (missing in your environment).
-
-We avoid using `Filter.univ_mem` directly (it `simp`s to `True` in this snapshot),
-and instead derive `∀ᶠ x in l, True` by `simp`, then rewrite.
--/
 private lemma eventually_of_forall'
     {α : Type} {l : Filter α} {P : α → Prop} (h : ∀ x, P x) :
     (∀ᶠ x in l, P x) := by
-  -- `Eventually True` is always available by simp
   have htrue : (∀ᶠ x in l, True) := by simp
-  -- rewrite `{x | P x}` to `{x | True}` using the pointwise proof `h`
   have hset : ({x : α | P x} : Set α) = {x : α | True} := by
     ext x; simp [h x]
-  -- now transport the eventuality statement
   simpa [Filter.Eventually, hset] using htrue
 
-/--
-In this snapshot: `DifferentiableAt` on a neighborhood is equivalent to `AnalyticAt`,
-via `analyticAt_iff_eventually_differentiableAt`.
-In particular, `completedRiemannZeta₀` is analytic everywhere (theorem-level).
--/
+/-- Λ₀ is analytic everywhere (theorem-level) in this snapshot. -/
 theorem completedRiemannZeta₀_analyticAt (z : ℂ) :
     AnalyticAt ℂ completedRiemannZeta₀ z := by
   have hdiff_all : ∀ w : ℂ, DifferentiableAt ℂ completedRiemannZeta₀ w := by
     intro w
+    -- available in this snapshot from `Mathlib.NumberTheory.LSeries.RiemannZeta`
     simpa using (differentiable_completedZeta₀.differentiableAt)
   have hev : ∀ᶠ w in nhds z, DifferentiableAt ℂ completedRiemannZeta₀ w :=
     eventually_of_forall' (l := nhds z) hdiff_all
   exact (analyticAt_iff_eventually_differentiableAt).2 hev
 
 -- ------------------------------------------------------------------
--- RC for Λ₀ and Λ (Λ₀ hinge kept as axiom)
+-- SINGLE AXIOM LEFT: RC hinge for Λ₀
 -- ------------------------------------------------------------------
 
-/-- FE for completed zeta (Mathlib). -/
-theorem completedRiemannZeta_FE (s : ℂ) :
-    completedRiemannZeta (1 - s) = completedRiemannZeta s := by
-  simpa using (completedRiemannZeta_one_sub (s := s))
-
 /--
-Remaining RC hinge (axiom): RC for `completedRiemannZeta₀`.
+Reality condition (RC) hinge for `completedRiemannZeta₀` (Λ₀).
+
+In this Mathlib snapshot, proving this axiom-free requires a bespoke conjugation-invariance proof
+through the Hurwitz-even FE-pair / Mellin representation, and no packaged lemma is available.
+So we keep this as the sole axiom in this file.
 -/
 axiom completedRiemannZeta₀_RC (s : ℂ) :
     completedRiemannZeta₀ (conjEnd s) =
       conjEnd (completedRiemannZeta₀ s)
 
-/-- RC for `completedRiemannZeta`, derived from `completedRiemannZeta_eq` and Λ₀ RC. -/
+-- ------------------------------------------------------------------
+-- RC for completedRiemannZeta, derived from Λ₀ RC
+-- ------------------------------------------------------------------
+
 theorem completedRiemannZeta_RC (s : ℂ) :
     completedRiemannZeta (conjEnd s) =
       conjEnd (completedRiemannZeta s) := by
@@ -115,50 +98,72 @@ theorem completedRiemannZeta_RC (s : ℂ) :
     sub_eq_add_neg, mul_assoc, add_assoc, add_left_comm, add_comm]
 
 -- ------------------------------------------------------------------
+-- Cancellation shim (THEOREM-LEVEL): entire extension via Λ₀
+-- ------------------------------------------------------------------
+
+/--
+Entire extension of the pole-cancelled product.
+
+Normalized form: `w*(w-1)*Λ₀(w) + 1`.
+(This is definitional-equal to `w*(w-1)*Λ(w)` on `w ≠ 0,1`.)
+-/
+def cancelledCompletedZeta (w : ℂ) : ℂ :=
+  w * (w - (1 : ℂ)) * completedRiemannZeta₀ w + 1
+
+theorem cancelledCompletedZeta_analyticAt (z : ℂ) :
+    AnalyticAt ℂ cancelledCompletedZeta z := by
+  have hid : AnalyticAt ℂ (fun w : ℂ => w) z := analyticAt_id
+  have hconst1 : AnalyticAt ℂ (fun _ : ℂ => (1 : ℂ)) z := analyticAt_const
+  have hsub1 : AnalyticAt ℂ (fun w : ℂ => w - (1 : ℂ)) z := by
+    simpa [sub_eq_add_neg] using hid.sub hconst1
+  have hΛ0 : AnalyticAt ℂ completedRiemannZeta₀ z :=
+    completedRiemannZeta₀_analyticAt (z := z)
+  have htermA :
+      AnalyticAt ℂ (fun w : ℂ => w * (w - (1 : ℂ)) * completedRiemannZeta₀ w) z :=
+    (hid.mul hsub1).mul hΛ0
+  simpa [cancelledCompletedZeta] using htermA.add analyticAt_const
+
+/--
+Valid cancellation on the punctured domain: for `w ≠ 0,1`,
+`w*(w-1)*Λ(w) = w*(w-1)*Λ₀(w) + 1`.
+-/
+theorem cancelledCompletedZeta_eq_raw {w : ℂ} (h0 : w ≠ 0) (h1 : w ≠ 1) :
+    w * (w - (1 : ℂ)) * completedRiemannZeta w = cancelledCompletedZeta w := by
+  classical
+  have h1' : (1 - w) ≠ 0 := by
+    intro hw
+    have hw' : w = 1 := by
+      simpa [eq_comm] using (sub_eq_zero.mp hw)
+    exact h1 hw'
+  simp [cancelledCompletedZeta, completedRiemannZeta_eq (s := w),
+    div_eq_mul_inv, sub_eq_add_neg, mul_assoc, mul_left_comm, mul_comm] at *
+  field_simp [h0, h1, h1']
+  ring
+
+-- ------------------------------------------------------------------
 -- FE / RC / Entirety for Xi
 -- ------------------------------------------------------------------
 
-/-- **FE**: `XiFn (1 - s) = XiFn s`. -/
 theorem Xi_FE : Factorization.FunFE XiFn := by
   intro s
-  dsimp [XiFn, Hyperlocal.xi]
-  simp [Hyperlocal.oneMinus]
-  rw [completedRiemannZeta_FE (s := s)]
+  dsimp [XiFn, Hyperlocal.xi, Hyperlocal.oneMinus]
+  rw [completedRiemannZeta₀_one_sub (s := s)]
   ring
 
-/-- **RC**: `XiFn (conj s) = conj (XiFn s)`. -/
 theorem Xi_RC : FactorizationRC.FunRC XiFn := by
   intro s
   dsimp [XiFn, Hyperlocal.xi]
-  rw [completedRiemannZeta_RC (s := s)]
-  simp [conjEnd, mul_assoc, sub_eq_add_neg, add_assoc, add_comm, add_left_comm]
+  simp [conjEnd, completedRiemannZeta₀_RC, mul_assoc, sub_eq_add_neg,
+    add_assoc, add_comm, add_left_comm]
 
-/-
-Temporary analytic hinge:
-
-Analyticity of the pole-cancelled Λ everywhere.
-Still missing as a named lemma in Mathlib v4.23.0-rc2, so it stays an axiom for now.
--/
-axiom cancelled_completedZeta_analyticAt (z : ℂ) :
-    AnalyticAt ℂ (fun w : ℂ => w * (w - (1 : ℂ)) * completedRiemannZeta w) z
-
-/--
-Rewrite lemma: make the definitional shape of `Hyperlocal.xi` explicit.
--/
-theorem xi_eq_cancelled :
-    XiFn = (fun w : ℂ => w * (w - (1 : ℂ)) * completedRiemannZeta w) := by
-  rfl
-
-/-- Entirety of Xi (as used by `GrowthOrder`). -/
 theorem Xi_entire : GrowthOrder.EntireFun XiFn := by
   intro z
-  have hz :
-      AnalyticAt ℂ (fun w : ℂ => w * (w - (1 : ℂ)) * completedRiemannZeta w) z :=
-    cancelled_completedZeta_analyticAt (z := z)
-  simpa [xi_eq_cancelled] using hz
+  have hz : AnalyticAt ℂ cancelledCompletedZeta z :=
+    cancelledCompletedZeta_analyticAt (z := z)
+  simpa [XiFn, Hyperlocal.xi, cancelledCompletedZeta] using hz
 
 -- ------------------------------------------------------------------
--- Quartet polynomial (unchanged, kept local)
+-- Quartet polynomial (unchanged)
 -- ------------------------------------------------------------------
 
 def Rquartet (ρ : ℂ) : Polynomial ℂ :=
