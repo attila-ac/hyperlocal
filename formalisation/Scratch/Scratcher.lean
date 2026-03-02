@@ -1,14 +1,8 @@
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
+import Mathlib.NumberTheory.LSeries.AbstractFuncEq
+
 open Complex
-private abbrev conjEnd : ℂ →+* ℂ := starRingEnd ℂ
 
-#check HurwitzZeta.completedHurwitzZetaEven₀
-
-#find HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) (conjEnd _) =
-      conjEnd (HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) _)
-
-#find HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) (star _) =
-      star (HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) _)
-
-#find HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) (IsROrC.conj _) =
-      IsROrC.conj (HurwitzZeta.completedHurwitzZetaEven₀ (0:UnitAddCircle) _)
+#check HurwitzZeta.hurwitzEvenFEPair
+#check (HurwitzZeta.hurwitzEvenFEPair (0 : UnitAddCircle))
+-- then type: ".Λ₀_" or ".Lambda0_" and let editor autocomplete

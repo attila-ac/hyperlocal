@@ -1,21 +1,22 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean
 
-  Cycle-safe nondegeneracy boundary (AXIOM-FREE):
+  Two-prime determinant nondegeneracy (AXIOM-FREE):
 
-  We prove an exact closed form for the two-prime 2×2 determinant built from
-  PrimeTrigPacket.aCoeff/bCoeff at p=2,3:
+  Closed form for the two-prime 2×2 determinant at primes 2 and 3 built from
+  PrimeTrigPacket.aCoeff / bCoeff:
 
-    det23R(σ,t) = aCoeff σ t 2 * bCoeff σ t 3 - aCoeff σ t 3 * bCoeff σ t 2
-                = pSigma σ 2 * pSigma σ 3 * sin(t * log(3/2)).
+    det23R(σ,t)
+      = aCoeff σ t 2 * bCoeff σ t 3 - aCoeff σ t 3 * bCoeff σ t 2
+      = pSigma σ 2 * pSigma σ 3 * sin(t * log(3/2)).
 
-  Consequently:
+  Consequences:
     sin(t * log(3/2)) ≠ 0  ⇒  det23R(σ,t) ≠ 0
   and the same for the ℂ-cast determinant used downstream.
 
   NOTE:
-  - This file intentionally does NOT mention XiTransport.delta.
-    The determinant depends on the height `t`.
+  - No transport/jet/window imports.
+  - Pure ℝ/ℂ algebra only (simp/ring + trig identity).
 -/
 
 import Hyperlocal.Transport.PrimeTrigPacket
@@ -42,6 +43,13 @@ def det23R (σ t : ℝ) : ℝ :=
   aCoeff σ t (2 : ℝ) * bCoeff σ t (3 : ℝ)
     - aCoeff σ t (3 : ℝ) * bCoeff σ t (2 : ℝ)
 
+/-- Convenience: `log(3/2) = log 3 - log 2` (using `Real.log_div`). -/
+lemma log_three_div_two :
+    Real.log ((3 : ℝ) / (2 : ℝ)) = Real.log (3 : ℝ) - Real.log (2 : ℝ) := by
+  have h3 : (3 : ℝ) ≠ 0 := by norm_num
+  have h2 : (2 : ℝ) ≠ 0 := by norm_num
+  simpa using (Real.log_div h3 h2)
+
 /--
 Closed form:
   det23R(σ,t) = pSigma σ 2 * pSigma σ 3 * sin(t*log(3/2)).
@@ -52,16 +60,33 @@ theorem det23R_eq_pSigma_mul_sin_log_ratio (σ t : ℝ) :
     (pSigma σ (2 : ℝ)) * (pSigma σ (3 : ℝ)) *
       Real.sin (t * Real.log ((3 : ℝ) / (2 : ℝ))) := by
   classical
-  -- expand aCoeff/bCoeff; do the trig identity in ℝ
+
+  -- Expand the PrimeTrigPacket coefficients.
+  -- (aCoeff/bCoeff are real-valued; this is pure ℝ algebra.)
   unfold det23R aCoeff bCoeff
 
-  -- trig core: sin(x-y)=sin x * cos y - cos x * sin y
-  have hsin_sub :
-      Real.cos (t * Real.log (2 : ℝ)) * Real.sin (t * Real.log (3 : ℝ))
-        - Real.cos (t * Real.log (3 : ℝ)) * Real.sin (t * Real.log (2 : ℝ))
+  -- Factor out the pSigma weights.
+  have hfactor :
+      pSigma σ (2 : ℝ) * Real.cos (t * Real.log (2 : ℝ)) *
+            (pSigma σ (3 : ℝ) * Real.sin (t * Real.log (3 : ℝ)))
+        -
+      pSigma σ (3 : ℝ) * Real.cos (t * Real.log (3 : ℝ)) *
+            (pSigma σ (2 : ℝ) * Real.sin (t * Real.log (2 : ℝ)))
+        =
+      (pSigma σ (2 : ℝ) * pSigma σ (3 : ℝ)) *
+        (Real.cos (t * Real.log (2 : ℝ)) * Real.sin (t * Real.log (3 : ℝ))
+          - Real.cos (t * Real.log (3 : ℝ)) * Real.sin (t * Real.log (2 : ℝ))) := by
+    ring
+
+  -- Trig identity (re-ordered): cos(b)*sin(a) - cos(a)*sin(b) = sin(a-b).
+  have htrig :
+      (Real.cos (t * Real.log (2 : ℝ)) * Real.sin (t * Real.log (3 : ℝ))
+        - Real.cos (t * Real.log (3 : ℝ)) * Real.sin (t * Real.log (2 : ℝ)))
         =
       Real.sin (t * Real.log (3 : ℝ) - t * Real.log (2 : ℝ)) := by
+    -- `Real.sin_sub a b : sin(a-b) = sin a * cos b - cos a * sin b`
     have h := Real.sin_sub (t * Real.log (3 : ℝ)) (t * Real.log (2 : ℝ))
+    -- rewrite `sin a * cos b` as `cos b * sin a`, then flip.
     have :
         Real.sin (t * Real.log (3 : ℝ) - t * Real.log (2 : ℝ))
           =
@@ -70,37 +95,33 @@ theorem det23R_eq_pSigma_mul_sin_log_ratio (σ t : ℝ) :
       simpa [mul_comm, mul_left_comm, mul_assoc] using h
     exact this.symm
 
-  -- log rewrite: t*log3 - t*log2 = t*log(3/2)
+  -- Rewrite the difference of logs into the log-ratio.
   have hlog :
       t * Real.log (3 : ℝ) - t * Real.log (2 : ℝ)
         =
       t * Real.log ((3 : ℝ) / (2 : ℝ)) := by
-    have hpos3 : (0 : ℝ) < (3 : ℝ) := by norm_num
-    have hpos2 : (0 : ℝ) < (2 : ℝ) := by norm_num
-    have hdiv :
-        Real.log ((3 : ℝ) / (2 : ℝ)) = Real.log (3 : ℝ) - Real.log (2 : ℝ) := by
-      simpa [div_eq_mul_inv] using (Real.log_div hpos3.ne' hpos2.ne')
     calc
       t * Real.log (3 : ℝ) - t * Real.log (2 : ℝ)
           = t * (Real.log (3 : ℝ) - Real.log (2 : ℝ)) := by ring
       _   = t * Real.log ((3 : ℝ) / (2 : ℝ)) := by
-            simpa using congrArg (fun x => t * x) hdiv.symm
+            simpa using congrArg (fun x => t * x) (log_three_div_two).symm
 
+  -- Assemble.
   calc
     pSigma σ (2 : ℝ) * Real.cos (t * Real.log (2 : ℝ)) *
           (pSigma σ (3 : ℝ) * Real.sin (t * Real.log (3 : ℝ)))
       -
-      pSigma σ (3 : ℝ) * Real.cos (t * Real.log (3 : ℝ)) *
+    pSigma σ (3 : ℝ) * Real.cos (t * Real.log (3 : ℝ)) *
           (pSigma σ (2 : ℝ) * Real.sin (t * Real.log (2 : ℝ)))
         =
       (pSigma σ (2 : ℝ) * pSigma σ (3 : ℝ)) *
         (Real.cos (t * Real.log (2 : ℝ)) * Real.sin (t * Real.log (3 : ℝ))
           - Real.cos (t * Real.log (3 : ℝ)) * Real.sin (t * Real.log (2 : ℝ))) := by
-      ring
+      simpa using hfactor
   _ =
       (pSigma σ (2 : ℝ) * pSigma σ (3 : ℝ)) *
         Real.sin (t * Real.log (3 : ℝ) - t * Real.log (2 : ℝ)) := by
-      simp [hsin_sub]
+      simp [htrig]
   _ =
       (pSigma σ (2 : ℝ) * pSigma σ (3 : ℝ)) *
         Real.sin (t * Real.log ((3 : ℝ) / (2 : ℝ))) := by
@@ -115,22 +136,21 @@ theorem det23R_ne_zero_of_sin_log_ratio_ne_zero
     (σ t : ℝ)
     (hsin : Real.sin (t * Real.log ((3 : ℝ) / (2 : ℝ))) ≠ 0) :
     det23R σ t ≠ 0 := by
-  have hexp2 : pSigma σ (2 : ℝ) ≠ 0 := by
+  have hp2 : pSigma σ (2 : ℝ) ≠ 0 := by
     simpa [pSigma] using (Real.exp_ne_zero (-σ * Real.log (2 : ℝ)))
-  have hexp3 : pSigma σ (3 : ℝ) ≠ 0 := by
+  have hp3 : pSigma σ (3 : ℝ) ≠ 0 := by
     simpa [pSigma] using (Real.exp_ne_zero (-σ * Real.log (3 : ℝ)))
 
   have hform := det23R_eq_pSigma_mul_sin_log_ratio (σ := σ) (t := t)
 
-  intro hdet
-  have : (pSigma σ (2 : ℝ)) * (pSigma σ (3 : ℝ)) *
-            Real.sin (t * Real.log ((3 : ℝ) / (2 : ℝ))) = 0 := by
-    simpa [hform] using hdet
+  -- Product nonzero, hence determinant nonzero.
+  have hprod :
+      (pSigma σ (2 : ℝ)) * (pSigma σ (3 : ℝ)) *
+        Real.sin (t * Real.log ((3 : ℝ) / (2 : ℝ))) ≠ 0 :=
+    mul_ne_zero (mul_ne_zero hp2 hp3) hsin
 
-  have hprod : (pSigma σ (2 : ℝ)) * (pSigma σ (3 : ℝ)) ≠ 0 :=
-    mul_ne_zero hexp2 hexp3
-
-  exact hsin ((mul_eq_zero.mp this).resolve_left hprod)
+  -- Use `simpa` (NOT `simp ... using`) to rewrite det23R into the closed form.
+  simpa [hform] using hprod
 
 /-- The same determinant but viewed in ℂ (the exact shape Stage-2 uses). -/
 theorem det23C_eq_of_det23R (σ t : ℝ) :
@@ -139,7 +159,7 @@ theorem det23C_eq_of_det23R (σ t : ℝ) :
     (aCoeff σ t (2 : ℝ) : ℂ) * (bCoeff σ t (3 : ℝ) : ℂ)
       -
     (aCoeff σ t (3 : ℝ) : ℂ) * (bCoeff σ t (2 : ℝ) : ℂ) := by
-  simp [det23R, sub_eq_add_neg, mul_add, add_mul]
+  simp [det23R]
 
 /-- Complex determinant nonzero if the sine-factor is nonzero (ready for Stage-2). -/
 theorem det23C_ne_zero_of_sin_log_ratio_ne_zero
@@ -151,16 +171,15 @@ theorem det23C_ne_zero_of_sin_log_ratio_ne_zero
   have hR : det23R σ t ≠ 0 :=
     det23R_ne_zero_of_sin_log_ratio_ne_zero (σ := σ) (t := t) hsin
   intro hC
-  have : ((det23R σ t : ℝ) : ℂ) = 0 := by
+  have hC' : ((det23R σ t : ℝ) : ℂ) = 0 := by
     simpa [det23C_eq_of_det23R (σ := σ) (t := t)] using hC
-  have : (det23R σ t : ℝ) = 0 := by
-    simpa using (show ((det23R σ t : ℝ) : ℂ) = 0 from this)
-  exact hR this
+  have hR0 : (det23R σ t : ℝ) = 0 := by
+    exact_mod_cast hC'
+  exact hR hR0
 
-/-
-Push-A micro-gate (guardrails-facing):
-
-Use `tval := ((sin(t*log(3/2)) : ℝ) : ℂ)` directly.
+/--
+Guardrails-facing micro-gate:
+if the ℂ-cast sine-factor is nonzero, then the ℂ determinant is nonzero.
 -/
 theorem det23C_ne_zero_of_tval_ne_zero
     (σ t : ℝ)

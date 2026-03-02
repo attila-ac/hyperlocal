@@ -1,14 +1,14 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiWindowScNonvanishing.lean
+  XiWindowScNonvanishing.lean
 
-  Cycle-safe semantic endpoint: nonvanishing (in real part) of `Xi` at the
-  critical-line anchor point `sc s`.
+  DEPRECATED LEGACY ENDPOINT.
 
-  NEXT STEP (Task B):
-  Replace the axiom `xi_sc_re_ne_zero` by a theorem proved from `XiAnalyticInputs`.
-  Downstream should consume `xi_sc_re_ne_zero_of_analytic` (stable name).
+  This file is retained only for older branches that still expect a lemma
+  `xi_sc_re_ne_zero` / `xi_sc_re_ne_zero_of_analytic`.
+
+  The W1 / Plan C++J pipeline MUST NOT import this file.
+  Use `xiJetNonflat_re_exists` + `xiJetPivotOrder_spec` instead.
 -/
-
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 
 set_option autoImplicit false
@@ -20,16 +20,10 @@ namespace XiPacket
 
 open Complex
 
-/--
-Semantic endpoint (temporary): the real part of `Xi` at the critical-line anchor `sc s` is nonzero.
--/
+/-- Legacy semantic endpoint (temporary compatibility). -/
 axiom xi_sc_re_ne_zero (s : OffSeed Xi) : (Xi (sc s)).re ≠ 0
 
-/--
-Future-facing theorem name for Task B.
-
-For now, it is just the axiom. Later, replace the body by the real proof and delete the axiom.
--/
+/-- Legacy “future-facing” name; still just the compatibility axiom. -/
 theorem xi_sc_re_ne_zero_of_analytic (s : OffSeed Xi) : (Xi (sc s)).re ≠ 0 := by
   simpa using (xi_sc_re_ne_zero (s := s))
 

@@ -1,7 +1,19 @@
+/-
+  Hyperlocal/Targets/XiPacket/XiJetNonflatOfAnalytic.lean
+
+  Plan C++J semantic endpoint (temporary):
+
+  Provide jet-nonflatness at the critical-line anchor `sc s` in a form usable by
+  the jet-pivot window constructor, without any value-level assumption like
+  `Re (Xi (sc s)) ≠ 0`.
+
+  Later this should be discharged from analyticity + `Xi` not identically zero
+  (identity theorem / nonflatness).
+-/
+
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Mathlib.Analysis.Calculus.IteratedDeriv.Defs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -11,16 +23,10 @@ namespace Targets
 namespace XiPacket
 
 open Complex
-open scoped BigOperators
-open Hyperlocal.Transport
 
-/-- Semantic endpoint: there exists some jet coordinate with nonzero real part. -/
-theorem xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
-  ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 := by
-  -- Discharge using the anchor nonvanishing at `m = 0`.
-  refine ⟨0, ?_⟩
-  -- `cderivIter 0 Xi = Xi`.
-  simpa [cderivIter] using (xi_sc_re_ne_zero_of_analytic (s := s))
+/-- Semantic endpoint (temporary): some jet has nonzero real part at `sc s`. -/
+axiom xiJetNonflat_re_exists (s : OffSeed Xi) :
+    ∃ m : ℕ, ((cderivIter m Xi) (sc s)).re ≠ 0
 
 end XiPacket
 end Targets

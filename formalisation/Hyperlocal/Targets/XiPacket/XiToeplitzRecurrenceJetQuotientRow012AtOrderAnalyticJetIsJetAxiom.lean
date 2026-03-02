@@ -1,21 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetIsJetAxiom.lean
 
-  Stage-only installer (Step 4.5 staging):
+  AXIOM-FREE installer:
 
-  Installs `TAC.XiJetWindowIsJetAtOrderProvider` via axioms.
+  Previously this file staged `XiJetWindowIsJetAtOrderProvider` via axioms
+  `jet_w0At_axiom / jet_wp2At_axiom / jet_wp3At_axiom`.
 
-  Why:
-  * The remaining analytic cliff is naturally expressed as jet predicates
-      IsJet3AtOrder m (z_?At s) (?At m s)
-    for w0/wp2/wp3.
-  * Once these jets are proved theorem-level, the provider instance becomes theorem-level.
-  * Until then, this file provides a *localized* staged instance to keep the DAG green.
+  Now we derive those jets theorem-level from the already-available
+  window-equality provider `[XiJetWindowEqAtOrderProvider]` using the
+  analytic-jet bundle `xiJetQuotRow012AtOrder_analyticJet`.
 
-  IMPORTANT:
-  Prefer importing the provider surface:
-    XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets.lean
-  and only import THIS file when intentionally staging jets.
+  Net effect:
+  * importing this file never introduces axioms,
+  * and you still get `XiJetWindowIsJetAtOrderProvider` wherever
+    `XiJetWindowEqAtOrderProvider` is available.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
@@ -29,27 +27,30 @@ namespace XiPacket
 
 namespace TAC
 
-/-- Staged axiom: `w0At` is an order-m Jet3 window at the anchor `z_w0At`. -/
-axiom jet_w0At_axiom (m : ℕ) (s : OffSeed Xi) :
-  IsJet3AtOrder m (z_w0At s) (w0At m s)
-
-/-- Staged axiom: `wp2At` is an order-m Jet3 window at the anchor `z_wp2At`. -/
-axiom jet_wp2At_axiom (m : ℕ) (s : OffSeed Xi) :
-  IsJet3AtOrder m (z_wp2At s) (wp2At m s)
-
-/-- Staged axiom: `wp3At` is an order-m Jet3 window at the anchor `z_wp3At`. -/
-axiom jet_wp3At_axiom (m : ℕ) (s : OffSeed Xi) :
-  IsJet3AtOrder m (z_wp3At s) (wp3At m s)
-
 /--
-Stage-only instance installer:
-`XiJetWindowIsJetAtOrderProvider` (and therefore `XiJetWindowEqAtOrderProvider`)
-is now available wherever this file is imported.
+Axiom-free instance installer:
+
+If `[XiJetWindowEqAtOrderProvider]` is available (the theorem-level window equalities),
+then the jet predicates `IsJet3AtOrder` for `w0At/wp2At/wp3At` follow automatically
+via `XiJetQuotRow012AtOrder_AnalyticJet.jet_*`.
 -/
-instance : XiJetWindowIsJetAtOrderProvider where
-  jet_w0At  := jet_w0At_axiom
-  jet_wp2At := jet_wp2At_axiom
-  jet_wp3At := jet_wp3At_axiom
+instance (priority := 1000)
+    [XiJetWindowEqAtOrderProvider] : XiJetWindowIsJetAtOrderProvider where
+  jet_w0At := by
+    intro m s
+    simpa using
+      (XiJetQuotRow012AtOrder_AnalyticJet.jet_w0At
+        (P := xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+  jet_wp2At := by
+    intro m s
+    simpa using
+      (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp2At
+        (P := xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
+  jet_wp3At := by
+    intro m s
+    simpa using
+      (XiJetQuotRow012AtOrder_AnalyticJet.jet_wp3At
+        (P := xiJetQuotRow012AtOrder_analyticJet (m := m) (s := s)))
 
 end TAC
 
