@@ -1,47 +1,25 @@
 /-
   Hyperlocal/Targets/XiPacket/XiWindowPayloadFromRecurrenceAtOrder.lean
 
-  Plan C++J (Jet Pivot): build a usable `WindowPayload` for ξ without any
-  value-level anchor nonvanishing.
+  Plan C++J (Jet Pivot): build a usable `WindowPayload` for ξ.
 
-  CURRENT STATE (green + parallel-track):
+  AXIOM-FREE (dslope-native):
 
-  * We now have an AXIOM-FREE analytic nonflatness theorem in
-      `XiJetNonflatOfAnalytic.lean`:
-        `xiJetNonflat_dslope_exists :
-           ∀ s, ∃ m, ((Function.swap dslope (sc s))^[m] Xi) (sc s) ≠ 0`.
+  * Choose the pivot order `m` from the theorem-level dslope witness
+        `xiJetNonflat_dslope_exists`.
 
-    However, in your Mathlib snapshot there is still no shipped bridge from this
-    dslope-iterate witness to the *jet* witness used by the κ-gate lemmas in
-    `XiLemmaC_RecurrenceToEllKappaAtOrder.lean` (which currently consume
-    `cderivIter` / real/imag parts).
+  * Obtain the κ-gate at the same order using
+        `hkappaAt_of_dslopeIter_ne0` (in `XiDslopeToKappaAtOrder.lean`).
 
-  * Therefore this file keeps the build GREEN by keeping a single *local shim*
-    axiom under the legacy interface:
-        `xiJetNonflat_re_exists : ∃ m, Re((cderivIter m Xi) (sc s)) ≠ 0`.
+  * Obtain ℓ-output at the same order from the Toeplitz recurrence arm:
+        `xiToeplitzEllOutAt_fromRecurrenceC`.
 
-  * Parallel track: once you add the dslope→κ lemma (or refactor κ-gates to
-    consume dslope directly), you can delete the shim and switch `xiJetPivotOrder`
-    to choose from `xiJetNonflat_dslope_exists`.
-
-  Inputs (and only inputs) for the green path:
-
-  * Jet nonflatness at some order `m` (local shim axiom):
-      `xiJetNonflat_re_exists : ∃ m, Re(Ξ^{(m)}(sc s)) ≠ 0`.
-
-  * AtOrder ℓ-output from the Toeplitz recurrence arm:
-      `xiToeplitzEllOutAt_fromRecurrenceC : XiToeplitzEllOutAt m s`.
-
-  Together with the closed-form κ-at-order identity, these yield κ≠0 at that
-  same order, and hence a full `WindowPayload (σ s) (t s)` built from the
-  jet-pivot windows `w0At/wp2At/wp3At`.
-
-  Downstream Stage-3 uses only `WindowPayloadFacts`.
+  This deletes the previous local shim axiom `xiJetNonflat_re_exists`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
-import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappaAtOrder
+import Hyperlocal.Targets.XiPacket.XiDslopeToKappaAtOrder
 import Hyperlocal.Targets.XiPacket.WindowPayload
 import Hyperlocal.Targets.XiPacket.Vectorize
 import Hyperlocal.Transport.PrimeTrigPacket
@@ -57,16 +35,6 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
-
-/-!
-### TEMP SHIM (green path)
-
-This file still consumes κ-gate lemmas stated in terms of `cderivIter` / Re/Im.
-Until the dslope-iterate witness is wired into κ (either by a bridge lemma or by
-refactoring κ-gates), we keep the old interface as a *local axiom* here.
--/
-axiom xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
-    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0
 
 /-! ### Jet-pivot `WindowPayload` constructor -/
 
@@ -88,12 +56,15 @@ axiom xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
   intro i
   rfl
 
-/-- Build `WindowPayload` from AtOrder ℓ-output + κ≠0 at the same order. -/
+/-- Build `WindowPayload` from AtOrder ℓ-output + widened κ-witness at the same order. -/
 def xiWindowPayloadAt_of_C
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     (hEll2 : Transport.ell (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0)
     (hEll3 : Transport.ell (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0)
-    (hKap  : Transport.kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+    (hKap  :
+      (Transport.kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+        ∨
+      (Transport.kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0))
     : WindowPayload (σ s) (t s) := by
   refine
     { w0 := w0At m s
@@ -105,30 +76,32 @@ def xiWindowPayloadAt_of_C
       hw3 := xiAt_hW3 (m := m) (s := s)
       hell2 := hEll2
       hell3 := hEll3
-      hkappa := Or.inl hKap }
+      hkappa := hKap }
 
-/-! ### Jet-pivot payload from the Route-B frontiers (green path) -/
+/-! ### Jet-pivot payload from the Route-B frontiers (AXIOM-FREE path) -/
 
-/-- The chosen jet order (noncomputable) from `xiJetNonflat_re_exists`. -/
+/-- The chosen jet order (noncomputable) from `xiJetNonflat_dslope_exists`. -/
 noncomputable def xiJetPivotOrder (s : Hyperlocal.OffSeed Xi) : ℕ :=
-  Classical.choose (xiJetNonflat_re_exists (s := s))
+  Classical.choose (xiJetNonflat_dslope_exists (s := s))
 
-/-- The defining nonflatness witness for `xiJetPivotOrder`. -/
+/-- The defining dslope nonflatness witness for `xiJetPivotOrder`. -/
 theorem xiJetPivotOrder_spec (s : Hyperlocal.OffSeed Xi) :
-    (((cderivIter (xiJetPivotOrder s) Xi) (sc s))).re ≠ 0 :=
-  Classical.choose_spec (xiJetNonflat_re_exists (s := s))
+    dslopeIterAt (m := xiJetPivotOrder s) (s := s) ≠ 0 :=
+  Classical.choose_spec (xiJetNonflat_dslope_exists (s := s))
 
-/-- Full `WindowPayload` for ξ from the jet-pivot order and AtOrder ℓ-out. -/
+/-- Full `WindowPayload` for ξ from the dslope-chosen pivot order and AtOrder ℓ-out. -/
 def xiWindowPayload_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     WindowPayload (σ s) (t s) := by
   classical
   let m : ℕ := xiJetPivotOrder s
-  have hmRe : (((cderivIter m Xi) (sc s))).re ≠ 0 := by
+  have hmDs : dslopeIterAt (m := m) (s := s) ≠ 0 := by
     simpa [m, xiJetPivotOrder] using xiJetPivotOrder_spec (s := s)
 
   have hKap :
-      kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 :=
-    hkappaAt_re_of_cderivRe_ne0 (m := m) (s := s) hmRe
+      (kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0)
+        ∨
+      (kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0) :=
+    hkappaAt_of_dslopeIter_ne0 (m := m) (s := s) hmDs
 
   have hEllOut : XiToeplitzEllOutAt m s :=
     xiToeplitzEllOutAt_fromRecurrenceC (m := m) (s := s)

@@ -16,11 +16,17 @@
   Downstream expects a semantic lemma named `xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0`.
   That lemma is provided (temporarily) by `XiWindowScNonvanishing.lean`,
   and this file imports it, so downstream still sees it after importing this module.
+
+  UPDATE (2026-03-02):
+  * Removed any use of the deleted shim `xiJetNonflat_re_exists`.
+  * Nonflatness is now derived AXIOM-FREE from `xiJetNonflat_dslope_exists`
+    via helpers in `XiDslopeToKappaAtOrder.lean`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
+import Hyperlocal.Targets.XiPacket.XiDslopeToKappaAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
 import Hyperlocal.Targets.XiPacket.XiCompletedRiemannZetaBridge
 import Mathlib.Tactic
@@ -115,53 +121,36 @@ theorem Xi_sc_re_ne_zero_of_anchor (s : Hyperlocal.OffSeed Xi)
   rw [Xi_sc_re_eq (s := s)]
   exact mul_ne_zero ha h
 
-/--
-Stronger form: some order has nonzero real part at the anchor (semantic cliff).
-
-This is imported theorem-level from `XiJetNonflatOfAnalytic.lean`.
--/
-theorem xiJetNonflat_re (s : Hyperlocal.OffSeed Xi) :
-    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0 := by
-  simpa using (_root_.Hyperlocal.Targets.XiPacket.xiJetNonflat_re_exists (s := s))
-
 /-!
-## Route B: JetPivot nonflatness at the anchor
+## Route B: JetPivot nonflatness at the anchor (AXIOM-FREE)
+
+We now derive all nonflatness interfaces from `xiJetNonflat_dslope_exists`
+using the dslope→jet helpers from `XiDslopeToKappaAtOrder.lean`.
 -/
 
 /-- Semantic nonflatness at the anchor: some complex derivative is nonzero. -/
 def XiJetNonflat (s : Hyperlocal.OffSeed Xi) : Prop :=
   ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
 
-/-- Route-B nonflatness (derived from real-part nonflatness). -/
+/--
+Semantic nonflatness at the anchor: some complex jet entry is nonzero.
+
+AXIOM-FREE: derived from `xiJetNonflat_dslope_exists`.
+-/
 theorem xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s := by
-  rcases xiJetNonflat_re (s := s) with ⟨m, hmre⟩
+  rcases xiJetNonflat_dslope_exists (s := s) with ⟨m, hmDs⟩
   refine ⟨m, ?_⟩
-  intro h0
-  exact hmre (by simpa [h0])
+  -- convert dslope witness to jet witness
+  exact cderivIter_ne0_of_dslopeIter_ne0 (m := m) (s := s) hmDs
 
-private lemma complex_eq_zero_of_re_im_eq_zero {z : ℂ}
-    (hre : z.re = 0) (him : z.im = 0) : z = 0 :=
-  Complex.ext hre him
-
-/-- If a complex number is nonzero, then at least one of its real/imag parts is nonzero. -/
-lemma re_ne_zero_or_im_ne_zero_of_ne_zero {z : ℂ} (hz : z ≠ 0) : z.re ≠ 0 ∨ z.im ≠ 0 := by
-  by_cases hre : z.re = 0
-  · by_cases him : z.im = 0
-    · exfalso
-      exact hz (complex_eq_zero_of_re_im_eq_zero (z := z) hre him)
-    · right
-      exact by simpa [him]
-  · left
-    exact by simpa [hre]
-
-/-- Re/Im split form used by the AtOrder payload constructor layer. -/
+/-- Re/Im split form used by the AtOrder payload constructor layer (AXIOM-FREE). -/
 theorem xiJetNonflat_re_or_im (s : Hyperlocal.OffSeed Xi) :
     (∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0)
     ∨ (∃ m : ℕ, (((cderivIter m Xi) (sc s))).im ≠ 0) := by
-  rcases xiJetNonflat (s := s) with ⟨m, hm⟩
+  rcases xiJetNonflat_dslope_exists (s := s) with ⟨m, hmDs⟩
   have hparts :
-      ((cderivIter m Xi) (sc s)).re ≠ 0 ∨ ((cderivIter m Xi) (sc s)).im ≠ 0 :=
-    re_ne_zero_or_im_ne_zero_of_ne_zero (z := (cderivIter m Xi) (sc s)) hm
+      (((cderivIter m Xi) (sc s))).re ≠ 0 ∨ (((cderivIter m Xi) (sc s))).im ≠ 0 :=
+    cderivIter_re_ne0_or_im_ne0_of_dslopeIter_ne0 (m := m) (s := s) hmDs
   cases hparts with
   | inl hre => exact Or.inl ⟨m, hre⟩
   | inr him => exact Or.inr ⟨m, him⟩

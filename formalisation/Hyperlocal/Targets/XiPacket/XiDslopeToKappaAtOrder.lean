@@ -17,6 +17,10 @@
     • the κ closed forms from `XiWindowKappaClosedFormAtOrder`,
     • the dslope→deriv/factorial identity (proved here),
     • elementary Re/Im splitting.
+
+  This file ALSO exports small plumbing helpers:
+    • `cderivIter_ne0_of_dslopeIter_ne0`
+    • `cderivIter_re_ne0_or_im_ne0_of_dslopeIter_ne0`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedFormAtOrder
@@ -44,8 +48,12 @@ open Hyperlocal.Transport
 abbrev dslopeIterAt (m : ℕ) (s : Hyperlocal.OffSeed Xi) : ℂ :=
   ((Function.swap dslope (sc s))^[m] Xi) (sc s)
 
-/-- dslope-iterate at the anchor equals `(deriv^[m] Xi)(sc) / m!` (your snapshot route). -/
-private lemma dslopeIter_eq_derivIter_div_factorial
+/--
+dslope-iterate at the anchor equals `(deriv^[m] Xi)(sc) / m!`.
+
+NOTE: this lemma is intentionally **not private** (used by downstream plumbing).
+-/
+lemma dslopeIter_eq_derivIter_div_factorial
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     dslopeIterAt (m := m) (s := s)
       =
@@ -122,21 +130,16 @@ theorem hkappaAt_of_dslopeIter_ne0
   | inl hRe =>
       refine Or.inl ?_
       intro hk
-      -- Put `hk` into the exact `(wc s)/(ws s)` shape (in case simp unfolded them).
-      have hkT :
-          kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
-        simpa [wc_eq_basis, ws_eq_basis] using hk
-
-      -- κ=0 ⇒ Re(cderivIter)=0 via the closed form.
+      -- κ=0 ⇒ Re(cderivIter)=0 via closed form.
       have hRe_cderiv0 : ((cderivIter m Xi) (sc s)).re = 0 := by
         calc
           ((cderivIter m Xi) (sc s)).re
               =
             kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
               simpa using (XiLemmaC_kappa_closedFormAt (m := m) (s := s)).symm
-          _ = 0 := hkT
+          _ = 0 := hk
 
-      -- Turn this into a statement about `(deriv^[m] Xi)`.
+      -- hence Re(deriv^[m])=0 (since `cderivIter` is definitional iterate of `deriv`)
       have hRe_deriv0 : (((deriv^[m] Xi) (sc s))).re = 0 := by
         simpa [cderivIter] using hRe_cderiv0
 
@@ -147,92 +150,77 @@ theorem hkappaAt_of_dslopeIter_ne0
           ((deriv^[m] Xi) (sc s)) / (Nat.factorial m : ℂ) :=
         dslopeIter_eq_derivIter_div_factorial (m := m) (s := s)
 
-      -- Multiply by factorial in ℂ: ds * fac = deriv
-      have hmul :
-          dslopeIterAt (m := m) (s := s) * (Nat.factorial m : ℂ)
-            =
-          ((deriv^[m] Xi) (sc s)) := by
+      -- Take real parts; RHS has real-part 0, so dslope.re = 0, contradiction.
+      have : (dslopeIterAt (m := m) (s := s)).re = 0 := by
+        -- from hds, rewrite and use hRe_deriv0
+        -- `simp` handles real part of division by real scalar
         have hfacC : (Nat.factorial m : ℂ) ≠ 0 := by
           exact_mod_cast (Nat.factorial_ne_zero m)
-        have := congrArg (fun z ↦ z * (Nat.factorial m : ℂ)) hds
-        simpa [div_eq_mul_inv, mul_assoc, hfacC] using this
-
-      -- Take real parts: ds.re * fac = 0 (since deriv.re = 0)
-      have hmul_re0 : (dslopeIterAt (m := m) (s := s)).re * (Nat.factorial m : ℝ) = 0 := by
-        have := congrArg Complex.re hmul
-        -- RHS becomes 0 using hRe_deriv0; LHS simplifies since factorial is real.
-        simpa [hRe_deriv0, Complex.mul_re] using this
-
-      -- Normalize order and cancel factorial.
-      have hmul_re0' : (Nat.factorial m : ℝ) * (dslopeIterAt (m := m) (s := s)).re = 0 := by
-        simpa [mul_comm, mul_left_comm, mul_assoc] using hmul_re0
-
-      have hfacR : (Nat.factorial m : ℝ) ≠ 0 := by
-        exact Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero m)
-
-      have hRe0 : (dslopeIterAt (m := m) (s := s)).re = 0 := by
-        rcases mul_eq_zero.mp hmul_re0' with hfac0 | hds0
-        · exact (False.elim (hfacR hfac0))
-        · exact hds0
-
-      exact hRe hRe0
+        -- rewrite as mul by inv
+        simp [hds, div_eq_mul_inv, hRe_deriv0, hfacC]  -- yields dslope.re = 0
+      exact hRe this
 
   | inr hIm =>
       refine Or.inr ?_
       intro hk
-      -- Put `hk` into the exact `(wc s)/(ws s)` shape (in case simp unfolded them).
-      have hkT :
-          kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
-        simpa [wc_eq_basis, ws_eq_basis] using hk
-
-      -- κ=0 ⇒ Im(cderivIter)=0 via the closed form.
+      -- κ=0 ⇒ Im(cderivIter)=0 via closed form.
       have hIm_cderiv0 : ((cderivIter m Xi) (sc s)).im = 0 := by
         calc
           ((cderivIter m Xi) (sc s)).im
               =
             kappa (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) := by
               simpa using (XiLemmaC_kappa_closedFormAt_im (m := m) (s := s)).symm
-          _ = 0 := hkT
+          _ = 0 := hk
 
-      -- Turn this into a statement about `(deriv^[m] Xi)`.
       have hIm_deriv0 : (((deriv^[m] Xi) (sc s))).im = 0 := by
         simpa [cderivIter] using hIm_cderiv0
 
-      -- dslope = deriv / m!
       have hds :
           dslopeIterAt (m := m) (s := s)
             =
           ((deriv^[m] Xi) (sc s)) / (Nat.factorial m : ℂ) :=
         dslopeIter_eq_derivIter_div_factorial (m := m) (s := s)
 
-      -- Multiply by factorial in ℂ: ds * fac = deriv
-      have hmul :
-          dslopeIterAt (m := m) (s := s) * (Nat.factorial m : ℂ)
-            =
-          ((deriv^[m] Xi) (sc s)) := by
+      have : (dslopeIterAt (m := m) (s := s)).im = 0 := by
         have hfacC : (Nat.factorial m : ℂ) ≠ 0 := by
           exact_mod_cast (Nat.factorial_ne_zero m)
-        have := congrArg (fun z ↦ z * (Nat.factorial m : ℂ)) hds
-        simpa [div_eq_mul_inv, mul_assoc, hfacC] using this
+        simp [hds, div_eq_mul_inv, hIm_deriv0, hfacC]
+      exact hIm this
 
-      -- Take imaginary parts: ds.im * fac = 0 (since deriv.im = 0)
-      have hmul_im0 : (dslopeIterAt (m := m) (s := s)).im * (Nat.factorial m : ℝ) = 0 := by
-        have := congrArg Complex.im hmul
-        simpa [hIm_deriv0, Complex.mul_im] using this
+/-!
+## Plumbing helpers (AXIOM-FREE)
 
-      -- Normalize order and cancel factorial.
-      have hmul_im0' : (Nat.factorial m : ℝ) * (dslopeIterAt (m := m) (s := s)).im = 0 := by
-        simpa [mul_comm, mul_left_comm, mul_assoc] using hmul_im0
+These let downstream “jet-language” files continue to work without resurrecting the old shim.
+-/
 
-      have hfacR : (Nat.factorial m : ℝ) ≠ 0 := by
-        exact Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero m)
+/-- dslope witness ⇒ nonzero complex jet entry at the same order. -/
+theorem cderivIter_ne0_of_dslopeIter_ne0
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    (hmDs : dslopeIterAt (m := m) (s := s) ≠ 0) :
+    (cderivIter m Xi (sc s)) ≠ (0 : ℂ) := by
+  intro h0
+  -- convert to deriv-iterate form
+  have hderiv0 : (deriv^[m] Xi) (sc s) = 0 := by
+    simpa [cderivIter] using h0
+  -- then dslopeIterAt = 0 by the dslope/deriv identity, contradiction
+  have hds :
+      dslopeIterAt (m := m) (s := s)
+        =
+      ((deriv^[m] Xi) (sc s)) / (Nat.factorial m : ℂ) :=
+    dslopeIter_eq_derivIter_div_factorial (m := m) (s := s)
+  apply hmDs
+  simp [hds, hderiv0]
 
-      have hIm0 : (dslopeIterAt (m := m) (s := s)).im = 0 := by
-        rcases mul_eq_zero.mp hmul_im0' with hfac0 | hds0
-        · exact (False.elim (hfacR hfac0))
-        · exact hds0
-
-      exact hIm hIm0
+/-- dslope witness ⇒ (Re ≠ 0) ∨ (Im ≠ 0) at the same order (jet language). -/
+theorem cderivIter_re_ne0_or_im_ne0_of_dslopeIter_ne0
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    (hmDs : dslopeIterAt (m := m) (s := s) ≠ 0) :
+    (((cderivIter m Xi) (sc s)).re ≠ 0) ∨ (((cderivIter m Xi) (sc s)).im ≠ 0) := by
+  have hjet : (cderivIter m Xi (sc s)) ≠ (0 : ℂ) :=
+    cderivIter_ne0_of_dslopeIter_ne0 (m := m) (s := s) hmDs
+  by_contra h
+  push_neg at h
+  exact hjet (Complex.ext h.1 h.2)
 
 end XiPacket
 end Targets
