@@ -1,14 +1,18 @@
 /-
   Hyperlocal/All.lean
 
-  One-stop import for the v4.0/v4.1 track.
+  One-stop import for the *current working* core pipeline.
 
-  This file re-exports the final ζ-statement proved in `Conclusion/Finisher.lean`.
+  NOTE (temporary):
+  The ζ-facing conclusion wrapper (`Conclusion/Finisher`) is intentionally
+  not exported right now while the conclusion layer is being stabilised.
 -/
 
-import Hyperlocal.Conclusion.Finisher
+import Hyperlocal.Targets.OffSeedPhaseLockXi
+import Hyperlocal.Targets.XiPhaseLock
+import Hyperlocal.Targets.XiPacket.Regression_NoLegacyAnchorImport
 
-export Hyperlocal.Conclusion.Finisher
-  ( noOffSeed_Xi
-    noOffSeed_Zeta
-    riemannHypothesis_zeta )
+-- Re-export stable Stage-3 surface (names exist today).
+export Hyperlocal.Targets
+  ( offSeedPhaseLock_Xi
+    xi_phaseLock )

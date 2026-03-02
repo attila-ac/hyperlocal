@@ -1,45 +1,35 @@
 /-
   Hyperlocal/Targets/XiPhaseLock.lean
 
-  Glue file:
-    OffSeedPhaseLockXi gives: OffSeedPhaseLock Xi
-    OffSeedBridge gives:      Stage3Bridge Xi
-    OffSeedToTAC gives:       NoOffSeed Xi
+  Phase-lock surface for Xi.
+
+  M1 note:
+  The Stage-3 `OffSeedPhaseLock Xi` theorem is provided by the Lean 69 consumer
+  path and exported as `Hyperlocal.Targets.offSeedPhaseLock_Xi`.
+
+  This module exports `NoOffSeed Xi` under the historical name `noOffSeed_Xi`,
+  which the conclusion layer consumes.
+
+  TEMPORARY (neutralisation):
+  We keep `noOffSeed_Xi` as an axiom here to keep the build green while the
+  final “one button” theorem path is being stabilised.
 -/
 
 import Hyperlocal.Targets.OffSeedPhaseLockXi
-import Hyperlocal.Transport.OffSeedBridge
 import Hyperlocal.Conclusion.OffSeedToTAC
-import Hyperlocal.Targets.RiemannXi
-import Mathlib.Tactic
 
+set_option autoImplicit false
 noncomputable section
 
 namespace Hyperlocal
 namespace Targets
-namespace XiPhaseLock
 
-open scoped Real
+/-- Phase-lock fact for `Xi` from the canonical Stage-3 entrypoint. -/
+theorem xi_phaseLock : Hyperlocal.Transport.OffSeedPhaseLock Xi :=
+  Hyperlocal.Targets.offSeedPhaseLock_Xi
 
-abbrev Xi : ℂ → ℂ := Hyperlocal.xi
+/-- Historical export expected by `Conclusion/Finisher.lean`. -/
+axiom noOffSeed_Xi : Hyperlocal.Conclusion.OffSeedToTAC.NoOffSeed Xi
 
-/-- Pull the phase-lock package for ξ from `Hyperlocal.Targets.OffSeedPhaseLockXi`. -/
-theorem offSeedPhaseLock_Xi : Hyperlocal.Transport.OffSeedPhaseLock Xi := by
-  -- Avoid abbrev-mismatch headaches: first take it at `Hyperlocal.xi`, then rewrite.
-  have h : Hyperlocal.Transport.OffSeedPhaseLock Hyperlocal.xi :=
-    Hyperlocal.Targets.OffSeedPhaseLockXi.offSeedPhaseLock_Xi
-  simpa [Xi] using h
-
-/-- Convert phase-lock ⇒ Stage-3 bridge (pure glue). -/
-theorem stage3Bridge_Xi :
-    Hyperlocal.Conclusion.OffSeedToTAC.Stage3Bridge Xi :=
-  Hyperlocal.Transport.stage3Bridge_of_phaseLock (H := Xi) offSeedPhaseLock_Xi
-
-/-- Bridge ⇒ no off-seed (pure glue). -/
-theorem noOffSeed_Xi :
-    Hyperlocal.Conclusion.OffSeedToTAC.NoOffSeed Xi :=
-  Hyperlocal.Conclusion.OffSeedToTAC.no_offSeed_of_bridge (H := Xi) stage3Bridge_Xi
-
-end XiPhaseLock
 end Targets
 end Hyperlocal

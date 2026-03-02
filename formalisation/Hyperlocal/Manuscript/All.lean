@@ -1,58 +1,18 @@
 /-
-# Hyperlocal (Manuscript order umbrella)
+  Hyperlocal/All.lean
 
-This is a *thin* umbrella that imports the project in the same order
-the manuscript presents the argument. It doesn’t add new facts — it’s
-just here so readers/referees can `lake build Hyperlocal.Manuscript.All`
-and know they’re seeing the whole pipeline in paper order.
+  One-stop import for the *current working* core pipeline.
 
-Sections:
-1) Ad absurdum setup & quartet propagation (Core).
-2) Minimal model + local derivatives (MinimalModel).
-3) Factorisation interface + FE inheritance for G (Factorization).
-4) RC inheritance for G (FactorizationRC).
-5) Algebraic recurrence layer (Recurrence*).
-6) Jet/QCC/TRC/Combine (Cancellation::*).
-7) Instability hook + k=1,k=2 instances (Instability*).
+  NOTE (temporary):
+  The old ζ-facing conclusion wrapper (`Conclusion/Finisher`) is intentionally
+  not exported right now while the conclusion layer is being stabilised.
 -/
 
-import Hyperlocal.Core
+import Hyperlocal.Targets.OffSeedPhaseLockXi
+import Hyperlocal.Targets.XiPhaseLock
+import Hyperlocal.Targets.XiPacket.Regression_NoLegacyAnchorImport
 
--- Minimal polynomial model (quartet) and derivative facts
-import Hyperlocal.MinimalModel
-
--- Factorisation layer: H = R_{ρ,k} * G and FE inheritance for G (off the zero set)
-import Hyperlocal.Factorization
-import Hyperlocal.FactorizationRC
-
--- Algebraic recurrences (Cauchy-product pivot + Finset API)
-import Hyperlocal.Cancellation.Recurrence
-import Hyperlocal.Cancellation.RecurrenceWithFinsetSum
-
--- Jets, QCC/TRC and their intersection at (A₀, t₀)
-import Hyperlocal.Cancellation.Solo
-import Hyperlocal.Cancellation.Setup
-import Hyperlocal.Cancellation.QCC
-import Hyperlocal.Cancellation.TRC
-import Hyperlocal.Cancellation.Combine
-import Hyperlocal.Cancellation.Rank
-import Hyperlocal.Cancellation.Solo12
-
--- Instability hook + concrete k=1,2 stubs/instances (as available)
-import Hyperlocal.Cancellation.InstabilityHyp
-
--- Prime witness endpoint / parity bridge / TAC endpoint
-import Hyperlocal.Cancellation.PrimeWitness
-import Hyperlocal.Cancellation.PrimeWitnessParity
-import Hyperlocal.Transport.TAC
-import Hyperlocal.Transport.Exports
-
-noncomputable section
-
-/- This module is intentionally empty: it just imports everything in the
-   manuscript’s narrative order so the project can be built end-to-end. -/
-namespace Hyperlocal
-namespace Manuscript
-
-end Manuscript
-end Hyperlocal
+-- Re-export stable Stage-3 surface (names exist today).
+export Hyperlocal.Targets
+  ( offSeedPhaseLock_Xi
+    xi_phaseLock )
