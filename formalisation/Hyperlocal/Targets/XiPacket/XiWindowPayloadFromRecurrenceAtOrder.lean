@@ -4,9 +4,29 @@
   Plan C++J (Jet Pivot): build a usable `WindowPayload` for ξ without any
   value-level anchor nonvanishing.
 
-  Inputs (and only inputs):
+  CURRENT STATE (green + parallel-track):
 
-  * Jet nonflatness at some order `m` (currently a single axiom):
+  * We now have an AXIOM-FREE analytic nonflatness theorem in
+      `XiJetNonflatOfAnalytic.lean`:
+        `xiJetNonflat_dslope_exists :
+           ∀ s, ∃ m, ((Function.swap dslope (sc s))^[m] Xi) (sc s) ≠ 0`.
+
+    However, in your Mathlib snapshot there is still no shipped bridge from this
+    dslope-iterate witness to the *jet* witness used by the κ-gate lemmas in
+    `XiLemmaC_RecurrenceToEllKappaAtOrder.lean` (which currently consume
+    `cderivIter` / real/imag parts).
+
+  * Therefore this file keeps the build GREEN by keeping a single *local shim*
+    axiom under the legacy interface:
+        `xiJetNonflat_re_exists : ∃ m, Re((cderivIter m Xi) (sc s)) ≠ 0`.
+
+  * Parallel track: once you add the dslope→κ lemma (or refactor κ-gates to
+    consume dslope directly), you can delete the shim and switch `xiJetPivotOrder`
+    to choose from `xiJetNonflat_dslope_exists`.
+
+  Inputs (and only inputs) for the green path:
+
+  * Jet nonflatness at some order `m` (local shim axiom):
       `xiJetNonflat_re_exists : ∃ m, Re(Ξ^{(m)}(sc s)) ≠ 0`.
 
   * AtOrder ℓ-output from the Toeplitz recurrence arm:
@@ -16,8 +36,7 @@
   same order, and hence a full `WindowPayload (σ s) (t s)` built from the
   jet-pivot windows `w0At/wp2At/wp3At`.
 
-  Downstream Stage-3 uses only `WindowPayloadFacts`, so this removes the last
-  consumer of the legacy value-level anchor axiom `xi_sc_re_ne_zero`.
+  Downstream Stage-3 uses only `WindowPayloadFacts`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
@@ -38,6 +57,16 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
+
+/-!
+### TEMP SHIM (green path)
+
+This file still consumes κ-gate lemmas stated in terms of `cderivIter` / Re/Im.
+Until the dslope-iterate witness is wired into κ (either by a bridge lemma or by
+refactoring κ-gates), we keep the old interface as a *local axiom* here.
+-/
+axiom xiJetNonflat_re_exists (s : Hyperlocal.OffSeed Xi) :
+    ∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0
 
 /-! ### Jet-pivot `WindowPayload` constructor -/
 
@@ -78,7 +107,7 @@ def xiWindowPayloadAt_of_C
       hell3 := hEll3
       hkappa := Or.inl hKap }
 
-/-! ### Jet-pivot payload from the Route-B frontiers -/
+/-! ### Jet-pivot payload from the Route-B frontiers (green path) -/
 
 /-- The chosen jet order (noncomputable) from `xiJetNonflat_re_exists`. -/
 noncomputable def xiJetPivotOrder (s : Hyperlocal.OffSeed Xi) : ℕ :=

@@ -22,6 +22,7 @@ import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
 import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
+import Hyperlocal.Targets.XiPacket.XiCompletedRiemannZetaBridge
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -52,51 +53,38 @@ lemma sc_mul_sc_sub_one (s : Hyperlocal.OffSeed Xi) :
     simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
     ring_nf
 
-/-!
-### Snapshot-robust bridge: Λ₀ vs Λ
+/-- `sc s ≠ 0` (purely algebraic: real part is 1/2). -/
+lemma sc_ne_zero (s : Hyperlocal.OffSeed Xi) : sc s ≠ 0 := by
+  intro h
+  have hre : (sc s).re = (0 : ℝ) := by simpa using congrArg Complex.re h
+  have : (sc s).re = (1 : ℝ) / 2 := by simp [sc]
+  have : ((1 : ℝ) / 2) = (0 : ℝ) := by simpa [this] using hre
+  norm_num at this
 
-In your snapshot, unfolding `completedRiemannZeta₀` and `completedRiemannZeta`
-goes through two different Hurwitz-zeta wrappers (`...Even₀` vs `...Even`), so a
-pure `simp` proof of the “+1 absorbed” identity is *not* stable across snapshots.
+/-- `sc s ≠ 1` (purely algebraic: real part is 1/2). -/
+lemma sc_ne_one (s : Hyperlocal.OffSeed Xi) : sc s ≠ 1 := by
+  intro h
+  have hre : (sc s).re = (1 : ℝ) := by simpa using congrArg Complex.re h
+  have : (sc s).re = (1 : ℝ) / 2 := by simp [sc]
+  have : ((1 : ℝ) / 2) = (1 : ℝ) := by simpa [this] using hre
+  norm_num at this
 
-To keep this file green and keep the proof DAG clean, we isolate the exact
-interface we need as a *single, local bridge axiom*:
-
-  z*(z-1)*Λ₀(z) + 1 = z*(z-1)*Λ(z)
-
-This is intended to be discharged later by whichever lemma in your Mathlib
-snapshot (or your own wrapper) states the relationship between Λ and Λ₀.
--/
-
-/-- Bridge axiom (temporary): `z*(z-1)*Λ₀(z) + 1 = z*(z-1)*Λ(z)`. -/
-axiom completedRiemannZeta0_bridge (z : ℂ) :
-    z * (z - 1) * completedRiemannZeta₀ z + 1
-      = z * (z - 1) * completedRiemannZeta z
-
-/-- The exact specialization of the bridge at `sc s`, rewritten in terms of `anchorScalar`. -/
+/-- The exact specialization of the Λ₀/Λ bridge at `sc s`, rewritten in terms of `anchorScalar`. -/
 lemma anchorScalar_mul_completedRZ0_add_one (s : Hyperlocal.OffSeed Xi) :
     ( (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 )
       = (anchorScalar s : ℂ) * completedRiemannZeta (sc s) := by
-  -- Start from the bridge axiom at `z = sc s`.
-  have h := completedRiemannZeta0_bridge (z := sc s)
-  -- Rewrite `sc s * (sc s - 1)` to `anchorScalar`.
-  -- Then cancel the common left factor.
-  -- (We avoid division; we just reassociate and `simp`.)
-  -- `h` is: sc*(sc-1)*Λ₀(sc) + 1 = sc*(sc-1)*Λ(sc)
-  -- After rewriting sc*(sc-1) = anchorScalar:
-  --   (anchorScalar:ℂ)*Λ₀(sc) + 1 = (anchorScalar:ℂ)*Λ(sc).
+  have hz0 : sc s ≠ 0 := sc_ne_zero (s := s)
+  have hz1 : sc s ≠ 1 := sc_ne_one (s := s)
+  have h := completedRiemannZeta0_bridge_of_ne (z := sc s) hz0 hz1
   simpa [mul_assoc, sc_mul_sc_sub_one (s := s)] using h
 
 /-- Closed-form for Xi on the critical-line anchor: Xi(sc) is a real scalar times Λ(sc). -/
 lemma Xi_sc_eq_real_mul_completed (s : Hyperlocal.OffSeed Xi) :
     Xi (sc s) = (anchorScalar s : ℂ) * completedRiemannZeta (sc s) := by
-  -- Unfold Xi to the Λ₀-form, rewrite the anchor factor, then apply the bridge.
   have hXi0 :
       Xi (sc s)
         = (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 := by
-    -- Xi z = z*(z-1)*Λ₀(z) + 1 (via `Hyperlocal.xi`), and at z=sc we have z*(z-1)=anchorScalar.
     simpa [Xi, Hyperlocal.xi, sc_mul_sc_sub_one (s := s), mul_assoc]
-  -- Switch Λ₀ → Λ using the bridge lemma.
   calc
     Xi (sc s)
         = (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 := hXi0
