@@ -16,6 +16,7 @@ import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Mathlib.Tactic
 
+
 set_option autoImplicit false
 noncomputable section
 
@@ -99,6 +100,8 @@ theorem XiLemmaC_kappa_closedFormAt_im (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
       congrArg Complex.im (w0At_apply_f0 (m := m) (s := s))
 
   exact hkappa.trans hw
+
+
 
 end XiPacket
 end Targets
