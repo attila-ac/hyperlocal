@@ -1,28 +1,24 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderAnalytic.lean
 
-  Analytic-only landing pad for the Rec2AtOrder provider instance (FULL R0).
+  Historical surface: Rec2 facts for the order-`m` Toeplitz/jet-quotient sequence.
 
-  Goal: replace the remaining Rec2 provider axiom instance by a theorem-level instance:
-    instance : XiJetQuotRec2AtOrderProvider
+  PREVIOUSLY:
+    This file axiom-staged three Rec2 facts
+      `rec2_w0At_analytic`, `rec2_wp2At_analytic`, `rec2_wp3At_analytic`.
 
-  DAG contract:
-  * Only "true analytic" imports (FE/RC/factorisation/jet identities / manuscript recurrences).
-  * MUST NOT import extractor-facing modules.
+  NOW (theorem-level):
+    We obtain these facts from the provider bundle
+      `XiJetQuotRec2AtOrderProvider`
+    installed by
+      `XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor`.
 
-  Today this file contains three local axioms (one per AtOrder window recurrence)
-  to keep the API stable. Replace them one-by-one by real analytic theorems, then
-  delete the axioms.
-
-  Once this instance is theorem-level, you can switch the public surface import from:
-    ...ProviderFromAnalyticExtractor
-  to:
-    ...ProviderAnalytic
-  without touching any downstream consumer.
+  Policy:
+    * keep the historical theorem names (they appear in `#print axioms` cones)
+    * introduce no new axioms
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor
 
 set_option autoImplicit false
 noncomputable section
@@ -31,38 +27,28 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open Complex
 open Hyperlocal.Transport
 
 /-!
-## True analytic surface (3 subgoals)
-
-These are exactly the three recurrence facts that must be proven from the manuscript/analytic layer:
-
-  JetQuotRec2 s (padSeq3 (w0At  m s))
-  JetQuotRec2 s (padSeq3 (wp2At m s))
-  JetQuotRec2 s (padSeq3 (wp3At m s))
+  These three are exported names that downstream expects.
+  They are now theorems (not axioms), derived from the provider bundle.
 -/
 
-axiom rec2_w0At_analytic
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (padSeq3 (w0At m s))
+/-- Rec2 for the padded order-`m` transported central jet window `w0At m s` (theorem-level). -/
+theorem rec2_w0At_analytic (m : ℕ) (s : OffSeed Xi) :
+    JetQuotRec2 s (padSeq3 (w0At m s)) := by
+  -- Provided by the instance `XiJetQuotRec2AtOrderProvider`.
+  simpa using (XiJetQuotRec2AtOrder.h_w0At (xiJetQuotRec2AtOrder_provided (m := m) (s := s)))
 
-axiom rec2_wp2At_analytic
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (padSeq3 (wp2At m s))
+/-- Rec2 for the padded order-`m` transported payload window `wp2At m s` (theorem-level). -/
+theorem rec2_wp2At_analytic (m : ℕ) (s : OffSeed Xi) :
+    JetQuotRec2 s (padSeq3 (wp2At m s)) := by
+  simpa using (XiJetQuotRec2AtOrder.h_wp2At (xiJetQuotRec2AtOrder_provided (m := m) (s := s)))
 
-axiom rec2_wp3At_analytic
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (padSeq3 (wp3At m s))
-
-/-- Theorem-level packaged recurrence payload (once axioms above are discharged, this is too). -/
-theorem xiJetQuotRec2AtOrder_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s :=
-  ⟨ rec2_w0At_analytic (m := m) (s := s),
-    rec2_wp2At_analytic (m := m) (s := s),
-    rec2_wp3At_analytic (m := m) (s := s) ⟩
-
-/-- Theorem-level analytic Rec2 provider instance (currently staged via the three axioms above). -/
-instance : XiJetQuotRec2AtOrderProvider where
-  rec2AtOrder := xiJetQuotRec2AtOrder_fromAnalytic
+/-- Rec2 for the padded order-`m` transported payload window `wp3At m s` (theorem-level). -/
+theorem rec2_wp3At_analytic (m : ℕ) (s : OffSeed Xi) :
+    JetQuotRec2 s (padSeq3 (wp3At m s)) := by
+  simpa using (XiJetQuotRec2AtOrder.h_wp3At (xiJetQuotRec2AtOrder_provided (m := m) (s := s)))
 
 end XiPacket
 end Targets
