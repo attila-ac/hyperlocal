@@ -13,6 +13,7 @@
 import Hyperlocal.Transport.PrimeTrigPacket
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceIdentity
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAt0NonzeroInject
 
 set_option autoImplicit false
 noncomputable section
@@ -27,14 +28,15 @@ open Hyperlocal.Transport.PrimeTrigPacket
 /-- Semantic injection: recurrence forces `bCoeff(2)=0` (theorem-level). -/
 theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨by decide⟩
-  simpa using (xiToeplitzRecurrenceIdentity_p (p := 2) s)
+  -- The identity lemma is packaged in the `p : ℝ` + `{2,3}` disjunction form.
+  simpa using
+    (xiToeplitzRecurrenceIdentity_p (s := s) (p := (2 : ℝ)) (Or.inl rfl))
 
 /-- Semantic injection: recurrence forces `bCoeff(3)=0` (theorem-level). -/
 theorem xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by decide⟩
-  simpa using (xiToeplitzRecurrenceIdentity_p (p := 3) s)
+  simpa using
+    (xiToeplitzRecurrenceIdentity_p (s := s) (p := (3 : ℝ)) (Or.inr rfl))
 
 end XiPacket
 end Targets

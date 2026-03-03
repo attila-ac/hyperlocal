@@ -5,13 +5,13 @@
 
   Derive bCoeff(p)=0 for p∈{2,3} using:
     • ell-out from recurrence at order m=0
-    • κ≠0 at order m=0 from κ closed form + legacy anchor axiom
-        xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
+    • κ≠0 at order m=0 provided as a *minimal class seam*:
+        [XiKappaAt0Nonzero s]
 
-  NOTE (2026-03-02):
-  This is the same temporary policy as OffSeedPhaseLockXiPayload:
-  the downstream Packet consumer wants Re-κ, so we stay at m=0 until that
-  boundary is widened.
+  NOTE (2026-03-03):
+  This file NO LONGER imports the legacy anchor seam directly.
+  The temporary provider of `[XiKappaAt0Nonzero s]` (if you still need one)
+  should live in a separate injector file.
 -/
 
 import Mathlib.Tactic
@@ -19,8 +19,7 @@ import Hyperlocal.Transport.PrimeTrigPacket
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
 import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappaAtOrder
-import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedFormAtOrder
-import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAt0Nonzero
 
 set_option autoImplicit false
 noncomputable section
@@ -33,28 +32,22 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- Helper: Re-κ ≠ 0 at order 0 from closed form + `xi_sc_re_ne_zero`. -/
-theorem xi_kappaAt0_ne0 (s : Hyperlocal.OffSeed Xi) :
-    Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
-  intro hk0
-  -- κ closed form at order 0
-  have hk :
-      Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s))
-        = (((cderivIter (0:ℕ) Xi) (sc s))).re :=
-    XiLemmaC_kappa_closedFormAt (m := (0:ℕ)) (s := s)
-  have hRe0 : (((cderivIter (0:ℕ) Xi) (sc s))).re = 0 :=
-    hk.symm.trans hk0
-  -- unwrap cderivIter 0 to Xi
-  have : (Xi (sc s)).re = 0 := by
-    simpa [cderivIter] using hRe0
-  exact xi_sc_re_ne_zero (s := s) this
+/-- The `κ`-nonvanishing hypothesis needed by the identity route, packaged as `kappaAt0`. -/
+theorem xi_kappaAt0_ne0 (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s] :
+    kappaAt0 s ≠ 0 :=
+  (XiKappaAt0Nonzero.kappa_ne0 (s := s))
 
-theorem xiToeplitzRecurrenceIdentity_p (s : Hyperlocal.OffSeed Xi)
+/--
+Order-0 Toeplitz identity route:
+if `p` is either `2` or `3`, recurrence ell-out at `m=0` forces `bCoeff(p)=0`,
+provided `kappaAt0 s ≠ 0`.
+
+(Kept in the older “`p : ℝ` + disjunction” shape to match the rest of the packet.)
+-/
+theorem xiToeplitzRecurrenceIdentity_p (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s]
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by
-  have hkappaAt :
-      Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 :=
-    xi_kappaAt0_ne0 (s := s)
+  have hkappaAt : kappaAt0 s ≠ 0 := xi_kappaAt0_ne0 (s := s)
 
   rcases hp with rfl | rfl
   ·
@@ -63,19 +56,18 @@ theorem xiToeplitzRecurrenceIdentity_p (s : Hyperlocal.OffSeed Xi)
       (xiToeplitzEllOutAt_fromRecurrenceC (m := (0:ℕ)) (s := s)).hell2
 
     have hmul :
-        bCoeff (σ s) (t s) (2 : ℝ)
-          * Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
+        bCoeff (σ s) (t s) (2 : ℝ) * kappaAt0 s = 0 := by
       calc
-        bCoeff (σ s) (t s) (2 : ℝ)
-            * Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s))
+        bCoeff (σ s) (t s) (2 : ℝ) * kappaAt0 s
             =
           Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp2At 0 s)) := by
-            simpa using (ell_wp2At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
+            -- unfold only the local abbrev; keep `wc/ws` opaque
+            simpa [kappaAt0] using
+              (ell_wp2At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
         _ = 0 := hell2
 
     have hdisj :
-        bCoeff (σ s) (t s) (2 : ℝ) = 0 ∨
-        Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 :=
+        bCoeff (σ s) (t s) (2 : ℝ) = 0 ∨ kappaAt0 s = 0 :=
       mul_eq_zero.mp hmul
 
     exact hdisj.resolve_right hkappaAt
@@ -85,19 +77,17 @@ theorem xiToeplitzRecurrenceIdentity_p (s : Hyperlocal.OffSeed Xi)
       (xiToeplitzEllOutAt_fromRecurrenceC (m := (0:ℕ)) (s := s)).hell3
 
     have hmul :
-        bCoeff (σ s) (t s) (3 : ℝ)
-          * Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
+        bCoeff (σ s) (t s) (3 : ℝ) * kappaAt0 s = 0 := by
       calc
-        bCoeff (σ s) (t s) (3 : ℝ)
-            * Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s))
+        bCoeff (σ s) (t s) (3 : ℝ) * kappaAt0 s
             =
           Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp3At 0 s)) := by
-            simpa using (ell_wp3At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
+            simpa [kappaAt0] using
+              (ell_wp3At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
         _ = 0 := hell3
 
     have hdisj :
-        bCoeff (σ s) (t s) (3 : ℝ) = 0 ∨
-        Transport.kappa (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 :=
+        bCoeff (σ s) (t s) (3 : ℝ) = 0 ∨ kappaAt0 s = 0 :=
       mul_eq_zero.mp hmul
 
     exact hdisj.resolve_right hkappaAt
