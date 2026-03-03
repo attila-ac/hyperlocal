@@ -1,27 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceInject.lean
 
-  Boundary module (semantic cliff isolation):
+  Boundary module (semantic cliff isolation).
 
-  The recurrence layer exports *only* the two bCoeff phase-lock facts
-  at primes 2 and 3.  Historically these were proven using an Option-ELL
-  order-0 κ argument that imported the legacy anchor axiom
+  This file used to be an axiom boundary exporting the two bCoeff phase-lock facts
+  at primes 2 and 3.
 
-      xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
-
-  M1 follow-through cleanup:
-  We *quarantine* that legacy path off the main import graph by reverting this
-  file to a small axiom boundary.
-
-  Downstream (Stage-3) now uses dslope-native Or-κ, so the anchor axiom is no
-  longer needed in the consumer pipeline.
-
-  Later (A1 / analytic closure) you can replace these axioms by a theorem-level
-  proof, without touching any consumer APIs.
+  R2 cleanup: those facts are now theorem-level, via the order-0 Toeplitz identity
+  path packaged in `XiToeplitzRecurrenceIdentity.lean`.
 -/
 
 import Hyperlocal.Transport.PrimeTrigPacket
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceIdentity
 
 set_option autoImplicit false
 noncomputable section
@@ -33,13 +24,17 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- Semantic injection: recurrence forces bCoeff(2)=0. -/
-axiom xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (2 : ℝ) = 0
+/-- Semantic injection: recurrence forces `bCoeff(2)=0` (theorem-level). -/
+theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
+  haveI : Fact (Nat.Prime 2) := ⟨by decide⟩
+  simpa using (xiToeplitzRecurrenceIdentity_p (p := 2) s)
 
-/-- Semantic injection: recurrence forces bCoeff(3)=0. -/
-axiom xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (3 : ℝ) = 0
+/-- Semantic injection: recurrence forces `bCoeff(3)=0` (theorem-level). -/
+theorem xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+    bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by decide⟩
+  simpa using (xiToeplitzRecurrenceIdentity_p (p := 3) s)
 
 end XiPacket
 end Targets
