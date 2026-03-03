@@ -1,35 +1,13 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiWindowAnchorNonvanishing.lean
+  Hyperlocal/Targets/XiPacket/XiAnchorNonvanishing.lean
 
-  Plan C++ (Route B): keep the anchor algebra, but remove the hard zeta-specific
-  nonvanishing axiom. The remaining semantic insertion point is jet-nonflatness
-  at the anchor, imported from `XiJetNonflatOfAnalytic`.
+  Minimal Prop-class capturing the single anchor nonvanishing obligation used by
+  the Toeplitz/κ pipeline.
 
-  Pure algebra:
-    Re(Xi(sc s)) = anchorScalar(s) * Re(completedRiemannZeta(sc s)),
-  where anchorScalar(s) = -(1/4 + (t s)^2) is a nonzero real scalar.
-
-  The file also provides the Re/Im split interface:
-    `xiJetNonflat_re_or_im`.
-
-  COMPATIBILITY NOTE:
-  Downstream expects a semantic lemma named `xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0`.
-  That lemma is provided (temporarily) by `XiWindowScNonvanishing.lean`,
-  and this file imports it, so downstream still sees it after importing this module.
-
-  UPDATE (2026-03-02):
-  * Removed any use of the deleted shim `xiJetNonflat_re_exists`.
-  * Nonflatness is now derived AXIOM-FREE from `xiJetNonflat_dslope_exists`
-    via helpers in `XiDslopeToKappaAtOrder.lean`.
+  This file is intentionally theorem-only: no legacy imports.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
-import Hyperlocal.Targets.XiPacket.XiDslopeToKappaAtOrder
-import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing
-import Hyperlocal.Targets.XiPacket.XiCompletedRiemannZetaBridge
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -39,121 +17,12 @@ namespace Targets
 namespace XiPacket
 
 open scoped Real
+open Hyperlocal.Transport
+open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- The real scalar multiplying Λ(sc). -/
-def anchorScalar (s : Hyperlocal.OffSeed Xi) : ℝ :=
-  -((1 : ℝ)/4 + (t s)^2)
-
-/-- Real scalar times complex: real part. -/
-lemma re_ofReal_mul (a : ℝ) (z : ℂ) : (((a : ℂ) * z).re) = a * z.re := by
-  simp [Complex.mul_re]
-
-/-- The anchor factor `sc(s) * (sc(s) - 1)` is the real number `anchorScalar s`. -/
-lemma sc_mul_sc_sub_one (s : Hyperlocal.OffSeed Xi) :
-    sc s * (sc s - 1) = (anchorScalar s : ℂ) := by
-  refine Complex.ext ?_ ?_
-  ·
-    simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
-    ring_nf
-  ·
-    simp [sc, t, anchorScalar, sub_eq_add_neg, Complex.mul_re, Complex.mul_im, pow_two]
-    ring_nf
-
-/-- `sc s ≠ 0` (purely algebraic: real part is 1/2). -/
-lemma sc_ne_zero (s : Hyperlocal.OffSeed Xi) : sc s ≠ 0 := by
-  intro h
-  have hre : (sc s).re = (0 : ℝ) := by simpa using congrArg Complex.re h
-  have : (sc s).re = (1 : ℝ) / 2 := by simp [sc]
-  have : ((1 : ℝ) / 2) = (0 : ℝ) := by simpa [this] using hre
-  norm_num at this
-
-/-- `sc s ≠ 1` (purely algebraic: real part is 1/2). -/
-lemma sc_ne_one (s : Hyperlocal.OffSeed Xi) : sc s ≠ 1 := by
-  intro h
-  have hre : (sc s).re = (1 : ℝ) := by simpa using congrArg Complex.re h
-  have : (sc s).re = (1 : ℝ) / 2 := by simp [sc]
-  have : ((1 : ℝ) / 2) = (1 : ℝ) := by simpa [this] using hre
-  norm_num at this
-
-/-- The exact specialization of the Λ₀/Λ bridge at `sc s`, rewritten in terms of `anchorScalar`. -/
-lemma anchorScalar_mul_completedRZ0_add_one (s : Hyperlocal.OffSeed Xi) :
-    ( (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 )
-      = (anchorScalar s : ℂ) * completedRiemannZeta (sc s) := by
-  have hz0 : sc s ≠ 0 := sc_ne_zero (s := s)
-  have hz1 : sc s ≠ 1 := sc_ne_one (s := s)
-  have h := completedRiemannZeta0_bridge_of_ne (z := sc s) hz0 hz1
-  simpa [mul_assoc, sc_mul_sc_sub_one (s := s)] using h
-
-/-- Closed-form for Xi on the critical-line anchor: Xi(sc) is a real scalar times Λ(sc). -/
-lemma Xi_sc_eq_real_mul_completed (s : Hyperlocal.OffSeed Xi) :
-    Xi (sc s) = (anchorScalar s : ℂ) * completedRiemannZeta (sc s) := by
-  have hXi0 :
-      Xi (sc s)
-        = (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 := by
-    simpa [Xi, Hyperlocal.xi, sc_mul_sc_sub_one (s := s), mul_assoc]
-  calc
-    Xi (sc s)
-        = (anchorScalar s : ℂ) * completedRiemannZeta₀ (sc s) + 1 := hXi0
-    _   = (anchorScalar s : ℂ) * completedRiemannZeta (sc s) :=
-          anchorScalar_mul_completedRZ0_add_one (s := s)
-
-/-- Real-part reduction: `Re(Xi(sc)) = anchorScalar(s) * Re(Λ(sc))`. -/
-lemma Xi_sc_re_eq (s : Hyperlocal.OffSeed Xi) :
-    (Xi (sc s)).re = (anchorScalar s) * (completedRiemannZeta (sc s)).re := by
-  have h := congrArg Complex.re (Xi_sc_eq_real_mul_completed (s := s))
-  simpa [re_ofReal_mul] using h
-
-/-- `anchorScalar s ≠ 0` (purely algebraic). -/
-lemma anchorScalar_ne_zero (s : Hyperlocal.OffSeed Xi) : anchorScalar s ≠ 0 := by
-  have hquarter : (0 : ℝ) < (1 : ℝ) / 4 := by norm_num
-  have hpos : (0 : ℝ) < (1 : ℝ)/4 + (t s)^2 := by
-    nlinarith [sq_nonneg (t s), hquarter]
-  exact neg_ne_zero.mpr (ne_of_gt hpos)
-
-/-- Stable “anchor” statement (kept for documentation / compatibility). -/
-def XiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : Prop :=
-  (completedRiemannZeta (sc s)).re ≠ 0
-
-/-- `XiAnchorNonvanishing` implies the original target `(Xi(sc)).re ≠ 0`. -/
-theorem Xi_sc_re_ne_zero_of_anchor (s : Hyperlocal.OffSeed Xi)
-    (h : XiAnchorNonvanishing s) : (Xi (sc s)).re ≠ 0 := by
-  have ha : (anchorScalar s) ≠ 0 := anchorScalar_ne_zero (s := s)
-  rw [Xi_sc_re_eq (s := s)]
-  exact mul_ne_zero ha h
-
-/-!
-## Route B: JetPivot nonflatness at the anchor (AXIOM-FREE)
-
-We now derive all nonflatness interfaces from `xiJetNonflat_dslope_exists`
-using the dslope→jet helpers from `XiDslopeToKappaAtOrder.lean`.
--/
-
-/-- Semantic nonflatness at the anchor: some complex derivative is nonzero. -/
-def XiJetNonflat (s : Hyperlocal.OffSeed Xi) : Prop :=
-  ∃ m : ℕ, (cderivIter m Xi) (sc s) ≠ 0
-
-/--
-Semantic nonflatness at the anchor: some complex jet entry is nonzero.
-
-AXIOM-FREE: derived from `xiJetNonflat_dslope_exists`.
--/
-theorem xiJetNonflat (s : Hyperlocal.OffSeed Xi) : XiJetNonflat s := by
-  rcases xiJetNonflat_dslope_exists (s := s) with ⟨m, hmDs⟩
-  refine ⟨m, ?_⟩
-  -- convert dslope witness to jet witness
-  exact cderivIter_ne0_of_dslopeIter_ne0 (m := m) (s := s) hmDs
-
-/-- Re/Im split form used by the AtOrder payload constructor layer (AXIOM-FREE). -/
-theorem xiJetNonflat_re_or_im (s : Hyperlocal.OffSeed Xi) :
-    (∃ m : ℕ, (((cderivIter m Xi) (sc s))).re ≠ 0)
-    ∨ (∃ m : ℕ, (((cderivIter m Xi) (sc s))).im ≠ 0) := by
-  rcases xiJetNonflat_dslope_exists (s := s) with ⟨m, hmDs⟩
-  have hparts :
-      (((cderivIter m Xi) (sc s))).re ≠ 0 ∨ (((cderivIter m Xi) (sc s))).im ≠ 0 :=
-    cderivIter_re_ne0_or_im_ne0_of_dslopeIter_ne0 (m := m) (s := s) hmDs
-  cases hparts with
-  | inl hre => exact Or.inl ⟨m, hre⟩
-  | inr him => exact Or.inr ⟨m, him⟩
+/-- Anchor nonvanishing: real part of `Xi` at the seed anchor is nonzero. -/
+class XiAnchorNonvanishing (s : Hyperlocal.OffSeed Xi) : Prop :=
+  (xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0)
 
 end XiPacket
 end Targets
