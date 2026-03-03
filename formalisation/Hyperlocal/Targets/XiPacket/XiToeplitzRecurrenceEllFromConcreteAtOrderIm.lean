@@ -126,6 +126,137 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed X
         (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s))
         c hc t0 tc t3
 
+
+/-
+  ADDITIONS to:
+  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceEllFromConcreteAtOrderIm.lean
+-/
+
+namespace Hyperlocal
+namespace Targets
+namespace XiPacket
+
+open scoped Real
+open Hyperlocal.Transport
+open Hyperlocal.Transport.PrimeTrigPacket
+
+/--
+Ell-out at order `m` for the *mixed* imag-pivot configuration needed by the pivot-gate consumer:
+
+`u0 = imVec3(w0At m s)`, `uc = reVec3(wc s)`, and `up = reVec3(wp2At/wp3At m s)`.
+
+This is theorem-only (same witness `cOp` as the real proof).
+-/
+theorem xiToeplitzEllOutAtImRe_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0 := by
+  classical
+
+  have hC : _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s :=
+    _root_.Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessC (s := s)
+
+  have hreal0 : (JetQuotOp.aRk1 s 0).im = 0 := JetQuotOp.aRk1_im0 (s := s)
+  have hreal1 : (JetQuotOp.aRk1 s 1).im = 0 := JetQuotOp.aRk1_im1 (s := s)
+  have hreal2 : (JetQuotOp.aRk1 s 2).im = 0 := JetQuotOp.aRk1_im2 (s := s)
+  have ha2 : JetQuotOp.aRk1 s 2 ≠ 0 := JetQuotOp.aRk1_nat2_ne_zero (s := s)
+
+  let c : Fin 3 → ℝ := JetQuotRow0.cOp s
+  have hc : c ≠ 0 :=
+    JetQuotRow0.cOp_ne_zero_of_aRk1_nonzero_at (s := s) (j := (2 : Fin 3)) hreal2 ha2
+
+  have hw0 : (toeplitzL 2 (coeffsNat3 c) (w0At m s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := w0At m s) hreal0 hreal1 hreal2 (xiJetQuot_row0_w0At m s)
+
+  have hwc : (toeplitzL 2 (coeffsNat3 c) (wc s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := wc s) hreal0 hreal1 hreal2 hC.hop_wc
+
+  have hwp2 : (toeplitzL 2 (coeffsNat3 c) (wp2At m s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := wp2At m s) hreal0 hreal1 hreal2 (xiJetQuot_row0_wp2At m s)
+
+  have hwp3 : (toeplitzL 2 (coeffsNat3 c) (wp3At m s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := wp3At m s) hreal0 hreal1 hreal2 (xiJetQuot_row0_wp3At m s)
+
+  have t0 : toeplitzRow3 c (imVec3 (w0At m s)) :=
+    toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero c (w0At m s) hw0
+
+  have tc : toeplitzRow3 c (reVec3 (wc s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c (wc s) hwc
+
+  have t2 : toeplitzRow3 c (reVec3 (wp2At m s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c (wp2At m s) hwp2
+
+  have t3 : toeplitzRow3 c (reVec3 (wp3At m s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c (wp3At m s) hwp3
+
+  refine ⟨?_, ?_⟩
+  ·
+    exact
+      ell_eq_zero_of_toeplitzRow3_local
+        (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s))
+        c hc t0 tc t2
+  ·
+    exact
+      ell_eq_zero_of_toeplitzRow3_local
+        (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s))
+        c hc t0 tc t3
+
+/--
+Auxiliary ell-out at order `m` for the mixed configuration with `up = reVec3(w0At m s)`.
+
+Used to cancel the `reVec3(w0At)` contribution when expanding `reVec3(wp2At/wp3At)`.
+-/
+theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 := by
+  classical
+
+  have hC : _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s :=
+    _root_.Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessC (s := s)
+
+  have hreal0 : (JetQuotOp.aRk1 s 0).im = 0 := JetQuotOp.aRk1_im0 (s := s)
+  have hreal1 : (JetQuotOp.aRk1 s 1).im = 0 := JetQuotOp.aRk1_im1 (s := s)
+  have hreal2 : (JetQuotOp.aRk1 s 2).im = 0 := JetQuotOp.aRk1_im2 (s := s)
+  have ha2 : JetQuotOp.aRk1 s 2 ≠ 0 := JetQuotOp.aRk1_nat2_ne_zero (s := s)
+
+  let c : Fin 3 → ℝ := JetQuotRow0.cOp s
+  have hc : c ≠ 0 :=
+    JetQuotRow0.cOp_ne_zero_of_aRk1_nonzero_at (s := s) (j := (2 : Fin 3)) hreal2 ha2
+
+  have hw0 : (toeplitzL 2 (coeffsNat3 c) (w0At m s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := w0At m s) hreal0 hreal1 hreal2 (xiJetQuot_row0_w0At m s)
+
+  have hwc : (toeplitzL 2 (coeffsNat3 c) (wc s)) (0 : Fin 3) = 0 := by
+    exact
+      JetQuotRow0.row0_eq_zero_of_op_row0_eq_zero
+        (s := s) (w := wc s) hreal0 hreal1 hreal2 hC.hop_wc
+
+  have t0 : toeplitzRow3 c (imVec3 (w0At m s)) :=
+    toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero c (w0At m s) hw0
+
+  have tc : toeplitzRow3 c (reVec3 (wc s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c (wc s) hwc
+
+  have tr0 : toeplitzRow3 c (reVec3 (w0At m s)) :=
+    toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero c (w0At m s) hw0
+
+  exact
+    ell_eq_zero_of_toeplitzRow3_local
+      (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s))
+      c hc t0 tc tr0
+
+end XiPacket
+end Targets
+end Hyperlocal
+
 end XiPacket
 end Targets
 end Hyperlocal

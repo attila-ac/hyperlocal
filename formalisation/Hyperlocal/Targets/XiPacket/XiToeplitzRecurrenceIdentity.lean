@@ -1,25 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceIdentity.lean
 
-  Option-ELL implementation (cycle-safe, no deleted lemmas).
+  Consumer-side identity route, generalized from fixed order `m=0` to arbitrary `m`.
 
-  Derive bCoeff(p)=0 for p∈{2,3} using:
-    • ell-out from recurrence at order m=0
-    • κ≠0 at order m=0 provided as a *minimal class seam*:
-        [XiKappaAt0Nonzero s]
+  This file is theorem-only. It does NOT depend on the legacy Prop-class
+  `[XiKappaAt0Nonzero s]`.  Instead, it provides:
+    * an order-`m` lemma consuming `kappaAt m s ≠ 0`, and
+    * a small order-0 wrapper consuming the plain hypothesis `kappaAt 0 s ≠ 0`.
 
-  NOTE (2026-03-03):
-  This file NO LONGER imports the legacy anchor seam directly.
-  The temporary provider of `[XiKappaAt0Nonzero s]` (if you still need one)
-  should live in a separate injector file.
+  NOTE:
+  imag-pivot is not consumed here yet.
 -/
 
-import Mathlib.Tactic
-import Hyperlocal.Transport.PrimeTrigPacket
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
 import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappaAtOrder
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAt0Nonzero
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAtOrder
+import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -32,65 +28,61 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- The `κ`-nonvanishing hypothesis needed by the identity route, packaged as `kappaAt0`. -/
-theorem xi_kappaAt0_ne0 (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s] :
-    kappaAt0 s ≠ 0 :=
-  (XiKappaAt0Nonzero.kappa_ne0 (s := s))
+/--
+Identity route at order `m` (real pivot):
+
+ell-out at order `m` + `kappaAt m s ≠ 0` ⇒ `bCoeff(2)=0 ∧ bCoeff(3)=0`.
+-/
+theorem xiToeplitzRecurrenceIdentity_atOrder
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    (hk : kappaAt m s ≠ 0) :
+    bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
+    bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
+  classical
+
+  have hell : XiToeplitzEllOutAt m s :=
+    xiToeplitzEllOutAt_fromRecurrenceC (m := m) (s := s)
+
+  refine ⟨?_, ?_⟩
+  ·
+    have hmul :
+        bCoeff (σ s) (t s) (2 : ℝ) *
+            kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
+      have h := hell.hell2
+      rw [ell_wp2At_eq_b_mul_kappa (m := m) (s := s)] at h
+      simpa using h
+
+    have hmul' : bCoeff (σ s) (t s) (2 : ℝ) * kappaAt m s = 0 := by
+      simpa [kappaAt, mul_assoc] using hmul
+
+    exact (mul_eq_zero.mp hmul').resolve_right hk
+  ·
+    have hmul :
+        bCoeff (σ s) (t s) (3 : ℝ) *
+            kappa (reVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (ws s)) = 0 := by
+      have h := hell.hell3
+      rw [ell_wp3At_eq_b_mul_kappa (m := m) (s := s)] at h
+      simpa using h
+
+    have hmul' : bCoeff (σ s) (t s) (3 : ℝ) * kappaAt m s = 0 := by
+      simpa [kappaAt, mul_assoc] using hmul
+
+    exact (mul_eq_zero.mp hmul').resolve_right hk
 
 /--
-Order-0 Toeplitz identity route:
-if `p` is either `2` or `3`, recurrence ell-out at `m=0` forces `bCoeff(p)=0`,
-provided `kappaAt0 s ≠ 0`.
-
-(Kept in the older “`p : ℝ` + disjunction” shape to match the rest of the packet.)
+Order-0 wrapper in the `{2,3}` API form, consuming only `kappaAt 0 s ≠ 0`.
+(This is the function `XiToeplitzRecurrenceInject` should call.)
 -/
-theorem xiToeplitzRecurrenceIdentity_p (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s]
+theorem xiToeplitzRecurrenceIdentity_p_of_kappaAt0
+    (s : Hyperlocal.OffSeed Xi)
+    (hk0 : kappaAt (0 : ℕ) s ≠ 0)
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by
-  have hkappaAt : kappaAt0 s ≠ 0 := xi_kappaAt0_ne0 (s := s)
-
+  classical
+  have hb := xiToeplitzRecurrenceIdentity_atOrder (m := 0) (s := s) hk0
   rcases hp with rfl | rfl
-  ·
-    have hell2 :
-        Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp2At 0 s)) = 0 :=
-      (xiToeplitzEllOutAt_fromRecurrenceC (m := (0:ℕ)) (s := s)).hell2
-
-    have hmul :
-        bCoeff (σ s) (t s) (2 : ℝ) * kappaAt0 s = 0 := by
-      calc
-        bCoeff (σ s) (t s) (2 : ℝ) * kappaAt0 s
-            =
-          Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp2At 0 s)) := by
-            -- unfold only the local abbrev; keep `wc/ws` opaque
-            simpa [kappaAt0] using
-              (ell_wp2At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
-        _ = 0 := hell2
-
-    have hdisj :
-        bCoeff (σ s) (t s) (2 : ℝ) = 0 ∨ kappaAt0 s = 0 :=
-      mul_eq_zero.mp hmul
-
-    exact hdisj.resolve_right hkappaAt
-  ·
-    have hell3 :
-        Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp3At 0 s)) = 0 :=
-      (xiToeplitzEllOutAt_fromRecurrenceC (m := (0:ℕ)) (s := s)).hell3
-
-    have hmul :
-        bCoeff (σ s) (t s) (3 : ℝ) * kappaAt0 s = 0 := by
-      calc
-        bCoeff (σ s) (t s) (3 : ℝ) * kappaAt0 s
-            =
-          Transport.ell (reVec3 (w0At 0 s)) (reVec3 (wc s)) (reVec3 (wp3At 0 s)) := by
-            simpa [kappaAt0] using
-              (ell_wp3At_eq_b_mul_kappa (m := (0:ℕ)) (s := s)).symm
-        _ = 0 := hell3
-
-    have hdisj :
-        bCoeff (σ s) (t s) (3 : ℝ) = 0 ∨ kappaAt0 s = 0 :=
-      mul_eq_zero.mp hmul
-
-    exact hdisj.resolve_right hkappaAt
+  · exact hb.1
+  · exact hb.2
 
 end XiPacket
 end Targets
