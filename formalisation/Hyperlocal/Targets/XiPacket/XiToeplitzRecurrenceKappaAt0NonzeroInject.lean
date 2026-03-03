@@ -12,7 +12,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAt0NonzeroFromScReNonzero
-import Hyperlocal.Targets.XiPacket.XiWindowScNonvanishing         -- legacy seam (localized here)
+import Hyperlocal.Targets.XiPacket.XiWindowAnchorNonvanishingInject
 
 set_option autoImplicit false
 noncomputable section
@@ -25,7 +25,8 @@ open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
 
 /-!
-This file remains the ONLY place that imports the legacy lemma `xi_sc_re_ne_zero`.
+The legacy lemma `xi_sc_re_ne_zero` is imported only via
+`XiWindowAnchorNonvanishingInject`.
 
 We use it solely to provide `[XiScReNonzero s]`.
 Then `XiKappaAt0Nonzero s` is obtained theorem-level via
@@ -35,7 +36,7 @@ Then `XiKappaAt0Nonzero s` is obtained theorem-level via
 instance (s : Hyperlocal.OffSeed Xi) : XiScReNonzero s := by
   refine ⟨?_⟩
   intro h0
-  exact xi_sc_re_ne_zero (s := s) h0
+  exact (XiAnchorNonvanishing.xi_sc_re_ne_zero (s := s)) h0
 
 end XiPacket
 end Targets
