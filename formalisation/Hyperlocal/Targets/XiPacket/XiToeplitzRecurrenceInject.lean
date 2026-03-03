@@ -1,20 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceInject.lean
 
-  Boundary module (semantic cliff isolation).
+  Injection boundary for the Toeplitz recurrence consumer.
 
-  R2 cleanup: bCoeff(2)=0 and bCoeff(3)=0 are theorem-level, via the order-0
-  Toeplitz identity path packaged in `XiToeplitzRecurrenceIdentity.lean`.
+  Target end-state (pivot-gate):
+  * NO dependency on the legacy anchor injector chain.
+  * Consume only the pivot gate `[XiKappaPivotNonzero s]`.
 
-  This module keeps the legacy surface:
-    it imports the order-0 nonvanishing injector so `[XiKappaAt0Nonzero s]`
-    is available to downstream consumers, but the bCoeff facts are theorem-level.
+  This file is theorem-only: it provides the `bCoeff(2)=0` / `bCoeff(3)=0` consequences
+  in a convenient API for downstream, but does not install any new instances.
 -/
 
-import Hyperlocal.Transport.PrimeTrigPacket
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceIdentity
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAt0NonzeroInject
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaPivotNonzero
 
 set_option autoImplicit false
 noncomputable section
@@ -26,22 +24,18 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
 
-/-- Semantic injection: recurrence forces `bCoeff(2)=0` (theorem-level). -/
-theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s] :
+/-- Consumer lemma: `bCoeff(2)=0` from the Toeplitz recurrence, via the pivot gate. -/
+theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiKappaPivotNonzero s] :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-  -- Convert the order-0 seam `kappaAt0 s ≠ 0` into `kappaAt 0 s ≠ 0`.
-  have hk0 : kappaAt (0 : ℕ) s ≠ 0 := by
-    simpa [kappaAt0, kappaAt] using (XiKappaAt0Nonzero.kappa_ne0 (s := s))
+  -- Use the already packaged `{2,3}` wrapper.
   simpa using
-    (xiToeplitzRecurrenceIdentity_p_of_kappaAt0 (s := s) hk0 (p := (2 : ℝ)) (Or.inl rfl))
+    (xiToeplitzRecurrenceIdentity_p (s := s) (p := (2 : ℝ)) (Or.inl rfl))
 
-/-- Semantic injection: recurrence forces `bCoeff(3)=0` (theorem-level). -/
-theorem xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiKappaAt0Nonzero s] :
+/-- Consumer lemma: `bCoeff(3)=0` from the Toeplitz recurrence, via the pivot gate. -/
+theorem xiToeplitz_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiKappaPivotNonzero s] :
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-  have hk0 : kappaAt (0 : ℕ) s ≠ 0 := by
-    simpa [kappaAt0, kappaAt] using (XiKappaAt0Nonzero.kappa_ne0 (s := s))
   simpa using
-    (xiToeplitzRecurrenceIdentity_p_of_kappaAt0 (s := s) hk0 (p := (3 : ℝ)) (Or.inr rfl))
+    (xiToeplitzRecurrenceIdentity_p (s := s) (p := (3 : ℝ)) (Or.inr rfl))
 
 end XiPacket
 end Targets
