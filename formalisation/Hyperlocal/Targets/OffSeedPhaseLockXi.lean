@@ -1,17 +1,18 @@
 /-
   Hyperlocal/Targets/OffSeedPhaseLockXi.lean
 
-  Stage-3 public entrypoint.
+  Targets-level export for `OffSeedPhaseLock Xi`.
 
-  NOTE:
-  `Hyperlocal.Targets.OffSeedPhaseLockXiPayload` already defines
-    * `Hyperlocal.Targets.Xi`
-    * `Hyperlocal.Targets.offSeedPhaseLock_Xi`
+  IMPORTANT:
+  We intentionally re-export the *AXIOM-FREE mainline* Stage-3 consumer
+  from `Targets/XiPacket/OffSeedPhaseLockXiPayloadAtOrder.lean`.
 
-  so this file must NOT redeclare them (otherwise Lean reports duplicate declarations).
+  This prevents the end-claim cone (e.g. `Targets/XiPhaseLock.lean`, `OneButton.lean`)
+  from picking up legacy analytic staging (e.g. sigma-out axiom providers).
 -/
 
-import Hyperlocal.Targets.OffSeedPhaseLockXiPayload
+import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.OffSeedPhaseLockXiPayloadAtOrder
 
 set_option autoImplicit false
 noncomputable section
@@ -19,8 +20,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 
--- Nothing to do: importing the payload module installs the canonical Stage-3 theorem
--- in this namespace as `Targets.offSeedPhaseLock_Xi`.
+/-- Stage-3 consumer (AXIOM-FREE mainline): `OffSeedPhaseLock Xi`. -/
+theorem offSeedPhaseLock_Xi :
+    Hyperlocal.Transport.OffSeedPhaseLock Hyperlocal.Targets.XiPacket.Xi :=
+  Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
 
 end Targets
 end Hyperlocal

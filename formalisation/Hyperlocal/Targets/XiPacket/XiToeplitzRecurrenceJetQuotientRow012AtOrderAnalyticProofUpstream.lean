@@ -22,8 +22,21 @@
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderFromPropBridge
 
--- provider axiom instances (DAG-clean placeholders)
+-- Provider instances.
+-- Coords01 is still sourced via the historical DAG-clean placeholder.
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
+
+-- Sigma MUST be sourced from a DAG-clean upstream provider.
+--
+-- IMPORTANT: do *not* import the Route–B / Route–C frontier-at-order facade here.
+-- That facade sits downstream of the analytic extractor stack, so importing it here
+-- creates a Lake module cycle:
+--
+--   ProofUpstream → SigmaFacade → ExtractorStack → AnalyticAxiom → ProofUpstream
+--
+-- For now we keep the (historical) placeholder provider to preserve an acyclic DAG.
+-- Downstream refactoring can later swap this for a theorem-backed provider via a
+-- dedicated installer module that does not sit on the extractor import spine.
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAxiom
 
 -- analytic-only upstream target (DAG-clean; consumes providers via typeclasses)

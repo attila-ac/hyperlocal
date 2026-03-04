@@ -44,7 +44,8 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- This searches for *anything* in scope whose type is `NoOffSeed Xi`.
 
-#print axioms Hyperlocal.Targets.noOffSeed_Xi
+#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+-- #print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Zeta
 
 -- Often there are variants like `NoOffSeed Hyperlocal.xi` or `NoOffSeed (Targets.Xi)`.
