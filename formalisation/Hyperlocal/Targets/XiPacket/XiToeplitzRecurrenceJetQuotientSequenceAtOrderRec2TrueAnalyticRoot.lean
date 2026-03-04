@@ -10,9 +10,7 @@
       ⇒ Rec2AtOrder true-analytic instance
 -/
 
--- (If Tail345-from-heart+coords still requires sigma at order, import whichever sigma provider you are using
--- in the strict chain. If you still rely on the axiom installer for sigma, keep this import.)
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAxiom
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
 
 -- Provide the *manuscript* Tail345 payload and adapt it to the real Tail345 gate.
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345FromHeartAndCoords

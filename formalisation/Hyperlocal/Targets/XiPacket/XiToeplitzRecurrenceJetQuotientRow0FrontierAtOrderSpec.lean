@@ -1,12 +1,11 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpec.lean
 
-  Axiom-thin interface for the Row0 frontier-at-order facts used downstream.
+  Axiom-thin interface for Row0 frontier-at-order facts used downstream.
 
-  Policy:
-  * MUST NOT import any sigma/coords01 provider axioms.
-  * MUST NOT route through analytic extractor spines.
-  * Only states the minimal Row0 Toeplitz-row0 vanishing facts at the three window points.
+  IMPORTANT:
+  * Names are suffixed `_spec` to avoid collisions with the legacy frontier module.
+  * This file is intentionally minimal.
 -/
 
 import Hyperlocal.Transport.PrimeTrigPacket
@@ -25,18 +24,15 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-/-- Row0 frontier fact at `w0At`: Toeplitz row0 vanishes. -/
-axiom xiJetQuot_row0_w0At
+axiom xiJetQuot_row0_w0At_spec
   (m : ℕ) (s : OffSeed Xi) :
   (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s)) (0 : Fin 3) = 0
 
-/-- Row0 frontier fact at `wp2At`: Toeplitz row0 vanishes. -/
-axiom xiJetQuot_row0_wp2At
+axiom xiJetQuot_row0_wp2At_spec
   (m : ℕ) (s : OffSeed Xi) :
   (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (0 : Fin 3) = 0
 
-/-- Row0 frontier fact at `wp3At`: Toeplitz row0 vanishes. -/
-axiom xiJetQuot_row0_wp3At
+axiom xiJetQuot_row0_wp3At_spec
   (m : ℕ) (s : OffSeed Xi) :
   (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (0 : Fin 3) = 0
 

@@ -1,20 +1,14 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderSigmaProviderInstallerFromRow0FrontierAtOrder.lean
+  Installs the sigma-at-order provider.
 
-  Downstream installer:
-
-  * Imports the historical axiom sigma provider (to satisfy the analytic upstream DAG).
-  * Imports the theorem-backed provider derived from Row0FrontierAtOrder.
-  * Re-exports an instance at HIGH PRIORITY so typeclass search picks the theorem version
-    whenever both are present.
-
-  IMPORTANT:
-  This module is intended to be imported ONLY downstream of the analytic upstream spine
-  (e.g. in interface/semantics/concrete cones), not inside the analytic upstream bundle itself.
+  Policy:
+  * This file is a stable import surface.
+  * It MUST NOT define a competing instance.
+  * The actual instance is provided by `XiRow0Bridge_AtOrderSigmaProviderTheorem`,
+    which is now theorem-backed (not axiom-backed).
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAxiom
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
 
 set_option autoImplicit false
 noncomputable section
@@ -23,13 +17,7 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/--
-High-priority instance forwarding to the theorem-backed provider.
-
-This avoids instance ambiguity when legacy modules still import the axiom provider.
--/
-instance (priority := 1000) : XiAtOrderSigmaProvider :=
-  (inferInstance : XiAtOrderSigmaProvider)
+-- no declarations; just re-export the installed instance
 
 end XiPacket
 end Targets
