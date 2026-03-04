@@ -30,7 +30,7 @@ def rowMap3 (c : Fin 3 → ℝ) : (Fin 3 → ℝ) →ₗ[ℝ] ℝ :=
     simp [mul_add, Finset.sum_add_distrib]
   map_smul' := by
     intro a v
-    simp [smul_eq_mul, mul_assoc, mul_left_comm, mul_comm, Finset.mul_sum] }
+    simp [smul_eq_mul, mul_left_comm, Finset.mul_sum] }
 
 /-- Evaluation on the standard basis recovers the coefficient. -/
 @[simp] lemma rowMap3_apply_e (c : Fin 3 → ℝ) (i : Fin 3) :
@@ -45,8 +45,9 @@ lemma rowMap3_ne_zero_of_coeff_ne_zero (c : Fin 3 → ℝ) (hc : c ≠ 0) :
   intro hL
   apply hc
   funext i
-  have : rowMap3 c (e i) = 0 := by simpa [hL]
-  simpa using this.trans (by simp [rowMap3_apply_e])
+  have : rowMap3 c (e i) = 0 := by simp [hL]
+  -- `rowMap3_apply_e` is a simp lemma, so we do not include it explicitly.
+  simpa using this.trans (by simp)
 
 /-- Convert a Toeplitz-row statement into a linear-functional annihilation. -/
 lemma rowMap3_eq_zero_of_toeplitzRow3 (c v : Fin 3 → ℝ) :

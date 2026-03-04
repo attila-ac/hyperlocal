@@ -38,6 +38,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 -- Downstream refactoring can later swap this for a theorem-backed provider via a
 -- dedicated installer module that does not sit on the extractor import spine.
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAxiom
+-- import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
 
 -- analytic-only upstream target (DAG-clean; consumes providers via typeclasses)
 import Hyperlocal.Targets.XiPacket.XiRow012SigmaExtraLinGoalsAtOrderAnalyticUpstream
