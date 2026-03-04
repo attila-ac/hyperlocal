@@ -3,19 +3,18 @@
 
   Imag-pivot analogue of `XiToeplitzRecurrenceEllFromConcreteAtOrder`.
 
-  IMPORTANT (current status):
-  This file is a **semantic cliff / placeholder**. The concrete Toeplitz-row-0
-  transport route for the imag-pivot columns is still being stabilized.
+  Status (2026-03-04): theorem-level.
 
-  Downstream consumers (notably `XiToeplitzRecurrenceIdentityIm`) only need the
-  ell-out statements at order `m`.
+  Pattern:
+  * keep this file import-light (DAG-stable downstream surface)
+  * move the concrete operator proof to an upstream module
 
-  Once the JetQuot/row0 witness surface is reinstated on the theorem route,
-  these axioms should be replaced by the corresponding proofs.
+  This avoids import cycles with `XiToeplitzRecurrenceIdentityIm`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrderImProofUpstream
 
 set_option autoImplicit false
 noncomputable section
@@ -30,35 +29,28 @@ open Hyperlocal.Transport.PrimeTrigPacket
 
 /--
 Ell-out at order `m` for the imag-pivot columns:
-`u0 = imVec3(w0At m s)`, `uc = reVec3(wc s)`,
-and `up = imVec3(wp2At/wp3At m s)`.
-
-(Placeholder axiom; theorem route to be restored.)
+`u0 = imVec3(w0At m s)`, `uc = reVec3(wc s)`, `up = imVec3(wp2At/wp3At m s)`.
 -/
-axiom xiToeplitzEllOutAtIm_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+theorem xiToeplitzEllOutAtIm_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp2At m s)) = 0 ∧
-    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s)) = 0
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s)) = 0 :=
+  xiToeplitzEllOutAtIm_fromRecurrenceC_proof (m := m) (s := s)
 
 /--
-Ell-out at order `m` for the *mixed* imag-pivot configuration used by the pivot-gate
-consumer:
-
-`u0 = imVec3(w0At m s)`, `uc = reVec3(wc s)`, and `up = reVec3(wp2At/wp3At m s)`.
-
-(Placeholder axiom; theorem route to be restored.)
+Ell-out at order `m` for the mixed imag-pivot configuration:
+`u0 = imVec3(w0At m s)`, `uc = reVec3(wc s)`, `up = reVec3(wp2At/wp3At m s)`.
 -/
-axiom xiToeplitzEllOutAtImRe_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+theorem xiToeplitzEllOutAtImRe_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
-    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0 :=
+  xiToeplitzEllOutAtImRe_fromRecurrenceC_proof (m := m) (s := s)
 
 /--
 Auxiliary ell-out at order `m` for the mixed configuration with `up = reVec3(w0At m s)`.
-Used by the imag-pivot identity consumer to cancel the `reVec3(w0At)` contribution.
-
-(Placeholder axiom; theorem route to be restored.)
 -/
-axiom xiToeplitzEllOutAtImRe_w0_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
-    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0
+theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 :=
+  xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof (m := m) (s := s)
 
 end XiPacket
 end Targets
