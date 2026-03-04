@@ -20,7 +20,7 @@ namespace XiPacket
 axiom xiAtOrderSigmaOut_axiom
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s
 
-instance : XiAtOrderSigmaProvider where
+instance (priority := 10) : XiAtOrderSigmaProvider where
   sigma := xiAtOrderSigmaOut_axiom
 
 end XiPacket

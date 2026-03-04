@@ -11,6 +11,7 @@
   `Hyperlocal.Targets.OffSeedPhaseLockXi`.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderInstallerFromRow0FrontierAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.OffSeedPhaseLockXi
 import Hyperlocal.Transport.OffSeedBridge

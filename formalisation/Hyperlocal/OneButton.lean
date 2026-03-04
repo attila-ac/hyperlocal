@@ -44,6 +44,18 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- This searches for *anything* in scope whose type is `NoOffSeed Xi`.
 
+#print axioms Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_of_toeplitz_row0_eq_zero
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_w0At
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp2At
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp3At
+#print axioms Hyperlocal.Targets.XiPacket.w0At
+#print axioms Hyperlocal.Targets.XiPacket.wp2At
+#print axioms Hyperlocal.Targets.XiPacket.wp3At
+
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_w0At
+#print axioms Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_of_toeplitz_row0_eq_zero
+
+#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderSigmaOut_fromRow0FrontierAtOrder
 #print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Zeta
