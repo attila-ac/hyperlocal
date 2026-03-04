@@ -1,10 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderCoords01ProviderAxiom.lean
 
-  DAG-clean placeholder instance: provides coords01 by axiom.
+  DAG-clean *axiom* instance for coords01-at-order.
 
-  Import this in analytic-only upstream provider modules to keep the project building
-  while the true analytic proof is installed.
+  Purpose:
+  * extractor/upstream-safe fallback instance
+  * MUST NOT import Rec2-at-order / extractor / heart discharge modules
+
+  NOTE:
+  We intentionally DO NOT use the historical name `xiAtOrderCoords01Out_axiom` here,
+  because that name is reserved for the theorem-level constant in
+  `...ProviderTheorem.lean` (downstream stability / axiom elimination cone).
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
@@ -16,14 +22,13 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open Hyperlocal.Transport
-
-/-- Placeholder (DAG-clean) coords01 provider. Replace by a theorem-level instance later. -/
-axiom xiAtOrderCoords01Out_axiom
+/-- DAG-clean placeholder axiom for coords01-at-order output. -/
+axiom xiAtOrderCoords01Out_axiom_stub
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderCoords01Out m s
 
-instance : XiAtOrderCoords01Provider where
-  coords01 := xiAtOrderCoords01Out_axiom
+/-- DAG-clean provider instance backed by the axiom stub above. -/
+instance (priority := 10) : XiAtOrderCoords01Provider where
+  coords01 := xiAtOrderCoords01Out_axiom_stub
 
 end XiPacket
 end Targets

@@ -17,6 +17,7 @@ import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrder
 import Hyperlocal.Transport.TACToeplitz
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpec
 
 set_option autoImplicit false
 noncomputable section
@@ -50,13 +51,11 @@ theorem xiJetQuot_row0_w0 (s : OffSeed Xi) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 := by
   simpa [w0At_zero (s := s)] using (xiJetQuot_row0_w0At (m := 0) (s := s))
 
-/-- Route–B frontier: Toeplitz row–0 annihilation for `wc`.
-
-NOTE: In this snapshot, there is no `...wcAt` theorem to specialize,
-so this remains the last row-0 staging point.
--/
-axiom xiJetQuot_row0_wc (s : OffSeed Xi) :
-    (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0
+/-- Historical name (was an axiom): now a theorem, sourced from the Row0-frontier spec. -/
+theorem xiJetQuot_row0_wc (s : OffSeed Xi) :
+  (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 :=
+by
+  simpa using (xiJetQuot_row0_wc_spec (s := s))
 
 /-- Route–B frontier: Toeplitz row–0 annihilation for `wp2` (derived). -/
 theorem xiJetQuot_row0_wp2 (s : OffSeed Xi) :

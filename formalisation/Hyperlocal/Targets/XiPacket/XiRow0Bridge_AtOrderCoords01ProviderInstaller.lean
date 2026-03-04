@@ -1,19 +1,16 @@
 /-
   Installs the coords01-at-order provider instance.
 
-  Purpose:
-  * Upstream analytic-only modules should import installers, not raw axiom provider nodes.
-  * This centralizes the import surface needed for `XiAtOrderCoords01Provider` synthesis.
+  Policy (DAG safety):
+  * Upstream analytic / extractor layers import THIS file.
+  * This file MUST NOT import Rec2-at-order true-analytic roots nor extractor glue.
 
-  Note:
-  * Today this still routes through the historical provider (possibly axiom-staged).
-  * Later we can switch this installer to a theorem-backed provider without touching upstream files.
+  Today:
+  * Installs the DAG-clean axiom provider instance.
+  * A theorem-backed route can be installed via a separate “theorem installer”
+    imported only in end-claim cones (to avoid cycles).
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
-
--- Current producer node for the coords01 provider.
--- This is the historical placeholder that defines the instance.
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
 set_option autoImplicit false
@@ -23,8 +20,7 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
--- No new instances here: the instance is provided by the imported producer.
--- This file exists purely as a stable import surface.
+-- stable import surface only
 
 end XiPacket
 end Targets

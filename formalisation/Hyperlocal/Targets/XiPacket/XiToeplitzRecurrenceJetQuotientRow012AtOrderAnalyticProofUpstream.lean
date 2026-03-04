@@ -22,14 +22,11 @@
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderFromPropBridge
 
--- Provider instances.
--- Coords01 is still sourced via the historical DAG-clean placeholder.
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
-
+-- provider installers (DAG-clean surfaces)
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstaller
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
--- import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
 
--- analytic-only upstream target (DAG-clean; consumes providers via typeclasses)
+-- analytic upstream goal
 import Hyperlocal.Targets.XiPacket.XiRow012SigmaExtraLinGoalsAtOrderAnalyticUpstream
 
 -- algebraic bridges
