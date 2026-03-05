@@ -1,23 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceEllFromConcreteAtOrderProofUpstream.lean
 
-  Task A (ell-out staging axiom elimination): upstream proof module.
+  Upstream proof module for AtOrder ell-out.
 
-  IMPORTANT:
-  This file is permitted to import the concrete JetQuot / Toeplitz operator stack.
-  The public surface file `XiToeplitzRecurrenceEllFromConcreteAtOrder.lean` should
-  remain import-light (DAG-stable) and only alias the theorem proved here.
-
-  This module must NOT import the recurrence-identity facade modules, because those
-  already import the public surface and would create a build cycle.
+  IMPORTANT (cycle breaker):
+  This file MUST NOT import any `_Spec.lean` surface modules.
+  It may import `...SpecProofUpstream` modules instead.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceStencilToEll
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpec
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpec
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -99,11 +95,7 @@ end ToeplitzEllOutAtOrderProof
 
 open ToeplitzEllOutAtOrderProof
 
-/--
-Upstream proof of the AtOrder ell-out package used by the public surface.
-
-This proves the two determinant equalities for `(wp2At m s)` and `(wp3At m s)`.
--/
+/-- Upstream proof of the AtOrder ell-out package used by the public surface. -/
 theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     XiToeplitzEllOutAt m s := by
@@ -117,19 +109,19 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hw0_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (w0At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := w0At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_w0At_spec (m := m) (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_w0At_spec_proof (m := m) (s := s))
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec_proof (s := s))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp2At_spec (m := m) (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp2At_spec_proof (m := m) (s := s))
 
   have hwp3_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp3At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp3At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp3At_spec (m := m) (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp3At_spec_proof (m := m) (s := s))
 
   have hU0 : toeplitzRow3 (cOp s) (reVec3 (w0At m s)) :=
     toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero (cOp s) (w0At m s) hw0_row0
