@@ -22,7 +22,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromHeartAndCoords
 
 -- Tail345 manuscript interface + adapter to the real Tail345 class.
@@ -52,7 +52,7 @@ private theorem tail345_of_row012ConvolutionAtRev
 
 /-- Push C: tail(3/4/5) for `w0At` from heart+coords. -/
 theorem tail345_w0At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 5 = 0 := by
@@ -60,7 +60,7 @@ theorem tail345_w0At_from_heart_and_coords
   have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
-    xiAtOrderCoords01Out_fromAnalytic (m := m) (s := s)
+    xiAtOrderCoords01Out_provided (m := m) (s := s)
   have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
     xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (m := m) (s := s) Hheart Hcoords
@@ -69,7 +69,7 @@ theorem tail345_w0At_from_heart_and_coords
 
 /-- Push C: tail(3/4/5) for `wp2At` from heart+coords. -/
 theorem tail345_wp2At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 5 = 0 := by
@@ -77,7 +77,7 @@ theorem tail345_wp2At_from_heart_and_coords
   have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
-    xiAtOrderCoords01Out_fromAnalytic (m := m) (s := s)
+    xiAtOrderCoords01Out_provided (m := m) (s := s)
   have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
     xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (m := m) (s := s) Hheart Hcoords
@@ -86,7 +86,7 @@ theorem tail345_wp2At_from_heart_and_coords
 
 /-- Push C: tail(3/4/5) for `wp3At` from heart+coords. -/
 theorem tail345_wp3At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 5 = 0 := by
@@ -94,7 +94,7 @@ theorem tail345_wp3At_from_heart_and_coords
   have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
-    xiAtOrderCoords01Out_fromAnalytic (m := m) (s := s)
+    xiAtOrderCoords01Out_provided (m := m) (s := s)
   have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
     xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (m := m) (s := s) Hheart Hcoords
@@ -108,7 +108,7 @@ Downstream, the adapter instance in
 `XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Manuscript.lean`
 upgrades this to `XiJetConvolutionTail345AtOrderTrueAnalytic`.
 -/
-instance (priority := 1000) [XiAtOrderSigmaProvider] :
+instance (priority := 1000) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     XiJetConvolutionTail345AtOrderTrueAnalytic_Manuscript where
   tail3_w0At := by
     intro m s
