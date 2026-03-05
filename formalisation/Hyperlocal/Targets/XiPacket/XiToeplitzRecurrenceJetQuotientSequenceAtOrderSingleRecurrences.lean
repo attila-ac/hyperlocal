@@ -15,7 +15,7 @@
   These are theorem-level consequences of the existing Route–A landing pad
   `xiJetQuotRec2AtOrder_fromRecurrenceA`.
 
-  When the manuscript-facing axiom is eventually replaced by the true analytic
+  When the manuscript-facing boundary is eventually replaced by the true analytic
   extractor proof, these theorems become fully analytic with no API change.
 -/
 

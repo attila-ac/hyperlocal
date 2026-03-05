@@ -4,7 +4,7 @@
   DAG-clean interface: provide the coords01 bundle for AtOrder windows.
 
   This isolates the dependency choice:
-  * DAG-clean: axiom instance (for now)
+  * DAG-clean: stub instance (for now)
   * non-cycle-safe: extractor instance (glue)
   * future: true analytic proof instance
 -/

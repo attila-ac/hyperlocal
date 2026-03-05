@@ -4,7 +4,7 @@
   Row-0 analytic bridge (stabilised): consume only row0Sigma = 0 facts.
 
   FIX (robust):
-  Do NOT reference Route–C frontier axiom names (`JetQuotOp.*`) from here.
+  Do NOT reference Route–C frontier staging names (`JetQuotOp.*`) from here.
   Instead consume only the root-level stable theorems exported by
   `XiRow0Bridge_CauchyConvolutionDischarge.lean`:
 

@@ -9,7 +9,7 @@
         ⇒ [JetQuotShiftBridge3AtOrderQuot ...]   (3 instances)
 
   E3 cleanup:
-  This file MUST NOT import any deprecated axiom payload.
+  This file MUST NOT import any deprecated staging payload.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetIsJetQuotProviderFromTrueAnalytic

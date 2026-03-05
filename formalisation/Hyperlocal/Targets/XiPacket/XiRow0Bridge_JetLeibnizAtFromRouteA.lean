@@ -23,16 +23,10 @@ namespace JetQuotOp
 /-
   NOTE (2026-02-22 → next step):
 
-  The old axiom
+  The old
     `xiRouteA_jetPkg (s) (z) (w)`
   quantified over *arbitrary* windows `w`.
 
-  We now split the problem:
-  * theorem-level analytic construction/discharge at the canonical jet `jet3 G z`
-    lives in `XiRow0Bridge_JetLeibnizAt_Discharge.lean`;
-  * the only remaining missing link is the identification of the concrete
-    ξ-windows with those canonical jets, isolated behind small axioms in
-    `XiRow0Bridge_JetWindowEqFromRouteA.lean`.
 -/
 
 /-- Route-A jet package specialised to the canonical jet window of the *chosen* `routeA_G s`. -/
@@ -54,9 +48,7 @@ theorem xiRouteA_jetPkg_jet3 (s : OffSeed Xi) (z : ℂ) :
 /-!
   ### Specialised Route-A packages for the concrete ξ-windows
 
-  These replace uses of the old axiom `xiRouteA_jetPkg`.
-  Each lemma is theorem-level *except* for the window=jet identification,
-  which is currently provided by axioms in `XiRow0Bridge_JetWindowEqFromRouteA`.
+  These replace uses of the old staged constant `xiRouteA_jetPkg`.
 -/
 
 /-- Package for the definitional window `w0 s` at `z = s.ρ`. -/

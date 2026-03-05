@@ -2,7 +2,7 @@
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA.lean
 
   Post-Task-A state (DAG-safe):
-  the former cycle-safe RecurrenceA axiom boundary is replaced by a theorem
+  the former cycle-safe RecurrenceA boundary is replaced by a theorem
   re-exporting the downstream analytic→recurrence endpoint.
 
   IMPORTANT:

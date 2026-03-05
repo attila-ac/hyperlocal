@@ -17,7 +17,7 @@
 
     XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor.lean
 
-  so downstream consumers do not see the axiom provider by default.
+  so downstream consumers do not see the fallback provider by default.
 
   NOTE:
   This file is intentionally NOT “true analytic”: it is a public surface file that

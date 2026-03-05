@@ -5,7 +5,7 @@
     toeplitzL 2 (coeffsNat3 c) (wc s) = 0
   forces c = 0 as soon as `s` is off-critical (δ ≠ 0).
 
-  This prevents accidental regression to the too-strong axiom shape.
+  This prevents accidental regression to the too-strong staging shape.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
@@ -195,7 +195,7 @@ theorem coeffsNat3_eq_zero_of_toeplitzL_two_wc_eq_zero
   funext i
   fin_cases i <;> simp [hc0, hc1, hc2]
 
-/-- Convenience corollary: the old “full-window annihilation” axiom shape is impossible off-critical. -/
+/-- Convenience corollary: the old “full-window annihilation” staging shape is impossible off-critical. -/
 theorem no_nonzero_toeplitzL_annihilator_for_wc (s : Hyperlocal.OffSeed Xi) :
     ¬ ∃ c : Fin 3 → ℝ, c ≠ 0 ∧ toeplitzL 2 (coeffsNat3 c) (wc s) = 0 := by
   rintro ⟨c, hc, hT⟩

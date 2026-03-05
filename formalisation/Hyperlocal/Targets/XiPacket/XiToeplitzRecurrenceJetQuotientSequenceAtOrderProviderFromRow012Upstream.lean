@@ -13,7 +13,7 @@
 
   IMPORTANT:
   * This file does NOT import extractor-facing modules.
-  * This file does NOT import the Row012 analytic-axiom endpoint module
+  * This file does NOT import the Row012 analytic endpoint endpoint module
       XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom.lean
     and does not depend on it.
   * It *does* depend on your Row012 upstream proof provider, which in turn

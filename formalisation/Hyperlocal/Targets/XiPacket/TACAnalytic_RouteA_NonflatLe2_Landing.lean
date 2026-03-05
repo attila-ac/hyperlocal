@@ -3,8 +3,6 @@
 
   Front~NF landing surface (Route–A bounded nonflatness ≤ 2).
 
-  This file is AXIOM-FREE and SORRY-FREE.
-
   Design:
   - We do *not* attempt to manufacture nonvanishing from `FactorisedByQuartet`,
     because in this repo that interface is only multiplicative (`H = R * G`) and
@@ -14,7 +12,7 @@
   - Given that input, bounded nonflatness ≤ 2 is immediate (take k = 0/1/2).
 
   Policy:
-  - Downstream should import the *axiom surface* file which re-exports these names.
+  - Downstream should import the *ax surface* file which re-exports these names.
   - The provider instance belongs in your analytic / pivot pipeline track.
 -/
 

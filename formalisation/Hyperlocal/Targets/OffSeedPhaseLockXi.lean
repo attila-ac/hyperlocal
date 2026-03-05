@@ -8,7 +8,7 @@
   from `Targets/XiPacket/OffSeedPhaseLockXiPayloadAtOrder.lean`.
 
   This prevents the end-claim cone (e.g. `Targets/XiPhaseLock.lean`, `OneButton.lean`)
-  from picking up legacy analytic staging (e.g. sigma-out axiom providers).
+  from picking up legacy analytic staging (e.g. sigma-out staging providers).
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs

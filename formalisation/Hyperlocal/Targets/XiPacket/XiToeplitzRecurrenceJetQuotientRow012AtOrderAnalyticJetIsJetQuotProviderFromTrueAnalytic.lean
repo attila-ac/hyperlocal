@@ -15,9 +15,22 @@
   NOTE:
   We work at the canonical Route–E anchors `TAC.z_w0At/z_wp2At/z_wp3At`
   so the downstream Eq-provider / ShiftBridge installer stack stays hands-free.
+
+  Editor/CLI robustness note (2026-03-05):
+  The Rec2-at-order true-analytic source for (w0At/wp2At/wp3At) is gated by
+  `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.  When VS Code elaborates this file
+  in isolation (`lake setup-file`), that instance may not be present unless we import
+  its producer chain.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
+
+-- Producer chain for `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.
+-- (existing analytic Row012 endpoint) ⇒ `XiRow012UpstreamTrueAnalytic`
+-- ⇒ `XiRow012ConvolutionAtRevAtOrderTrueAnalytic`.
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromUpstream
+
 import Hyperlocal.Targets.XiPacket.XiRouteA_QuotShiftBridgeInstancesFromTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 

@@ -1,10 +1,10 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom.lean
 
-  Analytic (non-cycle-safe) landing axiom for the Row012 target bundle.
+  Analytic (non-cycle-safe) landing for the Row012 target bundle.
 
   IMPORTANT:
-  This MUST remain primitive (axiom or later true analytic proof) because the extractor
+  This MUST remain primitive (later true analytic proof) because the extractor
   stack depends on it, and the Route–C proof stack now depends (indirectly) on the extractor
   via the heart discharge.
 

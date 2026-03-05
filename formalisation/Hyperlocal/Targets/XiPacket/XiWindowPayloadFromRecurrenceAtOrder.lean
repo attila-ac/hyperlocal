@@ -3,7 +3,7 @@
 
   Plan C++J (Jet Pivot): build a usable `WindowPayload` for ξ.
 
-  AXIOM-FREE (dslope-native):
+  (dslope-native):
 
   * Choose the pivot order `m` from the theorem-level dslope witness
         `xiJetNonflat_dslope_exists`.
@@ -14,7 +14,7 @@
   * Obtain ℓ-output at the same order from the Toeplitz recurrence arm:
         `xiToeplitzEllOutAt_fromRecurrenceC`.
 
-  This deletes the previous local shim axiom `xiJetNonflat_re_exists`.
+  This deletes the previous local shim placeholder `xiJetNonflat_re_exists`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiJetNonflatOfAnalytic
