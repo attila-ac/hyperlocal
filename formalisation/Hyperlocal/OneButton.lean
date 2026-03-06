@@ -63,11 +63,10 @@ Then paste the exact constant name into a #check / #print axioms block below.
 -- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 --#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 
-#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAt_fromRecurrenceC
-#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC
-#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_p
-#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff2_eq_zero
-#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
+-- #print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb3_fromRecurrence
@@ -86,8 +85,6 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
 --#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
-
---#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
 --#print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Zeta

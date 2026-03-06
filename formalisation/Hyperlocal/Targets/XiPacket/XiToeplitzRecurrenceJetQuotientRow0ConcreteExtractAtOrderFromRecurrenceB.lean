@@ -7,16 +7,23 @@
     Since `XiJetQuotRow0ConcreteExtractAtOrder m s` is Type-valued,
     this exported endpoint must be a `def`, not a `theorem`.
 
-  Big sweep (2026-02-19):
-    The endpoint is now axiom-free. The only remaining semantic cliff lives in
+  GRAPH-SURGERY UPDATE:
+    This file no longer imports the historical public semantics surface
 
-      `xiJetQuotOpZeroAtOrder : ∀ m s, XiJetQuotOpZeroAtOrder m s`
+      `XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder.lean`
 
-    from `XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder.lean`.
+    just to obtain the row-0 witness bundle.
+    Instead it consumes the new theorem-level upstream file
+
+      `XiToeplitzRecurrenceJetQuotientRow0WitnessAtOrderFromRow012Upstream.lean`
+
+    which breaks the back-edge responsible for the sigma-import cycle.
+
+  This is a graph cleanup step; it does not by itself claim end-cone reduction.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0WitnessAtOrderFromRow012Upstream
 
 set_option autoImplicit false
 noncomputable section
@@ -32,7 +39,7 @@ open Hyperlocal.Transport
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s := by
   have hC : XiJetQuotRow0WitnessCAtOrder m s :=
-    xiJetQuotRow0WitnessCAtOrder (m := m) (s := s)
+    xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream (m := m) (s := s)
   exact ⟨hC.hop_w0At, hC.hop_wp2At, hC.hop_wp3At⟩
 
 end XiPacket

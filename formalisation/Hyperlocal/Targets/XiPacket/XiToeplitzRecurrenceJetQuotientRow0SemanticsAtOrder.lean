@@ -10,23 +10,17 @@
   `xiJetQuotOpZeroAtOrder_fromRecurrenceA` consumes the recurrence payload via
   a typeclass `[XiJetQuotRec2AtOrderProvider]`.
 
-  EXPLICIT-REC2 TEST STEP:
-  This public surface now bypasses the recurrence-provider instance graph at the
-  historical wrapper theorem `xiJetQuotOpZeroAtOrder`.
-
-  Strategy:
-    * install the clean theorem-level coords01 route locally
-    * build the clean recurrence payload explicitly via
-        `xiJetQuotRec2AtOrder_fromRow012Upstream`
-    * construct `XiJetQuotOpZeroAtOrder` directly from that explicit payload
-
-  This tests whether the remaining dirty cone is being reintroduced specifically
-  by instance-graph selection at the public semantic freeze point.
+  LOCAL-CLEAN-PROVIDER TEST STEP:
+  The historical public wrapper now calls the already-clean theorem route
+    `xiJetQuotOpZeroAtOrder_fromRecurrenceA`
+  but with a locally installed clean recurrence provider backed by
+    `xiJetQuotRec2AtOrder_fromRow012Upstream`.
 
   IMPORTANT:
-  * no installer imports here
-  * use theorem-level coords source only
-  * keep upstream provider files interface-parametric
+  * do not touch shared historical provider files
+  * install only local theorem-backed instances here
+  * this tests whether the dirty cone is entering through the default global
+    `XiJetQuotRec2AtOrderProvider` instance selection
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
@@ -74,6 +68,22 @@ private def xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
     intro m s
     classical
     exact xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic (m := m) (s := s)
+
+/--
+Local clean recurrence provider, backed by the Row012-upstream theorem route and
+the local clean coords provider above.
+-/
+private def xiJetQuotRec2AtOrderProvider_fromRow012Upstream
+    [XiAtOrderSigmaProvider]
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
+    [XiSigma3Nonzero] :
+    XiJetQuotRec2AtOrderProvider where
+  rec2AtOrder := by
+    intro m s
+    classical
+    letI : XiAtOrderCoords01Provider :=
+      xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
+    exact xiJetQuotRec2AtOrder_fromRow012Upstream (m := m) (s := s)
 
 /--
 Explicit row-0 extraction from a supplied recurrence payload.
@@ -151,39 +161,24 @@ private theorem xiJetQuotOpZeroAtOrder_of_explicitRec2
 /--
 Route–B recurrence-natural semantic output.
 
-We explicitly install the clean coords theorem route locally, derive the clean
-Rec2 payload from the Row012-upstream theorem route, and build OpZero directly
-from that explicit payload. This avoids the recurrence-provider instance graph
-at the historical public wrapper theorem.
+Public wrapper: call the clean theorem-level route from
+`...FromRecurrenceA`, but with a local clean `XiJetQuotRec2AtOrderProvider`.
 -/
 theorem xiJetQuotOpZeroAtOrder (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrder m s := by
   classical
   letI : XiAtOrderSigmaProvider := by infer_instance
   letI : XiRow012ConvolutionAtRevAtOrderTrueAnalytic := by infer_instance
   letI : XiSigma3Nonzero := by infer_instance
-  letI : XiAtOrderCoords01Provider :=
-    xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
-
-  have hrec : XiJetQuotRec2AtOrder m s :=
-    xiJetQuotRec2AtOrder_fromRow012Upstream (m := m) (s := s)
-
-  exact xiJetQuotOpZeroAtOrder_of_explicitRec2 (m := m) (s := s) hrec
+  letI : XiJetQuotRec2AtOrderProvider :=
+    xiJetQuotRec2AtOrderProvider_fromRow012Upstream
+  exact xiJetQuotOpZeroAtOrder_fromRecurrenceA (m := m) (s := s)
 
 /-- Derived row-0 witness bundle (projection of the full-window contract). -/
 noncomputable def xiJetQuotRow0WitnessCAtOrder (m : ℕ) (s : OffSeed Xi) :
     XiJetQuotRow0WitnessCAtOrder m s := by
   classical
-  letI : XiAtOrderSigmaProvider := by infer_instance
-  letI : XiRow012ConvolutionAtRevAtOrderTrueAnalytic := by infer_instance
-  letI : XiSigma3Nonzero := by infer_instance
-  letI : XiAtOrderCoords01Provider :=
-    xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
-
-  have hrec : XiJetQuotRec2AtOrder m s :=
-    xiJetQuotRec2AtOrder_fromRow012Upstream (m := m) (s := s)
-
   exact xiJetQuotRow0WitnessCAtOrder_of_opZero (m := m) (s := s)
-    (xiJetQuotOpZeroAtOrder_of_explicitRec2 (m := m) (s := s) hrec)
+    (xiJetQuotOpZeroAtOrder (m := m) (s := s))
 
 end XiPacket
 end Targets
