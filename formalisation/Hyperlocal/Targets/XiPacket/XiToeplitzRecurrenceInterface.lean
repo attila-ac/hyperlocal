@@ -27,15 +27,17 @@ def XiRecurrencePhaseLock (s : Hyperlocal.OffSeed Xi) : Prop :=
   bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
   bCoeff (σ s) (t s) (3 : ℝ) = 0
 
-/-- Local wrapper: matches the name you tried to use. -/
 theorem xiBcoeff2_eq_zero (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (2 : ℝ) = 0 :=
-  xiToeplitz_hb2_fromRecurrence (s := s)
+    bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
+  classical
+  haveI : XiKappaPivotNonzero s := inferInstance
+  simpa using xiToeplitz_hb2_fromRecurrence (s := s)
 
-/-- Local wrapper: matches the name you tried to use. -/
 theorem xiBcoeff3_eq_zero (s : Hyperlocal.OffSeed Xi) :
-    bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
-  xiToeplitz_hb3_fromRecurrence (s := s)
+    bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
+  classical
+  haveI : XiKappaPivotNonzero s := inferInstance
+  simpa using xiToeplitz_hb3_fromRecurrence (s := s)
 
 /--
 Hook A: recurrence extraction gives phase lock.

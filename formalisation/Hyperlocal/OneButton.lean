@@ -13,6 +13,8 @@
 
 import Hyperlocal.Targets.XiPhaseLock
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceInject
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
+
 
 -- If these imports exist in your tree, keep them; if they don't, comment them out.
 -- (They were the ones that were "unknown identifier" for you because the theorem names differ,
@@ -57,7 +59,48 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- #print axioms Hyperlocal.Targets.XiPacket.xiAtOrderSigmaOut_fromRow0FrontierAtOrder
 -- #print axioms Hyperlocal.Targets.XiPacket.routeAJetCoordProvider_axiom
-#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+
+-- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
+--#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
+--#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
+--#check Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
+--#check Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_atOrder
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_atOrder_im
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAt_fromRecurrenceC
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_w0_fromRecurrenceC
+
+#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_fromAnalytic
+#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_fromRec2AtOrderTrueAnalytic
+#print axioms Hyperlocal.Targets.XiPacket.coords_eq_zero_of_rec2_padSeq3
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2_padSeq3_w0At_fromAnalytic_strict
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2_padSeq3_wp2At_fromAnalytic_strict
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2_padSeq3_wp3At_fromAnalytic_strict
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb3_fromRecurrence
+--#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_p
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff2_eq_zero
+--#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff3_eq_zero
+--#print axioms Hyperlocal.Targets.XiPacket.hkappaAt_of_dslopeIter_ne0
+--#check Hyperlocal.Targets.XiPacket.xiBcoeff2_eq_zero
+--#check Hyperlocal.Targets.XiPacket.xiBcoeff3_eq_zero
+--#check Hyperlocal.Targets.XiPacket.hkappaAt_of_dslopeIter_ne0
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
+--#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
+
+
+--#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
+--#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
+
+--#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+--#print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Xi
 -- #print axioms Hyperlocal.Targets.noOffSeed_Zeta
 

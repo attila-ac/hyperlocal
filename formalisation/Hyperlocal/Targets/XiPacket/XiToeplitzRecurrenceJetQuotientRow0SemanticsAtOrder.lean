@@ -1,5 +1,4 @@
-
-/-
+ /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder.lean
 
   AtOrder Route–B semantics (public surface).
@@ -11,20 +10,20 @@
   `xiJetQuotOpZeroAtOrder_fromRecurrenceA` consumes the recurrence payload via
   a typeclass `[XiJetQuotRec2AtOrderProvider]`.
 
-  DISCHARGE STEP (2026-02-22):
-  This public surface now installs the *theorem-level* provider instance from the
-  analytic extractor glue:
+  DISCHARGE STEP (extractor-free):
+  This public surface installs the theorem-level provider instance from the
+  Row012-upstream proof spine:
 
-    XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor.lean
+    XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream.lean
 
-  so downstream consumers do not see the fallback provider by default.
+  so downstream consumers do not see the fallback/extractor provider by default.
 
   NOTE:
-  This file is intentionally NOT “true analytic”: it is a public surface file that
-  may import extractor-facing glue. Analytic-only upstream modules must not import it.
+  This file is a public surface file, but it should remain extractor-free by imports.
+  Analytic-only upstream modules must still not import it.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 
 /-

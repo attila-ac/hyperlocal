@@ -7,9 +7,17 @@
   This file should install exactly one sigma-at-order provider instance.
   Therefore it imports the Row0-frontier installer (theorem route),
   and MUST NOT import the legacy axiom-provider file.
+
+  ALSO (cycle policy):
+  End-claim cone is allowed to import installer modules that realize interfaces
+  (e.g. coords01 provider). Upstream firewall modules must NOT.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderInstallerFromRow0FrontierAtOrder
+
+-- End-claim-only: override the DAG-clean coords01 axiom stub with the theorem-backed Rec2 route.
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstallerFromRec2AtOrderTrueAnalytic
+
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.OffSeedPhaseLockXi
 import Hyperlocal.Transport.OffSeedBridge
