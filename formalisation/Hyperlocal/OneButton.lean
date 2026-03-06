@@ -63,15 +63,11 @@ Then paste the exact constant name into a #check / #print axioms block below.
 -- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 --#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
---#print axiomsP Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
---#check Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
---#check Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
-
-#print axioms Hyperlocal.Targets.XiPacket.xiJetNonflat_dslope_exists
-#print axioms Hyperlocal.Targets.XiPacket.hkappaAt_of_dslopeIter_ne0
+#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAt_fromRecurrenceC
+#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC
+#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_p
 #print axioms Hyperlocal.Targets.XiPacket.xiBcoeff2_eq_zero
-#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff3_eq_zero
+#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb3_fromRecurrence

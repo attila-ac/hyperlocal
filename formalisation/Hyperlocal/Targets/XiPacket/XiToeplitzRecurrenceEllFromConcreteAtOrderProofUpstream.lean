@@ -4,15 +4,15 @@
   Upstream proof module for AtOrder ell-out.
 
   IMPORTANT (cycle breaker):
-  This file MUST NOT import any `_Spec.lean` surface modules.
-  It may import `...SpecProofUpstream` modules instead.
+  This file should consume the clean Row0 semantics surface for the at-order
+  trio `w0At/wp2At/wp3At`, while still using the theorem-level `wc` proof.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceStencilToEll
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
 import Mathlib.Tactic
 
@@ -29,18 +29,12 @@ open ToeplitzLToRow3
 
 namespace ToeplitzEllOutAtOrderProof
 
-/-- Real stencil extracted from operator coefficients: `c_i = Re(aRk1_i)`. -/
 def cOp (s : Hyperlocal.OffSeed Xi) : Fin 3 → ℝ :=
   fun i => (JetQuotOp.aRk1 s i.1).re
 
-/-- If `z.im = 0` then `z = (z.re : ℂ)`. -/
 lemma complex_eq_ofReal_of_im_zero (z : ℂ) (hz : z.im = 0) : z = (z.re : ℂ) := by
   apply Complex.ext <;> simp [hz]
 
-/--
-Row-0 agrees when coefficients 0/1/2 are real:
-`toeplitzL` at `(0:Fin 3)` only depends on those coefficients.
--/
 lemma toeplitzL_row0_eq_of_real_coeffs
     (s : Hyperlocal.OffSeed Xi) (w : Window 3)
     (h0 : (JetQuotOp.aRk1 s 0).im = 0)
@@ -77,7 +71,6 @@ lemma row0_eq_zero_of_op_row0_eq_zero
             simpa using heq
     _ = 0 := hop
 
-/-- Nontriviality of the real stencil: anchored at index 2 where `aRk1 = -2`. -/
 lemma cOp_ne_zero (s : Hyperlocal.OffSeed Xi) : cOp s ≠ 0 := by
   intro hc
   have hcre : cOp s (2 : Fin 3) = 0 := by
@@ -95,7 +88,6 @@ end ToeplitzEllOutAtOrderProof
 
 open ToeplitzEllOutAtOrderProof
 
-/-- Upstream proof of the AtOrder ell-out package used by the public surface. -/
 theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     XiToeplitzEllOutAt m s := by
@@ -107,9 +99,15 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hc : cOp s ≠ 0 := cOp_ne_zero (s := s)
 
+  have Hop : XiJetQuotOpZeroAtOrder m s :=
+    xiJetQuotOpZeroAtOrder (m := m) (s := s)
+
+  have Hw : XiJetQuotRow0WitnessCAtOrder m s :=
+    xiJetQuotRow0WitnessCAtOrder_of_opZero (m := m) (s := s) Hop
+
   have hw0_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (w0At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := w0At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_w0At_spec_proof (m := m) (s := s))
+      hreal0 hreal1 hreal2 Hw.hop_w0At
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
@@ -117,11 +115,11 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp2At_spec_proof (m := m) (s := s))
+      hreal0 hreal1 hreal2 Hw.hop_wp2At
 
   have hwp3_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp3At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp3At m s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wp3At_spec_proof (m := m) (s := s))
+      hreal0 hreal1 hreal2 Hw.hop_wp3At
 
   have hU0 : toeplitzRow3 (cOp s) (reVec3 (w0At m s)) :=
     toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero (cOp s) (w0At m s) hw0_row0
@@ -133,20 +131,20 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
     toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero (cOp s) (wp3At m s) hwp3_row0
 
   refine ⟨?_, ?_⟩
-  · exact
-      Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
-        (u0 := reVec3 (w0At m s))
-        (uc := reVec3 (wc s))
-        (v  := reVec3 (wp2At m s))
-        (c  := cOp s)
-        hc hU0 hUc hV2
-  · exact
-      Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
-        (u0 := reVec3 (w0At m s))
-        (uc := reVec3 (wc s))
-        (v  := reVec3 (wp3At m s))
-        (c  := cOp s)
-        hc hU0 hUc hV3
+  ·
+    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+      (u0 := reVec3 (w0At m s))
+      (uc := reVec3 (wc s))
+      (v := reVec3 (wp2At m s))
+      (c := cOp s)
+      hc hU0 hUc hV2
+  ·
+    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+      (u0 := reVec3 (w0At m s))
+      (uc := reVec3 (wc s))
+      (v := reVec3 (wp3At m s))
+      (c := cOp s)
+      hc hU0 hUc hV3
 
 end XiPacket
 end Targets
