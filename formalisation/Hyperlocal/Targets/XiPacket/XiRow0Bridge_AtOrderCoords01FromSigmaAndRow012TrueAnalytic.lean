@@ -7,15 +7,13 @@
     * XiRow012ConvolutionAtRevAtOrderTrueAnalytic
     * XiSigma3Nonzero
 
-  Strategy:
-    For each canonical AtOrder window, use the manuscript-side coordinate kill lemma
-
-      Tail345ManuscriptFromSigmaAndRow012.coords012_eq_zero_of_sigma_and_row012
-
-    to derive w0=w1=w2=0 from:
-      - row0Sigma = 0
-      - Row012ConvolutionAtRev
-      - σ3 ≠ 0
+  Updated structure:
+  * primary explicit-input theorem
+      `xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic`
+    consumes a concrete sigma payload `Hσ : XiAtOrderSigmaOut m s`
+  * wrapper theorem
+      `xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic`
+    recovers `Hσ` from `[XiAtOrderSigmaProvider]`
 
   IMPORTANT:
   * theorem-level only
@@ -39,18 +37,21 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-theorem xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
-    [XiAtOrderSigmaProvider]
+/--
+Explicit-input coords01-at-order theorem from:
+* a concrete sigma payload `Hσ`
+* Row012 true-analytic convolution facts
+* σ3 ≠ 0
+-/
+theorem xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     [XiSigma3Nonzero]
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi)
+    (Hσ : XiAtOrderSigmaOut m s) :
     XiAtOrderCoords01Out m s := by
   classical
   let hσ3 : (JetQuotOp.σ3 s : ℂ) ≠ 0 :=
     XiSigma3Nonzero.sigma3_ne_zero s
-
-  have Hσ : XiAtOrderSigmaOut m s :=
-    xiAtOrderSigmaOut_provided (m := m) (s := s)
 
   have Hw0 :
       (w0At m s) 0 = 0 ∧ (w0At m s) 1 = 0 ∧ (w0At m s) 2 = 0 :=
@@ -83,6 +84,21 @@ theorem xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
       hwp2At1 := Hwp2.2.1
       hwp3At0 := Hwp3.1
       hwp3At1 := Hwp3.2.1 }
+
+/--
+Wrapper theorem recovering the sigma payload from `[XiAtOrderSigmaProvider]`.
+-/
+theorem xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
+    [XiAtOrderSigmaProvider]
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
+    [XiSigma3Nonzero]
+    (m : ℕ) (s : OffSeed Xi) :
+    XiAtOrderCoords01Out m s := by
+  classical
+  have Hσ : XiAtOrderSigmaOut m s :=
+    xiAtOrderSigmaOut_provided (m := m) (s := s)
+  exact xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic
+    (m := m) (s := s) Hσ
 
 end XiPacket
 end Targets
