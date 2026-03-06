@@ -10,29 +10,20 @@
   `xiJetQuotOpZeroAtOrder_fromRecurrenceA` consumes the recurrence payload via
   a typeclass `[XiJetQuotRec2AtOrderProvider]`.
 
-  CLEAN SIGMA/COORDS RETARGET (post cycle-break):
-  The public wrapper now avoids the historical sigma/stub path.
+  CLEAN SIGMA/COORDS/REC2 RETARGET:
+  The public wrapper now freezes the full clean theorem-production spine locally:
 
-  New local route:
-    * install `[XiJetQuotRec2AtOrderTrueAnalytic]` from the true-analytic
-      Row012-convolution pipeline
-    * derive a local clean sigma provider from
-        `xiAtOrderSigmaOut_fromRec2TrueAnalytic`
-    * derive a local clean coords01 provider from
-        `xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic`
-    * let the standard interface
-        `[XiJetQuotRec2AtOrderTrueAnalytic] -> [XiJetQuotRec2AtOrderProvider]`
-      feed `xiJetQuotOpZeroAtOrder_fromRecurrenceA`
+    Row012 true-analytic
+      -> clean sigma from Rec2 true-analytic
+      -> clean coords01 from explicit sigma + Row012 true-analytic
+      -> explicit local Rec2 provider from Row012 upstream
+      -> `xiJetQuotOpZeroAtOrder_fromRecurrenceA`
 
-  IMPORTANT:
-  * do not touch shared historical provider files
-  * install only local theorem-backed instances here
-  * this is the direct attack on the remaining Row0 spec trio
-      `xiJetQuot_row0_w0At_spec`
-      `xiJetQuot_row0_wp2At_spec`
-      `xiJetQuot_row0_wp3At_spec`
+  Goal:
+  avoid any fallback through global provider selection at the public wrapper site.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
 
@@ -56,9 +47,6 @@ open Hyperlocal.Transport
 
 /--
 Local theorem-level sigma provider from the clean Rec2 true-analytic interface.
-
-This avoids the historical theorem/provider surface
-`xiAtOrderSigmaOut_axiom -> xiAtOrderSigmaOut_fromRow0FrontierAtOrder`.
 -/
 private def xiAtOrderSigmaProvider_fromRec2TrueAnalytic
     [XiJetQuotRec2AtOrderTrueAnalytic] :
@@ -69,11 +57,10 @@ private def xiAtOrderSigmaProvider_fromRec2TrueAnalytic
     exact xiAtOrderSigmaOut_fromRec2TrueAnalytic (m := m) (s := s)
 
 /--
-Local theorem-level coords provider from clean sigma + Row012 true-analytic.
-This is installer-free and used only to freeze the intended clean route into the
-historical public theorem surface.
+Local theorem-level coords provider from explicit sigma + Row012 true-analytic.
+This uses the explicit-input theorem, not the provider-facing wrapper.
 -/
-private def xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
+private def xiAtOrderCoords01Provider_ofSigmaAndRow012TrueAnalytic
     [XiAtOrderSigmaProvider]
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     [XiSigma3Nonzero] :
@@ -81,15 +68,32 @@ private def xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
   coords01 := by
     intro m s
     classical
-    exact xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic (m := m) (s := s)
+    have Hσ : XiAtOrderSigmaOut m s :=
+      xiAtOrderSigmaOut_provided (m := m) (s := s)
+    exact xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic
+      (m := m) (s := s) Hσ
+
+/--
+Local clean recurrence provider, backed explicitly by the Row012-upstream theorem
+route and the locally frozen clean sigma/coords providers above.
+-/
+private def xiJetQuotRec2AtOrderProvider_fromRow012Upstream
+    [XiAtOrderSigmaProvider]
+    [XiAtOrderCoords01Provider] :
+    XiJetQuotRec2AtOrderProvider where
+  rec2AtOrder := by
+    intro m s
+    classical
+    exact xiJetQuotRec2AtOrder_fromRow012Upstream (m := m) (s := s)
 
 /--
 Route–B recurrence-natural semantic output.
 
 Public wrapper: call the theorem-level route from `...FromRecurrenceA`, but with:
-* clean true-analytic Rec2
+* clean true-analytic Rec2 interface
 * local clean sigma from Rec2
-* local clean coords from sigma + Row012 true-analytic
+* local clean coords from explicit sigma + Row012 true-analytic
+* explicit local clean Rec2 provider from Row012 upstream
 -/
 theorem xiJetQuotOpZeroAtOrder (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrder m s := by
   classical
@@ -99,7 +103,9 @@ theorem xiJetQuotOpZeroAtOrder (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrd
     xiAtOrderSigmaProvider_fromRec2TrueAnalytic
   letI : XiSigma3Nonzero := by infer_instance
   letI : XiAtOrderCoords01Provider :=
-    xiAtOrderCoords01Provider_fromSigmaAndRow012TrueAnalytic
+    xiAtOrderCoords01Provider_ofSigmaAndRow012TrueAnalytic
+  letI : XiJetQuotRec2AtOrderProvider :=
+    xiJetQuotRec2AtOrderProvider_fromRow012Upstream
 
   exact xiJetQuotOpZeroAtOrder_fromRecurrenceA (m := m) (s := s)
 

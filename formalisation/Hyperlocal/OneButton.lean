@@ -62,17 +62,13 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 --#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
-#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderSigmaOut_fromRec2TrueAnalytic
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2AtOrder_fromRow012Upstream
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow012AtOrder_analytic_upstream
-#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic
-#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
+#print axioms Hyperlocal.Targets.XiPacket.xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
+#print axioms Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalytic.row012_out
+#print axioms Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At
+#print axioms Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp2At
+#print axioms Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp3At
 #print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream
-#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
 #print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
-
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb3_fromRecurrence
