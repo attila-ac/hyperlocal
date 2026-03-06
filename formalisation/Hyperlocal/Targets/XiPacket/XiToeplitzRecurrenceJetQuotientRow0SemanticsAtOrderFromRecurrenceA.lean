@@ -9,6 +9,13 @@
     [XiJetQuotRec2AtOrderProvider]  ⟹  XiJetQuotRec2AtOrder m s
 
   This concentrates the remaining semantic cliff into a small provider instance file.
+
+  BREAKTHROUGH ATTEMPT:
+  The core theorem is now factored through an explicit recurrence payload
+
+    Hrec : XiJetQuotRec2AtOrder m s
+
+  so downstream clean routes can bypass the provider/class layer entirely.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
@@ -98,17 +105,17 @@ private lemma row2_eq_zero_of_rec2
   simpa [toeplitzL_two_apply_fin2] using h2'
 
 /--
-Route–A discharge point: theorem-level, derived from the *provided* recurrence payload.
+Core discharge theorem from an explicit recurrence payload.
 
-No axiom imports here; the only remaining cliff is the provider instance.
+This theorem is the true semantic target for clean upstream routes:
+once `Hrec` is supplied directly, no provider/class indirection remains in the
+proof term.
 -/
-theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) [XiJetQuotRec2AtOrderProvider] :
+theorem xiJetQuotOpZeroAtOrder_of_rec2
+    (m : ℕ) (s : OffSeed Xi)
+    (Hrec : XiJetQuotRec2AtOrder m s) :
     XiJetQuotOpZeroAtOrder m s := by
   classical
-  have Hrec : XiJetQuotRec2AtOrder m s :=
-    xiJetQuotRec2AtOrder_provided (m := m) (s := s)
-
   have h0_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (0 : Fin 3) = 0 :=
     row0_eq_zero_of_rec2 (s := s) (w := w0At m s) Hrec.h_w0At
   have h0_wp2At : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (0 : Fin 3) = 0 :=
@@ -119,9 +126,9 @@ theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
   have h0 : XiJetQuotRow0WitnessCAtOrder m s := ⟨h0_w0At, h0_wp2At, h0_wp3At⟩
 
   have h1_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (1 : Fin 3) = 0 :=
-    row1_eq_zero_of_rec2 (s := s) (w := w0At m s)  Hrec.h_w0At
+    row1_eq_zero_of_rec2 (s := s) (w := w0At m s) Hrec.h_w0At
   have h2_w0At  : (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s))  (2 : Fin 3) = 0 :=
-    row2_eq_zero_of_rec2 (s := s) (w := w0At m s)  Hrec.h_w0At
+    row2_eq_zero_of_rec2 (s := s) (w := w0At m s) Hrec.h_w0At
 
   have h1_wp2At : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (1 : Fin 3) = 0 :=
     row1_eq_zero_of_rec2 (s := s) (w := wp2At m s) Hrec.h_wp2At
@@ -138,6 +145,17 @@ theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
     (h1_w0At := h1_w0At)   (h2_w0At := h2_w0At)
     (h1_wp2At := h1_wp2At) (h2_wp2At := h2_wp2At)
     (h1_wp3At := h1_wp3At) (h2_wp3At := h2_wp3At)
+
+/--
+Route–A discharge point: theorem-level, derived from the *provided* recurrence payload.
+
+No axiom imports here; the only remaining cliff is the provider instance.
+-/
+theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
+    (m : ℕ) (s : OffSeed Xi) [XiJetQuotRec2AtOrderProvider] :
+    XiJetQuotOpZeroAtOrder m s := by
+  exact xiJetQuotOpZeroAtOrder_of_rec2 (m := m) (s := s)
+    (Hrec := xiJetQuotRec2AtOrder_provided (m := m) (s := s))
 
 end XiPacket
 end Targets

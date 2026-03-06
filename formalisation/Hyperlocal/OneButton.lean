@@ -62,10 +62,11 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 --#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
-
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_of_rec2
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2AtOrder_fromRow012Upstream
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
 #print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
--- #print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
 
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
