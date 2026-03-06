@@ -1,19 +1,28 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom.lean
 
-  Analytic (non-cycle-safe) landing for the Row012 target bundle.
+  Analytic landing for the Row012 target bundle.
 
-  IMPORTANT:
-  This MUST remain primitive (later true analytic proof) because the extractor
-  stack depends on it, and the Route–C proof stack now depends (indirectly) on the extractor
-  via the heart discharge.
+  IMPORTANT (new graph discipline):
+  * this file is now interface-parametric
+  * it must NOT import provider installers
+  * it must NOT import historical theorem/axiom installer surfaces
 
-  If you try to define this from Route–C, you create an import cycle.
+  Reason:
+  The analytic extractor is the only downstream consumer of this file.
+  If this file imports installed sigma/coords providers directly, it freezes those
+  historical surfaces into the extractor cone and can create import cycles.
+
+  The installed extractor-facing import surface now lives in the separate file:
+
+    XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticInstaller.lean
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticProofUpstream
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstaller
+
+-- provider interfaces only
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 
 set_option autoImplicit false
 noncomputable section
@@ -26,13 +35,15 @@ open Complex
 open Hyperlocal.Transport
 
 /-
-Upstream analytic endpoint: provide the Type-valued Row012 target bundle.
+Parametric analytic endpoint: provide the Type-valued Row012 target bundle.
 
-This file is the *unique extractor-facing import*.
-Its implementation is delegated to `...AnalyticProofUpstream` to keep the dependency DAG cycle-free.
+This file is now upstream/interface-only.
+Concrete provider installation is delegated to the separate installer import surface.
 -/
 noncomputable def xiJetQuotRow012AtOrder_analytic
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow012AtOrder m s :=
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    XiJetQuotRow012AtOrder m s :=
   xiJetQuotRow012AtOrder_analytic_upstream (m := m) (s := s)
 
 end XiPacket

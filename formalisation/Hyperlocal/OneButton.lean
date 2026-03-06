@@ -64,21 +64,14 @@ Then paste the exact constant name into a #check / #print axioms block below.
 --#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
+--#print axiomsP Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
 --#check Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_fromRecurrenceA
 --#check Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_of_opZero
 
---#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_atOrder
---#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzRecurrenceIdentity_atOrder_im
---#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAt_fromRecurrenceC
---#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC
---#print axioms Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_w0_fromRecurrenceC
-
-#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
-#check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
-#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow012AtOrder_analytic_upstream
-#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
-#print axioms Hyperlocal.Targets.offSeedPhaseLock_Xi
+#print axioms Hyperlocal.Targets.XiPacket.xiJetNonflat_dslope_exists
+#print axioms Hyperlocal.Targets.XiPacket.hkappaAt_of_dslopeIter_ne0
+#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff2_eq_zero
+#print axioms Hyperlocal.Targets.XiPacket.xiBcoeff3_eq_zero
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb2_fromRecurrence
 --#print axioms Hyperlocal.Targets.XiPacket.xiToeplitz_hb3_fromRecurrence
