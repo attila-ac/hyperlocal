@@ -8,9 +8,12 @@
       ⇒ Row012ConvolutionAtRev
       ⇒ Row012Upstream installer
       ⇒ Rec2AtOrder true-analytic instance
+
+  Sigma-at-order in this cone should come from the clean Rec2 true-analytic route,
+  not from the historical frontier-backed theorem shim.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderAnalytic
 
 -- Provide the *manuscript* Tail345 payload and adapt it to the real Tail345 gate.
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345FromHeartAndCoords
