@@ -1,21 +1,10 @@
-/-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGateFromAnalytic.lean
-
-  FIX (Lean 4.23-rc2):
-    `theorem` must have a Prop type. Here the "alias" returns a Type
-    (`XiJetQuotRow0ConcreteExtractAtOrder m s`), so it must be a `def`.
-
-  This file stays cycle-safe: it imports only GateDefs + the Route–B endpoint module,
-  not the Gate axiom/heart/frontier.
--/
-
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderScalarize
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderGateDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderFromRecurrenceB
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_AtOrderCore
 
 import Mathlib.Tactic
 
@@ -29,7 +18,7 @@ namespace XiPacket
 open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
-open Hyperlocal.Cancellation  -- brings `convCoeff` into scope
+open Hyperlocal.Cancellation
 
 /-- Local alias: the Route–B endpoint feeding the AtOrder Gate glue (Type-valued, so `def`). -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic
@@ -37,11 +26,13 @@ noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic
   xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB (m := m) (s := s)
 
 /-- Build `Row0ConvolutionAtRev` for `w0At m s` from the analytic Toeplitz witness. -/
-theorem row0ConvolutionAtRev_w0At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_w0At_fromAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (s.ρ) (w0At m s) := by
   classical
-  -- NEW: specialised Route–A package (old `xiRouteA_jetPkg` is gone)
-  rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
+  rcases JetQuotOpClean.xiRouteA_jetPkg_w0At_clean (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=
@@ -56,10 +47,13 @@ theorem row0ConvolutionAtRev_w0At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
   exact ⟨G, hfac, hjet, h3⟩
 
 /-- Build `Row0ConvolutionAtRev` for `wp2At m s` from the analytic Toeplitz witness. -/
-theorem row0ConvolutionAtRev_wp2At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_wp2At_fromAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
-  rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
+  rcases JetQuotOpClean.xiRouteA_jetPkg_wp2At_clean (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=
@@ -74,10 +68,13 @@ theorem row0ConvolutionAtRev_wp2At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
   exact ⟨G, hfac, hjet, h3⟩
 
 /-- Build `Row0ConvolutionAtRev` for `wp3At m s` from the analytic Toeplitz witness. -/
-theorem row0ConvolutionAtRev_wp3At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_wp3At_fromAnalytic
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
-  rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
+  rcases JetQuotOpClean.xiRouteA_jetPkg_wp3At_clean (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have E : XiJetQuotRow0ConcreteExtractAtOrder m s :=
@@ -93,7 +90,9 @@ theorem row0ConvolutionAtRev_wp3At_fromAnalytic (m : ℕ) (s : OffSeed Xi) :
 
 /-- Package the three AtOrder Row--0 convolution facts (discharged from analytic Toeplitz witness). -/
 theorem xiJetQuotRow0AtOrderConvolutionOut_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetQuotRow0AtOrderConvolutionOut m s := by
   refine ⟨?_, ?_, ?_⟩
   · exact row0ConvolutionAtRev_w0At_fromAnalytic (m := m) (s := s)

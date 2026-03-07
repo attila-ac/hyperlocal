@@ -14,13 +14,16 @@
 import Hyperlocal.Targets.XiPhaseLock
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceInject
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Core
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider
 
+def instRouteAProvider :
+    Hyperlocal.Targets.XiPacket.RouteAJetCoordProvider := inferInstance
 
--- If these imports exist in your tree, keep them; if they don't, comment them out.
--- (They were the ones that were "unknown identifier" for you because the theorem names differ,
---  but the *modules* might still exist.)
--- import Hyperlocal.Conclusion.Stage3BridgeOfStage3System
--- import Hyperlocal.Conclusion.FinisherStage3System
+#print axioms instRouteAProvider
+#print axioms Hyperlocal.Targets.XiPacket.w0_eq_jet3_routeA
+#print axioms Hyperlocal.Targets.XiPacket.wc_eq_jet3_routeA
+
 
 set_option autoImplicit false
 noncomputable section
@@ -46,22 +49,6 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 -- This searches for *anything* in scope whose type is `NoOffSeed Xi`.
 
---#print axioms Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_of_toeplitz_row0_eq_zero
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_w0At
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp2At
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp3At
---#print axioms Hyperlocal.Targets.XiPacket.w0At
---#print axioms Hyperlocal.Targets.XiPacket.wp2At
---#print axioms Hyperlocal.Targets.XiPacket.wp3At
-
---#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_w0At
---#print axioms Hyperlocal.Targets.XiPacket.row0Sigma_eq_zero_of_toeplitz_row0_eq_zero
-
--- #print axioms Hyperlocal.Targets.XiPacket.xiAtOrderSigmaOut_fromRow0FrontierAtOrder
--- #print axioms Hyperlocal.Targets.XiPacket.routeAJetCoordProvider_axiom
-
--- #check (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
---#print axioms (inferInstance : Hyperlocal.Targets.XiPacket.XiAtOrderCoords01Provider)
 #print axioms Hyperlocal.Targets.XiPacket.xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
 #print axioms Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalytic.row012_out
 #print axioms Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At

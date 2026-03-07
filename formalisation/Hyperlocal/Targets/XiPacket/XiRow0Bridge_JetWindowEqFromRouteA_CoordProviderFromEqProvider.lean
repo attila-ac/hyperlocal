@@ -1,17 +1,15 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider.lean
 
-  E1 completed:
   Build full `RouteAJetCoordProvider` from Eq-provider for w0/wp2/wp3 and
-  from Route–A jet/leibniz package for wc (NO axioms).
+  from the tiny wc-only axiom boundary for wc.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcCoordsFromRouteAJetLeibniz
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcAxioms
 
 import Mathlib.Tactic
 
@@ -30,10 +28,6 @@ namespace TAC
 open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
-/-!
-## Definitional alignment for `m = 0`
--/
-
 @[simp] lemma xiCentralJetAt_zero (s : OffSeed Xi) : xiCentralJetAt 0 s = xiCentralJet s := by
   ext i
   fin_cases i <;> simp [xiCentralJetAt, xiCentralJet, xiJet3At, cderivIter]
@@ -50,17 +44,10 @@ end TAC
   ext i
   simp [wp3At, wpAt, wp3, w0At_zero]
 
-/-!
-## Anchor alignment lemma (Route–E trick)
--/
 private theorem z_w0At_eq_rho (s : OffSeed Xi) : TAC.z_w0At s = s.ρ := by
   apply Complex.ext
   · simp [TAC.z_w0At, sc, σ, t, Hyperlocal.Targets.XiTransport.delta]
   · simp [TAC.z_w0At, sc, σ, t, Hyperlocal.Targets.XiTransport.delta]
-
-/-!
-## Main instance: RouteAJetCoordProvider
--/
 
 instance (priority := 1000)
     [TAC.XiJetWindowEqAtOrderQuotProvider] : RouteAJetCoordProvider := by
@@ -97,11 +84,14 @@ instance (priority := 1000)
     simpa [TAC.jet3, z_w0At_eq_rho (s := s)] using h2
 
   ---------------------------------------------------------------------------
-  -- wc : theorem-level from Route–A jet/leibniz package (NO axioms)
+  -- wc : tiny wc-only boundary
   ---------------------------------------------------------------------------
-  · intro s; simpa using JetQuotOp.wc_0_from_routeAJetPkg (s := s)
-  · intro s; simpa using JetQuotOp.wc_1_from_routeAJetPkg (s := s)
-  · intro s; simpa using JetQuotOp.wc_2_from_routeAJetPkg (s := s)
+  · intro s
+    simpa using RouteAJetCoordAxioms.Wc.ax_wc_0 s
+  · intro s
+    simpa using RouteAJetCoordAxioms.Wc.ax_wc_1 s
+  · intro s
+    simpa using RouteAJetCoordAxioms.Wc.ax_wc_2 s
 
   ---------------------------------------------------------------------------
   -- wp2 : from m = 0 pivot; z_wp2At simp

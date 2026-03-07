@@ -13,7 +13,7 @@
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Theorem
 
 import Mathlib.Tactic
 
