@@ -1,17 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderCoords01ProviderInstallerFromRec2AtOrderTrueAnalytic.lean
 
-  Cycle-safe installer:
+  ROOT-FREE conditional installer:
 
-    XiAtOrderCoords01Provider := coords01 derived from the TRUE-ANALYTIC Rec2-at-order route.
+    [XiJetQuotRec2AtOrderProvider] -> [XiAtOrderCoords01Provider]
 
-  This file should be imported only by end-claim cones.
-  Upstream/firewall modules must depend only on the interface
-    `XiRow0Bridge_AtOrderCoords01Provider`.
+  IMPORTANT:
+  * this is no longer a zero-premise installer
+  * do NOT import this into the analytic installer cone
+  * it is for downstream / end-claim cones where a Rec2 provider is already present
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderFromRec2AtOrderTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
 
 set_option autoImplicit false
 noncomputable section
@@ -20,8 +22,8 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Installer: provides `XiAtOrderCoords01Provider` via the TRUE-ANALYTIC Rec2-at-order route. -/
-instance (priority := 50) : XiAtOrderCoords01Provider where
+instance (priority := 50)
+    [XiJetQuotRec2AtOrderProvider] : XiAtOrderCoords01Provider where
   coords01 := by
     intro m s
     classical
