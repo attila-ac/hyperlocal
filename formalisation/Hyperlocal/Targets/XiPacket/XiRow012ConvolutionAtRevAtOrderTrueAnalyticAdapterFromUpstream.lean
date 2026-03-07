@@ -9,10 +9,16 @@
   while the real analytic proof can be swapped in later.
 
   No new axioms introduced by this adapter itself.
+
+  Graph note:
+  `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic` requires
+  `[XiAtOrderSigmaProvider]`, so this adapter must import the installed sigma
+  producer surface explicitly.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
 
 set_option autoImplicit false
 noncomputable section
