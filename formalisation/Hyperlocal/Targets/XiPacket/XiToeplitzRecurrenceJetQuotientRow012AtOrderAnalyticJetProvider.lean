@@ -91,18 +91,28 @@ theorem jet_wp3At (P : XiJetQuotRow012AtOrder_AnalyticJet m s) :
 end XiJetQuotRow012AtOrder_AnalyticJet
 
 /--
-Exported endpoint (same name intent as before):
+Exported endpoint (same name intent as before).
 
 Now definitionally uses the theorem-level upstream base payload,
-and depends on `[XiJetWindowEqAtOrderProvider]` for the window equalities.
+and depends on explicit provider gates for:
+* window equalities,
+* sigma-at-order,
+* coords01-at-order.
 -/
 noncomputable def xiJetQuotRow012AtOrder_analyticJet
-    (m : ℕ) (s : OffSeed Xi) [XiJetWindowEqAtOrderProvider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetWindowEqAtOrderProvider]
+    [XiAtOrderSigmaProvider]
+    [XiAtOrderCoords01Provider] :
     XiJetQuotRow012AtOrder_AnalyticJet m s :=
-  { base := Hyperlocal.Targets.XiPacket.xiJetQuotRow012AtOrder_analytic_upstream (m := m) (s := s)
-    w0At_eq_xiJet3AtOrder  := (xiJetWindowEqAtOrder (m := m) (s := s)).w0At_eq_xiJet3AtOrder
-    wp2At_eq_xiJet3AtOrder := (xiJetWindowEqAtOrder (m := m) (s := s)).wp2At_eq_xiJet3AtOrder
-    wp3At_eq_xiJet3AtOrder := (xiJetWindowEqAtOrder (m := m) (s := s)).wp3At_eq_xiJet3AtOrder }
+  { base := Hyperlocal.Targets.XiPacket.xiJetQuotRow012AtOrder_analytic_upstream
+      (m := m) (s := s)
+    w0At_eq_xiJet3AtOrder  :=
+      (xiJetWindowEqAtOrder (m := m) (s := s)).w0At_eq_xiJet3AtOrder
+    wp2At_eq_xiJet3AtOrder :=
+      (xiJetWindowEqAtOrder (m := m) (s := s)).wp2At_eq_xiJet3AtOrder
+    wp3At_eq_xiJet3AtOrder :=
+      (xiJetWindowEqAtOrder (m := m) (s := s)).wp3At_eq_xiJet3AtOrder }
 
 end TAC
 
