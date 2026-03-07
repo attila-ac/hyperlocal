@@ -12,13 +12,21 @@
       to manufacture Row012ConvolutionAtRev for each window,
     * project the 9 convCoeff equalities.
 
+  IMPORTANT:
+    `XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromHeartAndCoords.lean`
+    is now theorem-side and explicitly requires
+
+        [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+    Therefore this consumer must thread that gate honestly as well.
+
   Output:
     An instance of the manuscript tail class
       XiJetConvolutionTail345AtOrderTrueAnalytic_Manuscript
     which is immediately upgraded to the real tail class
       XiJetConvolutionTail345AtOrderTrueAnalytic
     by the adapter instance already present in
-      XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Manuscript.lean.
+      `XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Manuscript.lean`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
@@ -37,7 +45,7 @@ namespace XiPacket
 
 open Complex
 open Hyperlocal.Transport
-open Hyperlocal.Cancellation   -- <-- FIX: brings `convCoeff` into scope
+open Hyperlocal.Cancellation
 
 /-- Helper: extract the three tail equalities from a `Row012ConvolutionAtRev` witness. -/
 private theorem tail345_of_row012ConvolutionAtRev
@@ -52,7 +60,9 @@ private theorem tail345_of_row012ConvolutionAtRev
 
 /-- Push C: tail(3/4/5) for `w0At` from heart+coords. -/
 theorem tail345_w0At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 5 = 0 := by
@@ -69,7 +79,9 @@ theorem tail345_w0At_from_heart_and_coords
 
 /-- Push C: tail(3/4/5) for `wp2At` from heart+coords. -/
 theorem tail345_wp2At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 5 = 0 := by
@@ -86,7 +98,9 @@ theorem tail345_wp2At_from_heart_and_coords
 
 /-- Push C: tail(3/4/5) for `wp3At` from heart+coords. -/
 theorem tail345_wp3At_from_heart_and_coords
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 5 = 0 := by
@@ -108,7 +122,9 @@ Downstream, the adapter instance in
 `XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Manuscript.lean`
 upgrades this to `XiJetConvolutionTail345AtOrderTrueAnalytic`.
 -/
-instance (priority := 1000) [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+instance (priority := 1000)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetConvolutionTail345AtOrderTrueAnalytic_Manuscript where
   tail3_w0At := by
     intro m s
