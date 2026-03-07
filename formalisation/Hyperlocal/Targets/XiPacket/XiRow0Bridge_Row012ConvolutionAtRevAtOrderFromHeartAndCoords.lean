@@ -2,7 +2,11 @@
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromHeartAndCoords.lean
 
   Cycle-safe core builder:
-    heart bundle + coords01 bundle  ==>  Row012 reverse-stencil payload.
+    heart bundle + coords01 bundle ==> Row012 reverse-stencil payload.
+
+  Theorem-side retarget:
+    consume the Route–A at-order jet packages from `JetQuotOpTheorem`,
+    not from the legacy mixed wrapper.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartDefs
@@ -13,7 +17,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDef
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Reduce
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
 
 import Mathlib.Tactic
 
@@ -32,6 +36,7 @@ open Hyperlocal.Cancellation
 /-- Core builder: heart + coords ⇒ row012 reverse-stencil payload (AtOrder). -/
 theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
     (m : ℕ) (s : OffSeed Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (H : XiJetQuotRow0AtOrderHeartOut m s)
     (HC : XiAtOrderCoords01Out m s) :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
@@ -39,7 +44,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
   refine ⟨?_, ?_, ?_⟩
 
   · -- w0At
-    rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
+    rcases JetQuotOpTheorem.xiRouteA_jetPkg_w0At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
       have hs : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
@@ -51,7 +56,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (s := s) (z := s.ρ) (w := w0At m s) H0 HL
 
   · -- wp2At
-    rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
+    rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
       have hs : row0Sigma s (wp2At m s) = 0 := H.hwp2AtSigma
@@ -63,7 +68,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
       (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) H0 HL
 
   · -- wp3At
-    rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
+    rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
       ⟨G, hfac, hjet, _, _, _, _⟩
     have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by
       have hs : row0Sigma s (wp3At m s) = 0 := H.hwp3AtSigma

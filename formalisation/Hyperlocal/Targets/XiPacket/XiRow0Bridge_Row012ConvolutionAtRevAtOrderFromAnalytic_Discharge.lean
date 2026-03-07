@@ -53,21 +53,17 @@ theorem row012ConvolutionAtRev_w0At_fromHeart
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
 
-  -- rebuilt extra-lin bundle (theorem-level)
   have HLall : XiRow012ExtraLinAtOrderOut m s :=
     xiRow012ExtraLinAtOrderOut_fromHeart (m := m) (s := s)
   have HL : Row012ExtraLin s (w0At m s) := HLall.hw0At
 
-  -- Route–A witnesses (NEW API; old `xiRouteA_jetPkg` is gone)
   rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
-  -- coeff 3 from row0Sigma = 0
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
     have hs : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
     simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w0At m s)] using hs
 
-  -- coeff 4/5 from Row012ExtraLin via closed forms
   have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 := by
     rw [convCoeff_rev_eq_n4 (s := s) (w := w0At m s)]
     simpa using HL.h4
