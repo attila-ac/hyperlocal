@@ -18,6 +18,8 @@ namespace Hyperlocal.Targets.XiPacket
 open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-
 Option A (direct bCoeff-level phase lock)
 -/

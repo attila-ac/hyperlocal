@@ -27,6 +27,8 @@ open scoped BigOperators Real
 open Hyperlocal.Transport
 open ToeplitzLToRow3
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 namespace ToeplitzEllOutAtOrderProof
 
 def cOp (s : Hyperlocal.OffSeed Xi) : Fin 3 → ℝ :=

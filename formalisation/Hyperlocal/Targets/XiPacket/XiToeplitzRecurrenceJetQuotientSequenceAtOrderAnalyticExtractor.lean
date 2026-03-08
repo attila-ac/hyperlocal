@@ -37,9 +37,10 @@ theorem xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor
     JetQuotRec2 s (padSeq3 (wp3At m s)) := by
   classical
 
-  -- downstream extractor: consume the installed analytic surface explicitly
-  letI : XiAtOrderSigmaProvider := by infer_instance
-  letI : XiAtOrderCoords01Provider := by infer_instance
+  -- Do not ask typeclass search to rediscover these at this consumer node.
+  -- Install the currently intended extractor-facing provider surfaces explicitly.
+  letI : XiAtOrderSigmaProvider := ⟨xiAtOrderSigmaOut_axiom⟩
+  letI : XiAtOrderCoords01Provider := ⟨xiAtOrderCoords01Out_axiom_stub⟩
 
   have Hrow012 : XiJetQuotRow012AtOrder m s :=
     xiJetQuotRow012AtOrder_analytic (m := m) (s := s)

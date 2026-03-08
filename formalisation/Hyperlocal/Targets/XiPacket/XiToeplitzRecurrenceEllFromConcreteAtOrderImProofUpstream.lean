@@ -28,6 +28,8 @@ open Hyperlocal.Transport
 open ToeplitzLToRow3
 open ToeplitzEllOutAtOrderProof
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /--
 Row-0 imag-transport: from a row-0 `toeplitzL` constraint we obtain a real row
 stencil constraint on `imVec3`.

@@ -1,9 +1,18 @@
 /-
-PATCH (REPLACE FILE CONTENT) for:
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_CauchyConvolutionDischarge.lean
 
-Use the canonical Move–3 theorems `row0ConvolutionAtRev_w*` (axiom-free),
-instead of the general bridge `row0ConvolutionAtRev_of_JetLeibnizAt`.
+  Route-C discharge of the row-0 scalar sigma goals.
+
+  IMPORTANT:
+  The canonical Move-3 theorems
+    `row0ConvolutionAtRev_w0`, `row0ConvolutionAtRev_wc`,
+    `row0ConvolutionAtRev_wp2`, `row0ConvolutionAtRev_wp3`
+  are theorem-side results that now depend on the explicit provider gate
+
+    [TAC.XiJetWindowEqAtOrderQuotProvider].
+
+  Therefore this file must carry that gate explicitly rather than hoping
+  instance synthesis finds a global default producer.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
@@ -18,6 +27,8 @@ namespace Hyperlocal.Targets.XiPacket
 
 open Complex
 open scoped BigOperators
+
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 namespace JetQuotOp
 
@@ -43,14 +54,14 @@ theorem row0Sigma_w0_eq_zero (s : OffSeed Xi) : row0Sigma s (w0 s) = 0 := by
 
 theorem row0Sigma_wc_eq_zero (s : OffSeed Xi) : row0Sigma s (wc s) = 0 := by
   exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
-    (s := s) (z := (1 - s.ρ)) (w := wc s) (JetQuotOp.row0Conv_wc s)
+    (s := s) (z := 1 - s.ρ) (w := wc s) (JetQuotOp.row0Conv_wc s)
 
 theorem row0Sigma_wp2_eq_zero (s : OffSeed Xi) : row0Sigma s (wp2 s) = 0 := by
   exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
-    (s := s) (z := ((starRingEnd ℂ) s.ρ)) (w := wp2 s) (JetQuotOp.row0Conv_wp2 s)
+    (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2 s) (JetQuotOp.row0Conv_wp2 s)
 
 theorem row0Sigma_wp3_eq_zero (s : OffSeed Xi) : row0Sigma s (wp3 s) = 0 := by
   exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
-    (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3 s) (JetQuotOp.row0Conv_wp3 s)
+    (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3 s) (JetQuotOp.row0Conv_wp3 s)
 
 end Hyperlocal.Targets.XiPacket

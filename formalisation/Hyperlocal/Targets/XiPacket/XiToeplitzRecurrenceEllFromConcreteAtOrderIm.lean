@@ -1,17 +1,3 @@
-/-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceEllFromConcreteAtOrderIm.lean
-
-  Imag-pivot analogue of `XiToeplitzRecurrenceEllFromConcreteAtOrder`.
-
-  Status (2026-03-04): theorem-level.
-
-  Pattern:
-  * keep this file import-light (DAG-stable downstream surface)
-  * move the concrete operator proof to an upstream module
-
-  This avoids import cycles with `XiToeplitzRecurrenceIdentityIm`.
--/
-
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrderImProofUpstream
@@ -26,6 +12,8 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
+
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 /--
 Ell-out at order `m` for the imag-pivot columns:

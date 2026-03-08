@@ -5,17 +5,18 @@
 
   Policy:
   * leaves the historical installer untouched
-  * installs the Rec2-backed TRUE-ANALYTIC theorem corridor
-  * installs coords01 via the conditional Rec2-based installer
+  * keeps the strict Rec2-backed TRUE-ANALYTIC corridor in the cone
+  * explicitly installs the Row012 true-analytic fieldwise instance needed by the
+    theorem-side coords01 constructor
   * intended first consumer:
       XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticAxiom
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstallerFromRec2AtOrderTrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalyticFromRec2TrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromOutTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRec2TrueAnalyticRoot
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromUpstream
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromSigmaAndRow012TrueAnalytic
 
 set_option autoImplicit false
 noncomputable section

@@ -18,6 +18,8 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-- Public endpoint: SpanOut from the kernel (semantics layer). -/
 theorem xiToeplitzSpanOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     XiToeplitzSpanOut s := by

@@ -1,0 +1,3 @@
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
+
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wc_spec_proof

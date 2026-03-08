@@ -37,6 +37,8 @@ open Hyperlocal.Targets.XiPacket
 
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-! ### Small algebra: `bCoeff = 0` forces `sin(t log p) = 0` -/
 
 lemma sin_eq_zero_of_bCoeff_eq_zero (σ t p : ℝ)

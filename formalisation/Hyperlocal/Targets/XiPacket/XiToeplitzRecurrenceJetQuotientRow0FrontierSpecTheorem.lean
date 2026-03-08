@@ -20,6 +20,8 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-- Theorem-backed `wc` frontier spec fact. -/
 theorem xiJetQuot_row0_wc_spec_theorem
   (s : OffSeed Xi) :

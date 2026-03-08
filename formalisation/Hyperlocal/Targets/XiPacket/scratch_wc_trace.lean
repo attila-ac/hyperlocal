@@ -1,0 +1,8 @@
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Analytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischarge
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
+
+#print axioms Hyperlocal.Targets.XiPacket.row0Sigma_wc_eq_zero
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_scalarGoals
+#print axioms Hyperlocal.Targets.XiPacket.row0ConvolutionAtRev_wc
+#print axioms Hyperlocal.Targets.XiPacket.JetQuotOp.row0Conv_wc

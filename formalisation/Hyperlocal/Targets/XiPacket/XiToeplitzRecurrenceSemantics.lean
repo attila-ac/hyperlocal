@@ -26,6 +26,8 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-- Kernel-level output: currently just SpanOut, extendable later. -/
 structure XiToeplitzKernelOut (s : Hyperlocal.OffSeed Xi) : Prop
     extends toSpanOut : XiToeplitzSpanOut s

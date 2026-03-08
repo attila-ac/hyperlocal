@@ -29,6 +29,8 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /--
 Identity route at order `m` (imag pivot):
 

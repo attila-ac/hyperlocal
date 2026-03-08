@@ -24,6 +24,8 @@ namespace XiPacket
 open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-- Consumer lemma: `bCoeff(2)=0` from the Toeplitz recurrence, via the pivot gate. -/
 theorem xiToeplitz_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiKappaPivotNonzero s] :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by

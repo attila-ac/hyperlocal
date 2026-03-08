@@ -1,16 +1,22 @@
 /-
-PATCH (REPLACE FILE CONTENT) for:
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row0Coeff3Extractor.lean
 
-Fix:
-  Your build cycle is caused by importing Row0Concrete / Row0ConcreteProof, which
-  (via Row0Analytic) depends back on Route–C files.
-
-This version imports ONLY the cycle-safe Route–B frontier file.
+  Cycle-kill extractor:
+  * DO NOT import `XiToeplitzRecurrenceJetQuotientRow0Frontier`
+    because that re-enters `...Row0Concrete` and closes the build cycle.
+  * DO NOT import `XiToeplitzRecurrenceJetQuotientRow0FrontierSpecTheorem`
+    because that sits downstream of `...Row0ConcreteExtract`, which depends back on
+    this extractor.
+  * Instead consume only:
+      - row-0 scalar rewrite from `...Row0ConcreteProof`
+      - theorem-side `w0/wp2/wp3` AtOrder proofs at `m = 0`
+      - the thin axiom surface for `wc`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Frontier
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpec
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -25,42 +31,53 @@ open scoped BigOperators
 open Hyperlocal.Cancellation
 open Hyperlocal.Transport
 
-/-- Extract the Route–C `n=3` reverse convCoeff payload for `w0`. -/
+lemma w0At_zero (s : OffSeed Xi) : w0At 0 s = w0 s := by
+  funext i
+  simp [w0At, w0, xiTransportedJet, xiCentralJetAt, xiCentralJet, xiJet3At, cderivIter]
+
+lemma wp2At_zero (s : OffSeed Xi) : wp2At 0 s = wp2 s := by
+  funext i
+  simp [wp2At, wpAt, wp2, w0At_zero (s := s)]
+
+lemma wp3At_zero (s : OffSeed Xi) : wp3At 0 s = wp3 s := by
+  funext i
+  simp [wp3At, wpAt, wp3, w0At_zero (s := s)]
+
 theorem row0ConvCoeff3_w0 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
   have ht :
-      (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 :=
-    xiJetQuot_row0_w0 s
+      (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 := by
+    simpa [w0At_zero (s := s)] using
+      (xiJetQuot_row0_w0At_spec_proof (m := 0) (s := s))
   have hs : row0Sigma s (w0 s) = 0 := by
     simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := w0 s)] using ht
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w0 s)] using hs
 
-/-- Extract the Route–C `n=3` reverse convCoeff payload for `wc`. -/
 theorem row0ConvCoeff3_wc (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
   have ht :
       (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 :=
-    xiJetQuot_row0_wc s
+    xiJetQuot_row0_wc_spec (s := s)
   have hs : row0Sigma s (wc s) = 0 := by
     simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)] using ht
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wc s)] using hs
 
-/-- Extract the Route–C `n=3` reverse convCoeff payload for `wp2`. -/
 theorem row0ConvCoeff3_wp2 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by
   have ht :
-      (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2 s)) (0 : Fin 3) = 0 :=
-    xiJetQuot_row0_wp2 s
+      (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2 s)) (0 : Fin 3) = 0 := by
+    simpa [wp2At_zero (s := s)] using
+      (xiJetQuot_row0_wp2At_spec_proof (m := 0) (s := s))
   have hs : row0Sigma s (wp2 s) = 0 := by
     simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wp2 s)] using ht
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp2 s)] using hs
 
-/-- Extract the Route–C `n=3` reverse convCoeff payload for `wp3`. -/
 theorem row0ConvCoeff3_wp3 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3 s)) 3 = 0 := by
   have ht :
-      (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0 :=
-    xiJetQuot_row0_wp3 s
+      (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0 := by
+    simpa [wp3At_zero (s := s)] using
+      (xiJetQuot_row0_wp3At_spec_proof (m := 0) (s := s))
   have hs : row0Sigma s (wp3 s) = 0 := by
     simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wp3 s)] using ht
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp3 s)] using hs
