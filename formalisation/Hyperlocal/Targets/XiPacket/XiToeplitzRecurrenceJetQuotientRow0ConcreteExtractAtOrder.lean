@@ -3,10 +3,12 @@
 
   Thin wrapper re-export for the AtOrder jet-quotient row-0 concrete extraction cliff.
 
-  Policy:
-  * The ONLY axiom is in `...AtOrderFrontier.lean`.
-  * This file exposes stable downstream-facing names, without importing any
-    Row0Correctness/Bridge layers.
+  UPDATED POLICY:
+  * this file now exports the theorem-only Route-B endpoint directly
+  * it no longer imports the historical frontier wrapper
+      `XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderFrontier`
+  * this keeps the public name stable while moving the live dependency path
+    onto the theorem-level witness lane
 
   NOTE (Lean 4.23):
   Since `XiJetQuotRow0ConcreteExtractAtOrder m s : Type`, the exported witness
@@ -14,7 +16,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderFrontier
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderFromRecurrenceB
 
 set_option autoImplicit false
 noncomputable section
@@ -26,17 +28,15 @@ namespace XiPacket
 /--
 Type-level witness for the AtOrder concrete extraction cliff.
 
-Currently delegates to the single frontier axiom.
-When the frontier axiom is replaced by a theorem, this definition stays unchanged.
+This now delegates directly to the theorem-level Route-B endpoint
+`xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB`.
 -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
-  xiJetQuotRow0ConcreteExtractAtOrder_frontier m s
+  xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB (m := m) (s := s)
 
 /--
 Prop-level packaged output derived from the Type-level concrete extract.
-
-This is what the AtOrder frontier projections use.
 -/
 theorem xiJetQuotRow0AtOrderOut_fromConcrete (m : ℕ) (s : OffSeed Xi) :
     XiJetQuotRow0AtOrderOut m s := by
