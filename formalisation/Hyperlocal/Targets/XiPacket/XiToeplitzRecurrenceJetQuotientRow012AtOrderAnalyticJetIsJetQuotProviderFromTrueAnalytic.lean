@@ -28,7 +28,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrde
 -- Producer chain for `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.
 -- (existing analytic Row012 endpoint) ⇒ `XiRow012UpstreamTrueAnalytic`
 -- ⇒ `XiRow012ConvolutionAtRevAtOrderTrueAnalytic`.
-import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_Row012ConvolutionInstanceFromUpstream
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromUpstream
 
 import Hyperlocal.Targets.XiPacket.XiRouteA_QuotShiftBridgeInstancesFromTrueAnalytic

@@ -1,19 +1,14 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream.lean
 
-  Adapter (no refactor):
-  Use the existing upstream Row012 reverse-convolution endpoint to instantiate the
-  new Prop-class interface `XiRow012UpstreamTrueAnalytic`.
+  Import-surface repair for the true-analytic Row012 adapter.
 
-  This makes downstream code depend on the Prop-first class interface,
-  while the real analytic proof can be swapped in later.
-
-  No new axioms introduced by this adapter itself.
-
-  Graph note:
-  `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic` requires
-  `[XiAtOrderSigmaProvider]`, so this adapter must import the installed sigma
-  producer surface explicitly.
+  Policy:
+  * this adapter remains the installed producer of `XiRow012UpstreamTrueAnalytic`
+  * it re-exports the public theorem
+      `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
+  * the required sigma producer is restored here explicitly
+  * no local `haveI` patching
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
@@ -27,11 +22,10 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Adapter: existing upstream endpoint ⇒ new Prop-first interface class. -/
 instance (priority := 1000) : XiRow012UpstreamTrueAnalytic where
   row012_out := by
     intro m s
-    simpa using (xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s))
+    exact xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
 
 end XiPacket
 end Targets

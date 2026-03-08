@@ -1,15 +1,15 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ExtraLinAtOrderFromHeart.lean
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ExtraLinAtOrderFromRec2AtOrderTrueAnalytic.lean
 
-  Pure projection from the analytic coords01 branch.
+  Theorem-side coords01 -> extra-lin bridge from the ROOT-FREE Rec2-at-order corridor.
 
-  NOTE:
-  This remains the existing analytic branch and is kept for stability.
-  The theorem-side Rec2 branch lives separately in
-  `XiRow0Bridge_Row012ExtraLinAtOrderFromRec2AtOrderTrueAnalytic.lean`.
+  IMPORTANT:
+  * theorem-level only
+  * requires the Rec2 provider gate explicitly
+  * does NOT import the analytic extractor corridor
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderFromRec2AtOrderTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinToCoords
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
@@ -24,11 +24,12 @@ namespace XiPacket
 
 open Hyperlocal.Transport
 
-theorem xiRow012ExtraLinAtOrderOut_fromHeart
+theorem xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic
+    [XiJetQuotRec2AtOrderProvider]
     (m : ℕ) (s : OffSeed Xi) [A0Nonzero (s := s)] :
     XiRow012ExtraLinAtOrderOut m s := by
   have HC : XiAtOrderCoords01Out m s :=
-    xiAtOrderCoords01Out_fromAnalytic (m := m) (s := s)
+    xiAtOrderCoords01Out_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
 
   refine ⟨?_, ?_, ?_⟩
   · exact row012ExtraLin_of_coords (s := s) (w := w0At m s) HC.hw0At0 HC.hw0At1
