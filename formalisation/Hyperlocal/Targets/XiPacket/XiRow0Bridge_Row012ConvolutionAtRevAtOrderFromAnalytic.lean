@@ -9,7 +9,7 @@
   It stays parametric in `[XiAtOrderSigmaProvider]` and *consumes* `[A0Nonzero]`
   via `infer_instance` (installed by `XiRow0Bridge_A0NonzeroBoundary`).
 -/
-
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Discharge
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
@@ -22,7 +22,8 @@ namespace Targets
 namespace XiPacket
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) [XiAtOrderSigmaProvider] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
   classical
   letI : A0Nonzero (s := s) := by infer_instance

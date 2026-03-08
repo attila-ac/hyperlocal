@@ -1,5 +1,0 @@
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0Coeff3Semantic
-
-#print axioms Hyperlocal.Targets.XiPacket.row0ConvCoeff3_eq_zero_wc
-#print axioms Hyperlocal.Targets.XiPacket.row0ConvolutionAtRev_wc

@@ -1,26 +1,19 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ExtraLinAtOrderFromHeart.lean
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ExtraLinAtOrderFromProvidedCoords.lean
 
-  Pure projection from a provided coords01 payload.
+  Clean theorem-side Row012ExtraLin route from an abstract coords01 provider.
 
   IMPORTANT:
-  * stay theorem-level / cycle-safe
-  * do NOT call the analytic coords extractor wrapper here
-  * consume `[XiAtOrderCoords01Provider]` abstractly instead
-
-  This is the first live theorem node above the Row012 analytic discharge corridor
-  that was still freezing the historical coords01 stub.
-
-  COMPAT NOTE:
-  We keep `[A0Nonzero (s := s)]` in the signature to avoid downstream interface churn,
-  even though this theorem now only projects from the provided coords payload.
+  * do NOT replace the historical FromHeart file in place
+  * this file is the theorem-side sibling used only by consumers that already
+    carry `[XiAtOrderCoords01Provider]`
+  * keeps the historical analytic branch available for legacy/shared consumers
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinToCoords
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
 
 set_option autoImplicit false
 noncomputable section
@@ -31,9 +24,9 @@ namespace XiPacket
 
 open Hyperlocal.Transport
 
-theorem xiRow012ExtraLinAtOrderOut_fromHeart
+theorem xiRow012ExtraLinAtOrderOut_fromProvidedCoords
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderCoords01Provider] [A0Nonzero (s := s)] :
+    [XiAtOrderCoords01Provider] :
     XiRow012ExtraLinAtOrderOut m s := by
   have HC : XiAtOrderCoords01Out m s :=
     xiAtOrderCoords01Out_provided (m := m) (s := s)
