@@ -12,11 +12,6 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
--- Self-check: if these fail, the import is not pointing at the file you edited.
-#check xiJetQuot_row0_w0At_spec
-#check xiJetQuot_row0_wp2At_spec
-#check xiJetQuot_row0_wp3At_spec
-
 theorem xiAtOrderSigmaOut_fromRow0FrontierAtOrder
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s := by
   classical

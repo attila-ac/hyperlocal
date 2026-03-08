@@ -4,7 +4,7 @@
   Upstream proof module for AtOrder ell-out.
 
   IMPORTANT (cycle breaker):
-  This file should consume the clean Row0 semantics surface for the at-order
+  This file should consume the theorem-level Row0 witness surface for the at-order
   trio `w0At/wp2At/wp3At`, while still using the theorem-level `wc` proof.
 -/
 
@@ -12,7 +12,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceStencilToEll
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0WitnessAtOrderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
 import Mathlib.Tactic
 
@@ -99,11 +99,8 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hc : cOp s ≠ 0 := cOp_ne_zero (s := s)
 
-  have Hop : XiJetQuotOpZeroAtOrder m s :=
-    xiJetQuotOpZeroAtOrder (m := m) (s := s)
-
   have Hw : XiJetQuotRow0WitnessCAtOrder m s :=
-    xiJetQuotRow0WitnessCAtOrder_of_opZero (m := m) (s := s) Hop
+    xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream (m := m) (s := s)
 
   have hw0_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (w0At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := w0At m s)

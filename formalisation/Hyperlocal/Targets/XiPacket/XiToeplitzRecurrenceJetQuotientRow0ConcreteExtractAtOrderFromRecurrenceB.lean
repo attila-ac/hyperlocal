@@ -8,19 +8,19 @@
     this exported endpoint must be a `def`, not a `theorem`.
 
   Consumer retarget:
-    this file now consumes the public Row0 semantic witness
-      `xiJetQuotRow0WitnessCAtOrder`
-    rather than any historical row0 spec surface.
+    this file now consumes the theorem-level row-0 witness
+      `xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream`
+    directly, rather than the historical public wrapper
+      `xiJetQuotRow0WitnessCAtOrder`.
 
   IMPORTANT:
-  * this is a consumer-layer cleanup
-  * it does not by itself resolve the remaining dirty adapter/import path
-  * the currently measured obstruction sits upstream in
-      `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
+  * this is a theorem-only downstream retarget
+  * it avoids importing the public Row0 semantics wrapper here
+  * it does not by itself remove any remaining axiom from the end cone
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0WitnessAtOrderFromRow012Upstream
 
 set_option autoImplicit false
 noncomputable section
@@ -34,13 +34,13 @@ open Hyperlocal.Transport
 
 /--
 Route–B endpoint (AtOrder):
-package the row-0 semantic witness into the Type-level concrete extract bundle.
+package the theorem-level row-0 witness into the Type-level concrete extract bundle.
 -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB
     (m : ℕ) (s : OffSeed Xi) :
     XiJetQuotRow0ConcreteExtractAtOrder m s := by
   have hC : XiJetQuotRow0WitnessCAtOrder m s :=
-    xiJetQuotRow0WitnessCAtOrder (m := m) (s := s)
+    xiJetQuotRow0WitnessCAtOrder_fromRow012Upstream (m := m) (s := s)
   exact ⟨hC.hop_w0At, hC.hop_wp2At, hC.hop_wp3At⟩
 
 end XiPacket

@@ -16,6 +16,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceInject
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Core
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
 
 def instRouteAProvider :
     Hyperlocal.Targets.XiPacket.RouteAJetCoordProvider := inferInstance
@@ -23,7 +24,6 @@ def instRouteAProvider :
 #print axioms instRouteAProvider
 #print axioms Hyperlocal.Targets.XiPacket.w0_eq_jet3_routeA
 #print axioms Hyperlocal.Targets.XiPacket.wc_eq_jet3_routeA
-
 
 set_option autoImplicit false
 noncomputable section
@@ -47,8 +47,6 @@ Run this file; Lean will print candidates in the infoview.
 Then paste the exact constant name into a #check / #print axioms block below.
 -/
 
--- This searches for *anything* in scope whose type is `NoOffSeed Xi`.
-
 #print axioms Hyperlocal.Targets.XiPacket.xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
 #print axioms Hyperlocal.Targets.XiPacket.XiRow012UpstreamTrueAnalytic.row012_out
 #print axioms Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At
@@ -70,7 +68,6 @@ Then paste the exact constant name into a #check / #print axioms block below.
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
 --#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
-
 
 --#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
 --#print axioms Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
@@ -102,12 +99,8 @@ Keep this commented until you’ve pasted a real name.
 Because the exact Stage3System type name can vary, we search more flexibly:
 -/
 
--- Try these if the identifiers exist in your project; if they don't, they simply won't find anything.
--- (They also don’t error: `#find` is safe to keep even if it returns nothing.)
 -- #find (_root_.Stage3System Xi → _root_.NoOffSeed Xi)
 -- #find (Stage3System Xi → NoOffSeed Xi)
-
--- If your bridge lemma uses an intermediate "Finisher" structure, search for arrows ending in `NoOffSeed Xi`.
 
 /-
 (4) After you identify the bridge theorem name from the `#find` output, paste it here:
