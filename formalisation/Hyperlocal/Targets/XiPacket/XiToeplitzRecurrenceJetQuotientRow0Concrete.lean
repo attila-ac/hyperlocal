@@ -35,18 +35,6 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
 
-lemma w0At_zero (s : OffSeed Xi) : w0At 0 s = w0 s := by
-  funext i
-  simp [w0At, w0, xiTransportedJet, xiCentralJetAt, xiCentralJet, xiJet3At, cderivIter]
-
-lemma wp2At_zero (s : OffSeed Xi) : wp2At 0 s = wp2 s := by
-  funext i
-  simp [wp2At, wpAt, wp2, w0At_zero (s := s)]
-
-lemma wp3At_zero (s : OffSeed Xi) : wp3At 0 s = wp3 s := by
-  funext i
-  simp [wp3At, wpAt, wp3, w0At_zero (s := s)]
-
 theorem xiJetQuot_row0_w0 (s : OffSeed Xi) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 := by
   simpa [w0At_zero (s := s)] using (xiJetQuot_row0_w0At_spec_proof (m := 0) (s := s))

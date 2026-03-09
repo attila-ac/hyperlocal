@@ -1,20 +1,14 @@
 /-
-REPLACE FILE CONTENT for:
-  Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row0Coeff3Semantic.lean
-
-Fix:
-  Stop referencing `_root_.Hyperlocal.Targets.XiPacket.row0ConvCoeff3_*`.
-  After importing the extractor, the theorems are available in the *current*
-  namespace, so use them directly.
-
-  This avoids VSCode “unknown identifier” glitches caused by stale elaboration
-  state / namespace qualification.
--/
-
-/-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row0Coeff3Semantic.lean
 
   MOVE–3 semantic payload (theorem-level, upstream-extracted).
+
+  IMPORTANT:
+  This layer must stay extractor-only and must NOT import
+  Route-A stencil files, otherwise we create a cycle.
+
+  The `wc` theorem therefore stays on the extractor route.
+  The clean Route-A theorem is consumed downstream instead.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt

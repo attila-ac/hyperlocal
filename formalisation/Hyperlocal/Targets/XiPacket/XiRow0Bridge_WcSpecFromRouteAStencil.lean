@@ -12,17 +12,15 @@ open Hyperlocal.Transport
 open Hyperlocal.Cancellation
 
 /--
-Route-A stencil identity.
+Clean replacement for the historical `xiJetQuot_row0_wc_spec`.
 
-This analytic statement is the remaining ingredient needed to
-derive the clean `wc` coeff-3 convolution theorem.
+This derives the row-0 Toeplitz equation for `wc`
+from the Route-A analytic stencil.
 -/
-axiom routeA_stencil_zero
+axiom xiJetQuot_row0_wc_fromStencil
     (s : OffSeed Xi)
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
-      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
-        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
-        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0
+    row0Sigma s (wc s) = 0
 
 end XiPacket
 end Targets

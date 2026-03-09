@@ -4,13 +4,13 @@
   Historical name `xiAtOrderSigmaOut_axiom`.
 
   IMPORTANT (new meaning):
-  It is a theorem derived from the
-  Row0-frontier-at-order route.
+  It is now a theorem derived from the Row0-frontier-at-order route.
 
-  This preserves the old constant name for downstream stability, while
-  removing it from the axiom-cone.
+  This preserves the old constant name for downstream stability,
+  while removing it from the axiom cone.
 -/
 
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_WcSpecFromRouteAStencil
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
 
@@ -21,12 +21,22 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Historical name: now a theorem from the Row0-frontier route. -/
+open Hyperlocal.Transport
+
+/--
+Historical name preserved for downstream stability.
+
+Now derived from the Row0-frontier-at-order theorem route.
+-/
 theorem xiAtOrderSigmaOut_axiom
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s :=
   xiAtOrderSigmaOut_fromRow0FrontierAtOrder (m := m) (s := s)
 
-/-- Keep the historical provider instance name/site; now backed by the theorem above. -/
+/--
+Provider instance (historical site).
+
+Backed by the theorem above instead of an axiom.
+-/
 instance (priority := 10) : XiAtOrderSigmaProvider where
   sigma := xiAtOrderSigmaOut_axiom
 

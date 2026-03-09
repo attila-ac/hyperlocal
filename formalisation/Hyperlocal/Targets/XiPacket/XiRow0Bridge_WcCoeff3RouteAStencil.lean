@@ -4,16 +4,16 @@
   Local theorem-side reduction for the remaining `wc` coeff-3 seam.
 
   Purpose:
-  * do NOT claim the final clean `wc` coeff-3 vanishing yet
-  * do reduce the target
-      convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0
-    to the exact Route-A scalar stencil at `z = 1 - s.ρ`
+  * reduce
+        convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0
+    to the Route-A scalar stencil
 
-  This isolates the real missing theorem:
-      (-2) * G''(1-ρ) + σ2 * G'(1-ρ) - σ3 * G(1-ρ) = 0
-  for `G = routeA_G s`.
+        (-2) G''(1-ρ) + σ2 G'(1-ρ) - σ3 G(1-ρ)
 
-  That is the honest next proof obligation.
+  for G = routeA_G s.
+
+  The clean theorem `wc_convCoeff3_clean` is obtained once that stencil
+  is proven to vanish.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
@@ -31,6 +31,9 @@ open Complex
 open Hyperlocal.Cancellation
 open Hyperlocal.Transport
 
+/--
+Rewrite the wc coeff-3 convolution as the exact Route-A scalar stencil.
+-/
 theorem wc_convCoeff3_eq_routeA_stencil
     (s : OffSeed Xi)
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
@@ -58,8 +61,8 @@ theorem wc_convCoeff3_eq_routeA_stencil
             simp [jet3]
 
 /--
-If you later prove the Route-A scalar stencil vanishes at `z = 1 - s.ρ`,
-this immediately yields the clean coeff-3 `wc` theorem.
+Bridge lemma: if the Route-A stencil vanishes, then the coeff-3
+convolution vanishes.
 -/
 theorem wc_convCoeff3_clean_of_routeA_stencil
     (s : OffSeed Xi)
@@ -71,6 +74,19 @@ theorem wc_convCoeff3_clean_of_routeA_stencil
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
   rw [wc_convCoeff3_eq_routeA_stencil (s := s)]
   exact hStencil
+
+/--
+Clean coeff-3 theorem once the Route-A stencil vanishing is available.
+-/
+theorem wc_convCoeff3_clean
+    (s : OffSeed Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (hStencil :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 :=
+  wc_convCoeff3_clean_of_routeA_stencil s hStencil
 
 end XiPacket
 end Targets
