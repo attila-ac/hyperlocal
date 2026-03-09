@@ -1,21 +1,8 @@
-/-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0Analytic.lean
-
-  Row-0 analytic bridge (stabilised): consume only row0Sigma = 0 facts.
-
-  FIX:
-  The exported row0Sigma facts now depend on the explicit provider gate
-
-    [TAC.XiJetWindowEqAtOrderQuotProvider].
-
-  So this file must carry that gate explicitly.
--/
-
 import Hyperlocal.Targets.XiPacket.XiAnalyticInputs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SigmaFromRec2_Parametric
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischarge
-import Mathlib.Tactic
 
 set_option autoImplicit false
 noncomputable section
@@ -24,25 +11,32 @@ namespace Hyperlocal.Targets.XiPacket
 
 open Complex
 open scoped BigOperators
+open Hyperlocal.Transport
 
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+variable [XiAtOrderSigmaProvider]
+variable [XiAtOrderCoords01Provider]
 
 /--
-Route-C / Route-A: analytic discharge of the row-0 scalar goals.
+Analytic row0 scalar goals using the **clean Rec2 trio route**.
+`wc` remains on the legacy surface for now.
 -/
-noncomputable def xiJetQuot_row0_scalarGoals_analytic (s : Hyperlocal.OffSeed Xi) :
+noncomputable def xiJetQuot_row0_scalarGoals_analytic
+    (s : OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s where
-  hw0 := by
-    exact (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_w0_eq_zero s)
-  hwc := by
-    exact (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wc_eq_zero s)
-  hwp2 := by
-    exact (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wp2_eq_zero s)
-  hwp3 := by
-    exact (_root_.Hyperlocal.Targets.XiPacket.row0Sigma_wp3_eq_zero s)
+  hw0 :=
+    row0Sigma_w0_eq_zero_fromRec2_parametric s
+  hwc :=
+    -- still legacy for now
+    Hyperlocal.Targets.XiPacket.row0Sigma_wc_eq_zero s
+  hwp2 :=
+    row0Sigma_wp2_eq_zero_fromRec2_parametric s
+  hwp3 :=
+    row0Sigma_wp3_eq_zero_fromRec2_parametric s
 
-/-- Public stable name (consumed downstream). -/
-noncomputable def xiJetQuot_row0_scalarGoals (s : Hyperlocal.OffSeed Xi) :
+/-- Public wrapper. -/
+noncomputable def xiJetQuot_row0_scalarGoals
+    (s : OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s :=
   xiJetQuot_row0_scalarGoals_analytic s
 
