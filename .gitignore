@@ -32,3 +32,4 @@ formalisation.zip
 # local/exchange archives
 *.tar.gz
 *.tgz
+formalisation/Hyperlocal/Targets/XiPacket/scratch_*.lean
