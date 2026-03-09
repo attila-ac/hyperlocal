@@ -8,7 +8,9 @@ import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 set_option autoImplicit false
 noncomputable section
 
-namespace Hyperlocal.Targets.XiPacket
+namespace Hyperlocal
+namespace Targets
+namespace XiPacket
 
 open Hyperlocal.Transport
 
@@ -48,4 +50,6 @@ theorem row0Sigma_wp3_eq_zero_fromRec2_parametric
     xiJetQuotRow0WitnessCAtOrder_of_opZero (m := 0) (s := s) Hop
   simpa [toeplitzL_row0_eq_row0Sigma] using Hw.hop_wp3At
 
-end Hyperlocal.Targets.XiPacket
+end XiPacket
+end Targets
+end Hyperlocal
