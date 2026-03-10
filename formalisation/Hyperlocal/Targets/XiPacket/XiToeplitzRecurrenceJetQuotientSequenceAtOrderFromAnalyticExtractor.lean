@@ -1,20 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor.lean
 
-  Route-X endpoint (analytic -> recurrence) at order.
+  Legacy packaged Route-X endpoint (analytic -> recurrence) at order.
 
-  Updated:
-  this packaged endpoint consumes the parallel theorem-only extractor spine.
+  CHANGE:
+  * this historical endpoint is now a compatibility shim over the clean
+    theorem-parametric endpoint
+  * preserve the historical ambient-instance surface here
+  * restore the required producer surfaces explicitly by import
 
   IMPORTANT:
-  the extractor theorem is conditional on
-    [XiAtOrderSigmaProvider] and [XiAtOrderCoords01Provider],
-  so this consumer must restore those producer surfaces explicitly.
+  * this file remains the legacy convenience surface
+  * the clean theorem corridor lives in
+      XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor_Theorem
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractorFromRec2TrueAnalytic
-
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor_Theorem
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
 
@@ -28,15 +29,10 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-/-- Route-X (analytic -> recurrence) packaged endpoint at order `m`. -/
+/-- Legacy packaged endpoint, now re-exported from the clean theorem corridor. -/
 theorem xiJetQuotRec2AtOrder_fromAnalyticExtractor
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
-  classical
-  rcases
-      xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor_fromRec2TrueAnalytic
-        (m := m) (s := s)
-    with ⟨hw0, hwp2, hwp3⟩
-  exact ⟨hw0, hwp2, hwp3⟩
+  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor_theorem (m := m) (s := s)
 
 end XiPacket
 end Targets

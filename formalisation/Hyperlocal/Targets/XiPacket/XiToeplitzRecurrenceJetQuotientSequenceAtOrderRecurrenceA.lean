@@ -1,16 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA.lean
 
-  Post-Task-A state (DAG-safe):
-  the former cycle-safe RecurrenceA boundary is replaced by a theorem
-  re-exporting the downstream analytic→recurrence endpoint.
+  Legacy ambient compatibility wrapper for the RecurrenceA bridge.
 
   IMPORTANT:
-    This replacement is DAG-safe only once the analytic row012 landing proof
-    is independent of Row0SemanticsAtOrder / any RecurrenceA consumers.
+  * preserve the historical theorem name
+  * keep the ambient-instance API surface for downstream compatibility
+  * re-export the clean theorem-side bridge
+  * restore the needed theorem-provider surfaces explicitly by import
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA_Theorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
 
 set_option autoImplicit false
 noncomputable section
@@ -19,10 +21,9 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Former Route–A boundary, now theorem-level: re-export the analytic extractor endpoint. -/
 theorem xiJetQuotRec2AtOrder_fromRecurrenceA
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
-  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor (m := m) (s := s)
+  simpa using xiJetQuotRec2AtOrder_fromRecurrenceA_theorem (m := m) (s := s)
 
 end XiPacket
 end Targets

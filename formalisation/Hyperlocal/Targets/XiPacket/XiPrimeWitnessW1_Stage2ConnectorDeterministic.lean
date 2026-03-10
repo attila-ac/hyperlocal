@@ -14,7 +14,7 @@
     to the explicit sine micro-gate via the axiom-free closed form in
     `XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean`.
 -/
-
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder_Theorem
 import Hyperlocal.Targets.XiPacket.WindowPayload
 import Hyperlocal.Targets.XiPacket.XiPrimeWitnessW1_FWiredFromOpZeroAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
@@ -158,7 +158,7 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
   classical
 
   -- semantic OpZeroAtOrder package gives w0/wp2/wp3 annihilation for the JetQuot Toeplitz operator
-  let Hop : XiJetQuotOpZeroAtOrder m s := xiJetQuotOpZeroAtOrder (m := m) (s := s)
+  let Hop : XiJetQuotOpZeroAtOrder m s := xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
 
   -- Define the real stencil: take Re of the first 3 Toeplitz coefficients
   let c : Fin 3 → ℝ := fun i => (JetQuotOp.aRk1 s i.1).re

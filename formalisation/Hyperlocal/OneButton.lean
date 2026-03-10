@@ -26,7 +26,8 @@
   So progress should be measured at:
     * the final theorem,
     * the two immediate live consumers,
-    * and the exact row-0 root surfaces being attacked.
+    * the exact row-0 root surfaces being attacked,
+    * and the new clean theorem-parametric sibling surfaces.
 
   Policy:
   * no new mathematics
@@ -39,6 +40,9 @@ import Hyperlocal.Targets.XiPacket.OffSeedPhaseLockXiPayloadAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceInterface
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceInject
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder_Theorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA_Theorem
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
@@ -81,10 +85,20 @@ namespace Hyperlocal
 #print axioms Hyperlocal.Targets.XiPacket.xiJetQuot_row0_wp3At_spec_proof
 
 /-!
-  Public row-0 wrapper.
-  Useful to see whether local cleanups are real or only living on sibling surfaces.
+  Public row-0 wrappers.
+  Compare the old ambient wrapper against the new theorem-parametric sibling.
 -/
 #print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotOpZeroAtOrder_theorem
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRow0WitnessCAtOrder_theorem
+
+/-!
+  RecurrenceA bridge surfaces.
+  Compare the old ambient shim against the new theorem-parametric sibling.
+-/
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2AtOrder_fromRecurrenceA
+#print axioms Hyperlocal.Targets.XiPacket.xiJetQuotRec2AtOrder_fromRecurrenceA_theorem
 
 /-!
   Shared coords01 producer root.
