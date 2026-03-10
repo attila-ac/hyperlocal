@@ -4,12 +4,19 @@
   Route-X endpoint (analytic -> recurrence) at order.
 
   Updated:
-  this packaged endpoint now consumes the parallel theorem-only extractor spine
-  rather than the historical installed extractor surface.
+  this packaged endpoint consumes the parallel theorem-only extractor spine.
+
+  IMPORTANT:
+  the extractor theorem is conditional on
+    [XiAtOrderSigmaProvider] and [XiAtOrderCoords01Provider],
+  so this consumer must restore those producer surfaces explicitly.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractorFromRec2TrueAnalytic
+
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
 
 set_option autoImplicit false
 noncomputable section
