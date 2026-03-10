@@ -19,7 +19,7 @@
     plus the anchor nonvanishing, and derives everything else algebraically.
 
   Anchor nonvanishing remains separate via:
-      xi_sc_re_ne_zero : (Xi (sc s)).re ≠ 0
+      XiAnchorNonvanishing s
 
   κ ≠ 0 is derived purely algebraically from the closed form theorem:
       XiLemmaC_kappa_closedForm :
@@ -46,6 +46,8 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /-- Convenience projections: the two `ell` vanishings from Toeplitz extraction. -/
 theorem xiWindowLemmaC_hell2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 :=
@@ -55,7 +57,6 @@ theorem xiWindowLemmaC_hell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
   (xiToeplitzEllOut_fromRecurrenceC (s := s)).hell3
 
-
 theorem xiWindowLemmaC_ell2ell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp2 s)) = 0 ∧
     Transport.ell (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (wp3 s)) = 0 :=
@@ -63,7 +64,7 @@ theorem xiWindowLemmaC_ell2ell3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
    xiWindowLemmaC_hell3_fromRecurrence (s := s)⟩
 
 /-- κ≠0 from the anchor nonvanishing plus the κ closed form. -/
-theorem xi_kappa_ne0_from_anchor (s : Hyperlocal.OffSeed Xi) :
+theorem xi_kappa_ne0_from_anchor (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 := by
   intro hk0
   have hk :
@@ -71,7 +72,7 @@ theorem xi_kappa_ne0_from_anchor (s : Hyperlocal.OffSeed Xi) :
         = (Xi (sc s)).re :=
     XiLemmaC_kappa_closedForm (s := s)
   have hXi0 : (Xi (sc s)).re = 0 := hk.symm.trans hk0
-  exact (xi_sc_re_ne_zero (s := s)) hXi0
+  exact (XiAnchorNonvanishing.xi_sc_re_ne_zero (s := s)) hXi0
 
 /--
 KEY SHRINK RESULT:
@@ -79,7 +80,7 @@ KEY SHRINK RESULT:
 `hb2/hb3` are theorems obtained by rewriting from the Toeplitz-extracted `ell`-vanishings
 and using κ≠0 from the anchor.
 -/
-theorem xiWindowLemmaC_hb2hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+theorem xiWindowLemmaC_hb2hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧ bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
   have hkappa :
       Transport.kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) ≠ 0 :=
@@ -98,11 +99,11 @@ theorem xiWindowLemmaC_hb2hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
   exact ⟨hb2, hb3⟩
 
 /-- Move-4 outputs as direct projections. -/
-theorem xi_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+theorem xi_hb2_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 :=
   (xiWindowLemmaC_hb2hb3_fromRecurrence (s := s)).1
 
-theorem xi_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+theorem xi_hb3_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
   (xiWindowLemmaC_hb2hb3_fromRecurrence (s := s)).2
 
@@ -136,18 +137,19 @@ theorem XiLemmaC_of_recOut (s : Hyperlocal.OffSeed Xi) (h : XiLemmaC_RecOut s) :
 /--
 RecOut extraction (theorem form):
 
-* `hell2/hell3` come from Toeplitz extraction (`xiToeplitzEllOut_fromRecurrence`).
-* `hRe` comes from `xi_sc_re_ne_zero`.
+* `hell2/hell3` come from Toeplitz extraction (`xiToeplitzEllOut_fromRecurrenceC`).
+* `hRe` comes from `XiAnchorNonvanishing`.
 -/
-theorem xiWindowLemmaC_recOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+theorem xiWindowLemmaC_recOut_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     XiLemmaC_RecOut s := by
   refine ⟨?_, ?_, ?_⟩
   · exact xiWindowLemmaC_hell2_fromRecurrence (s := s)
   · exact xiWindowLemmaC_hell3_fromRecurrence (s := s)
-  · simpa using (xi_sc_re_ne_zero (s := s))
+  · simpa using (XiAnchorNonvanishing.xi_sc_re_ne_zero (s := s))
 
 /-- Backwards-compatible name: rebuild the full `XiLemmaC` from the smaller RecOut. -/
-theorem xiWindowLemmaC_fromRecurrence (s : Hyperlocal.OffSeed Xi) : XiLemmaC s := by
+theorem xiWindowLemmaC_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
+    XiLemmaC s := by
   exact XiLemmaC_of_recOut (s := s) (xiWindowLemmaC_recOut_fromRecurrence (s := s))
 
 end XiPacket

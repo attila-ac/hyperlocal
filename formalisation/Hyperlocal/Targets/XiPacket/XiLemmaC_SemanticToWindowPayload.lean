@@ -49,22 +49,16 @@ structure XiLemmaC_Semantic (s : _root_.Hyperlocal.OffSeed Xi) : Prop where
 theorem bCoeff_two_eq_zero_of_semantic
     (s : _root_.Hyperlocal.OffSeed Xi) (h : XiLemmaC_Semantic s) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-  -- abbreviate κ to make simp stable
   set k : ℝ :=
     kappa (reVec3 (w0 s)) (reVec3 (wc s)) (reVec3 (ws s)) with hkdef
   have hk : k ≠ 0 := by
     simpa [hkdef] using h.hKap
 
-  -- rewrite `ell=0` into `b*k=0` using the proven collapse lemma
   have hmul :
       (bCoeff (σ s) (t s) (2 : ℝ)) * k = 0 := by
-    -- `ell_wp2_eq_b_mul_kappa` has shape: ell(...) = bCoeff* kappa(...)
-    -- so rewriting LHS of `h.hEll2` gives exactly `b*k = 0`.
     simpa [hkdef, ell_wp2_eq_b_mul_kappa] using h.hEll2
 
-  -- cancel k using inverse (field trick)
   have hmul' := congrArg (fun x : ℝ => x * k⁻¹) hmul
-  -- (b*k)*k⁻¹ = 0*k⁻¹  ⇒  b = 0
   simpa [mul_assoc, hk] using hmul'
 
 /-- `ell=0` at p=3 plus κ≠0 forces `bCoeff(...,3)=0` (pure rewriting). -/
@@ -112,9 +106,12 @@ theorem xi_semantic_exists_kappa_sinlog2_sinlog3
     ∃ κ : ℝ, κ ≠ 0 ∧
       Real.sin (t s * Real.log (2 : ℝ)) = 0 ∧
       Real.sin (t s * Real.log (3 : ℝ)) = 0 := by
-  simpa using
-    WindowPayload.exists_kappa_sinlog2_sinlog3
-      (X := xiWindowPayload_of_semantic (s := s) h)
+  let X : WindowPayload (σ s) (t s) := xiWindowPayload_of_semantic (s := s) h
+  have hKapRe :
+      kappa (reVec3 X.w0) (reVec3 X.wc) (reVec3 X.ws) ≠ 0 := by
+    simpa [X] using h.hKap
+  simpa [X] using
+    WindowPayload.exists_kappa_sinlog2_sinlog3 X hKapRe
 
 end XiPacket
 end Targets

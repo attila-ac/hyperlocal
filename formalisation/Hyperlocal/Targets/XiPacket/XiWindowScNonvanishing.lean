@@ -3,13 +3,18 @@
 
   DEPRECATED LEGACY ENDPOINT.
 
-  This file is retained only for older branches that still expect a lemma
+  This file is retained only for older branches that still expect theorem names
   `xi_sc_re_ne_zero` / `xi_sc_re_ne_zero_of_analytic`.
 
-  The W1 / Plan C++J pipeline MUST NOT import this file.
-  Use `xiJetNonflat_re_exists` + `xiJetPivotOrder_spec` instead.
+  UPDATED POLICY:
+  * this file contains no axioms
+  * the old names are theorem-backed wrappers around `XiAnchorNonvanishing`
+
+  The W1 / Plan C++J pipeline MUST NOT depend on this file directly.
+  Use `XiWindowAnchorNonvanishing` and theorem-side payload constructors instead.
 -/
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
+
+import Hyperlocal.Targets.XiPacket.XiWindowAnchorNonvanishing
 
 set_option autoImplicit false
 noncomputable section
@@ -20,11 +25,14 @@ namespace XiPacket
 
 open Complex
 
-/-- Legacy semantic endpoint (temporary compatibility). -/
-axiom xi_sc_re_ne_zero (s : OffSeed Xi) : (Xi (sc s)).re ≠ 0
+/-- Legacy semantic endpoint, now theorem-backed from `XiAnchorNonvanishing`. -/
+theorem xi_sc_re_ne_zero (s : OffSeed Xi) [XiAnchorNonvanishing s] :
+    (Xi (sc s)).re ≠ 0 :=
+  XiAnchorNonvanishing.xi_sc_re_ne_zero (s := s)
 
-/-- Legacy “future-facing” name; still just the compatibility axiom. -/
-theorem xi_sc_re_ne_zero_of_analytic (s : OffSeed Xi) : (Xi (sc s)).re ≠ 0 := by
+/-- Legacy “future-facing” name; now just a theorem alias. -/
+theorem xi_sc_re_ne_zero_of_analytic (s : OffSeed Xi) [XiAnchorNonvanishing s] :
+    (Xi (sc s)).re ≠ 0 := by
   simpa using (xi_sc_re_ne_zero (s := s))
 
 end XiPacket

@@ -19,11 +19,11 @@ open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
 
-theorem xiLemmaC_Semantic_fromRecurrence (s : Hyperlocal.OffSeed Xi) :
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+theorem xiLemmaC_Semantic_fromRecurrence (s : Hyperlocal.OffSeed Xi) [XiAnchorNonvanishing s] :
     XiLemmaC_Semantic s := by
-  -- get the 3 scalar facts from the “Lemma C” bundle
   have hC : XiLemmaC s := xiWindowLemmaC_fromRecurrence (s := s)
-  -- package them into the semantic record
   exact ⟨hC.hell2, hC.hell3, hC.hkappa⟩
 
 end XiPacket
