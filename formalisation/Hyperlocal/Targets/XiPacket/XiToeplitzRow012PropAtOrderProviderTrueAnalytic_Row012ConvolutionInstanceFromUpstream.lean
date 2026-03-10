@@ -8,13 +8,8 @@
   IMPORTANT:
   This file must consume only the interface carrying
     `XiRow012UpstreamTrueAnalytic`
-  and must NOT import the installed adapter surface, otherwise it closes the
-  true-analytic SCC:
-    AdapterFromUpstream
-      -> Row012ConvolutionInstanceFromUpstream
-      -> FromUpstream
-      -> ...
-      -> AdapterFromUpstream
+  and must NOT import the installed adapter surface.
+  That was the SCC edge.
 
   This is a pure graph repair; no new mathematics.
 -/

@@ -1,13 +1,19 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream.lean
 
-  Import-surface repair for the true-analytic Row012 adapter.
+  Stable installed producer for `XiRow012UpstreamTrueAnalytic`.
+
+  IMPORTANT:
+  * this file is an installer root
+  * therefore it must use producer surfaces that are already available here
+  * do NOT import the analytic sigma surface here, because that route is conditional on
+      `[XiJetQuotRec2AtOrderTrueAnalytic]`
+    and that premise is not available at this installer boundary
 
   Policy:
-  * this adapter remains the installed producer of `XiRow012UpstreamTrueAnalytic`
-  * it re-exports the public theorem
-      `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
-  * the required sigma producer is restored here explicitly
+  * remain the installed producer of `XiRow012UpstreamTrueAnalytic`
+  * re-export `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`
+  * use the stable theorem-backed sigma/coords producer surfaces here
   * no local `haveI` patching
 -/
 
