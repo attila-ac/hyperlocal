@@ -1,19 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceEllFromConcrete.lean
 
-  Semantic bridge (collision-free name):
+  Collision-free exported non-AtOrder ℓ-output.
 
-    xiRecRowPkg (packaged, to be replaced by the jet-quotient recurrence operator)
-      ⇒ XiMinimalModelRecurrenceHyp   (manufacturing layer)
-      ⇒ XiToeplitzEllOut              (extraction layer).
+  NEW POLICY:
+  Do NOT rebuild this through the legacy concrete/minimal-model recurrence corridor.
+  The AtOrder proof/export lane is now cleaner. So the non-AtOrder endpoint should be
+  obtained by specializing the AtOrder theorem at `m = 0`.
 
-  IMPORTANT:
-  We intentionally DO NOT redeclare the global name `xiToeplitzEllOut_fromRecurrence`
-  (it may still exist in stale .olean artifacts). We use a fresh name `...C`.
+  This is the exact proof/export seam cut suggested by the second-wave measurement:
+  `xiToeplitzEllOutAt_fromRecurrenceC` is already off `xiJetQuot_row0_wc_spec`,
+  while `xiToeplitzEllOut_fromRecurrenceC` is not.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceExtract
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceMinimalModelProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider
 
 set_option autoImplicit false
 noncomputable section
@@ -22,11 +24,16 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- Project-facing endpoint (collision-free): concrete recurrence rows ⇒ ℓ-vanishing output. -/
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+/-- Project-facing endpoint (collision-free): obtain the non-AtOrder ℓ-output by
+specializing the clean AtOrder theorem at `m = 0`. -/
 theorem xiToeplitzEllOut_fromRecurrenceC (s : Hyperlocal.OffSeed Xi) :
     XiToeplitzEllOut s := by
-  exact xiToeplitzEllOut_of_minRecurrence (s := s)
-    (xiMinimalModelRecurrenceHyp_fromConcrete (s := s))
+  let h0 := xiToeplitzEllOutAt_fromRecurrenceC (m := 0) (s := s)
+  refine ⟨?_, ?_⟩
+  · simpa [w0At_zero (s := s), wp2At_zero (s := s)] using h0.hell2
+  · simpa [w0At_zero (s := s), wp3At_zero (s := s)] using h0.hell3
 
 end XiPacket
 end Targets
