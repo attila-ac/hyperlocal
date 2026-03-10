@@ -3,19 +3,18 @@
 
   Imag-pivot upstream proof module.
 
-  IMPORTANT (cycle breaker):
-  This file consumes the clean explicit Row0 witness route for the at-order
-  trio `w0At/wp2At/wp3At`, while still using the theorem-level `wc` proof.
-
-  CLEAN ROUTE USED HERE:
-    Row012Upstream -> Rec2 -> OpZero_of_rec2 -> Row0Witness_of_opZero
+  LIVE WC-SPLICE:
+  Keep the existing clean Rec2 route for `w0At/wp2At/wp3At`,
+  but source the `wc` row-0 fact from the gated parallel producer
+  `XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil`
+  instead of the historical `xiJetQuot_row0_wc_spec_proof`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceStencilToEll
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrderProofUpstream
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
 import Mathlib.Tactic
@@ -34,10 +33,6 @@ open ToeplitzEllOutAtOrderProof
 
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
-/--
-Row-0 imag-transport: from a row-0 `toeplitzL` constraint we obtain a real row
-stencil constraint on `imVec3`.
--/
 lemma toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero
     (c : Fin 3 → ℝ) (w : Window 3)
     (h0 : (toeplitzL 2 (coeffsNat3 c) w) (0 : Fin 3) = 0) :
@@ -60,10 +55,6 @@ lemma toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero
     simpa [imVec3, Fin.sum_univ_three, add_assoc, add_left_comm, add_comm] using him
   simpa [toeplitzRow3] using this
 
-/--
-Imag-pivot ell-out:
-`ell(imVec3(w0At), reVec3(wc), imVec3(wp2At/wp3At)) = 0`.
--/
 theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp2At m s)) = 0 ∧
@@ -91,7 +82,7 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec_proof (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
@@ -129,10 +120,6 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
       (c := cOp s)
       hc hU0 hUc hV3
 
-/--
-Mixed imag-pivot ell-out:
-`ell(imVec3(w0At), reVec3(wc), reVec3(wp2At/wp3At)) = 0`.
--/
 theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
@@ -160,7 +147,7 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec_proof (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
@@ -198,10 +185,6 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
       (c := cOp s)
       hc hU0 hUc hV3
 
-/--
-Auxiliary mixed ell-out cancellation:
-`ell(imVec3(w0At), reVec3(wc), reVec3(w0At)) = 0`.
--/
 theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 := by
@@ -228,7 +211,7 @@ theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec_proof (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
 
   have hU0 : toeplitzRow3 (cOp s) (imVec3 (w0At m s)) :=
     toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero (c := cOp s) (w := w0At m s) hw0_row0

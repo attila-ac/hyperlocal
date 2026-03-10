@@ -3,19 +3,18 @@
 
   Upstream proof module for AtOrder ell-out.
 
-  IMPORTANT (cycle breaker):
-  This file should consume the clean explicit Row0 witness route for the at-order
-  trio `w0At/wp2At/wp3At`, while still using the theorem-level `wc` proof.
-
-  CLEAN ROUTE USED HERE:
-    Row012Upstream -> Rec2 -> OpZero_of_rec2 -> Row0Witness_of_opZero
+  LIVE WC-SPLICE:
+  Keep the existing clean Rec2 route for `w0At/wp2At/wp3At`,
+  but source the `wc` row-0 fact from the gated parallel producer
+  `XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil`
+  instead of the historical `xiJetQuot_row0_wc_spec_proof`.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceStencilToEll
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
 import Mathlib.Tactic
@@ -120,7 +119,7 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_spec_proof (s := s))
+      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)

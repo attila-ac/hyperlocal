@@ -7,22 +7,21 @@
   * keep the historical ungated `XiToeplitzRecurrenceJetQuotientRow0Concrete.lean`
     untouched and build-green;
   * provide a parallel producer in which only the `wc` component is upgraded to
-    the clean Route-A stencil proof;
-  * expose the honest gate `[TAC.XiJetWindowEqAtOrderQuotProvider]` exactly here,
-    and nowhere upstream of this file.
+    the Route-A stencil discharge lane;
+  * expose the honest gate `[TAC.XiJetWindowEqAtOrderQuotProvider]` exactly here.
 
   Policy:
   * `w0/wp2/wp3` are reused from the existing theorem-side AtOrder route.
-  * `wc` is discharged via `wc_convCoeff3_clean`.
+  * `wc` is discharged directly via the packaged row-0 sigma theorem.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_WcRouteAStencilZero
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
-import Hyperlocal.Transport.TACToeplitz
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0SigmaToToeplitzRow0
+import Hyperlocal.Transport.TACToeplitz
 
 set_option autoImplicit false
 noncomputable section
@@ -58,10 +57,10 @@ theorem xiJetQuot_row0_wc_fromWcStencil
     (s : OffSeed Xi)
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
-  have hsigma : row0Sigma s (wc s) = 0 := by
-    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wc s)] using
-      (wc_convCoeff3_clean (s := s))
-  exact toeplitz_row0_eq_zero_of_row0Sigma_eq_zero (s := s) (w := wc s) hsigma
+  have hsigma : row0Sigma s (wc s) = 0 :=
+    row0Sigma_wc_eq_zero_fromWcStencil (s := s)
+  exact
+    toeplitz_row0_eq_zero_of_row0Sigma_eq_zero (s := s) (w := wc s) hsigma
 
 theorem xiJetQuot_row0_wp2_fromWcStencil
     (s : OffSeed Xi)
