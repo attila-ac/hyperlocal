@@ -1,20 +1,25 @@
 /-
   Provide the Row012 true-analytic concrete interface from the clean upstream
-  Prop-class payload.
+  payload class.
 
   Retarget:
     [XiRow012UpstreamTrueAnalytic] -> [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
 
   IMPORTANT:
-  This file must consume the upstream payload class directly, rather than calling
-  the historical theorem
-    `xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic`,
-  because that theorem carries the legacy dirty cone.
+  This file must consume only the interface carrying
+    `XiRow012UpstreamTrueAnalytic`
+  and must NOT import the installed adapter surface, otherwise it closes the
+  true-analytic SCC:
+    AdapterFromUpstream
+      -> Row012ConvolutionInstanceFromUpstream
+      -> FromUpstream
+      -> ...
+      -> AdapterFromUpstream
 
-  This is a consumer-side retarget only; no new mathematics.
+  This is a pure graph repair; no new mathematics.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic
 
 set_option autoImplicit false
