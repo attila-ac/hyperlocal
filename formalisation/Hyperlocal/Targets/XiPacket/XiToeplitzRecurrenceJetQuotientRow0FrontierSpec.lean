@@ -1,17 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0FrontierSpec.lean
 
-  Axiom-thin interface for the Row0 frontier fact at `wc`.
+  Historical public `wc` frontier surface.
 
-  IMPORTANT:
-  * This file must be minimal and must NOT import proof modules,
-    otherwise it cycles through the bridge stack.
+  UPDATED POLICY:
+  This is no longer an axiom declaration.
+  It is now a theorem-backed wrapper around the new theorem-side stencil route.
 -/
 
 import Hyperlocal.Transport.PrimeTrigPacket
 import Hyperlocal.Transport.TACToeplitz
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 
 set_option autoImplicit false
 noncomputable section
@@ -23,9 +24,12 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-axiom xiJetQuot_row0_wc_spec
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+theorem xiJetQuot_row0_wc_spec
   (s : OffSeed Xi) :
-  (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0
+  (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
+  simpa using xiJetQuot_row0_wc_fromWcStencil (s := s)
 
 end XiPacket
 end Targets

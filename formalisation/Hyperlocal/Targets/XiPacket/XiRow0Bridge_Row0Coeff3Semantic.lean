@@ -25,6 +25,8 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Cancellation
 
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 theorem row0ConvCoeff3_eq_zero_w0 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_w0 (s := s))

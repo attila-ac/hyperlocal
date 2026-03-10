@@ -16,8 +16,9 @@
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpec
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
 import Mathlib.Tactic
+
 
 set_option autoImplicit false
 noncomputable section
@@ -30,6 +31,7 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Cancellation
 open Hyperlocal.Transport
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 theorem row0ConvCoeff3_w0 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
@@ -43,11 +45,7 @@ theorem row0ConvCoeff3_w0 (s : OffSeed Xi) :
 
 theorem row0ConvCoeff3_wc (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
-  have ht :
-      (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 :=
-    xiJetQuot_row0_wc_spec (s := s)
-  have hs : row0Sigma s (wc s) = 0 := by
-    simpa [toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)] using ht
+  have hs : row0Sigma s (wc s) = 0 := row0Sigma_wc_eq_zero_fromWcStencil (s := s)
   simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wc s)] using hs
 
 theorem row0ConvCoeff3_wp2 (s : OffSeed Xi) :
