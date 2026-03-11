@@ -8,12 +8,17 @@
 
   This file uses ONLY the tail gate interface:
     [XiJetConvolutionTail345AtOrderTrueAnalytic]
+
+  2026-03-11:
+  Retargeted from the legacy ambient Route-A Leibniz wrapper to the
+  theorem-side wrapper with explicit gate
+    [TAC.XiJetWindowEqAtOrderQuotProvider].
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalyticFromJetConvolution
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
 
 -- tail gate interface (cycle-safe)
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Interface
@@ -30,13 +35,17 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open Hyperlocal.Transport
 open Hyperlocal.Cancellation
 
-/-- Support: winSeqRev vanishes for indices ≥ 3. -/
+/-- Support: winSeqRev vanishes for indices >= 3. -/
 lemma winSeqRev_eq_zero_of_ge3 (w : Transport.Window 3) :
-    ∀ k : ℕ, 3 ≤ k → winSeqRev w k = 0 := by
+    ∀ k : ℕ, 3 ≤ k -> winSeqRev w k = 0 := by
   intro k hk
   cases k with
   | zero =>
@@ -52,9 +61,9 @@ lemma winSeqRev_eq_zero_of_ge3 (w : Transport.Window 3) :
           | succ k =>
               simp [winSeqRev]
 
-/-- Support: row0CoeffSeqRev vanishes for indices ≥ 4. -/
+/-- Support: row0CoeffSeqRev vanishes for indices >= 4. -/
 lemma row0CoeffSeqRev_eq_zero_of_ge4 (s : OffSeed Xi) :
-    ∀ k : ℕ, 4 ≤ k → row0CoeffSeqRev s k = 0 := by
+    ∀ k : ℕ, 4 ≤ k -> row0CoeffSeqRev s k = 0 := by
   intro k hk
   cases k with
   | zero =>
@@ -75,7 +84,7 @@ lemma row0CoeffSeqRev_eq_zero_of_ge4 (s : OffSeed Xi) :
                   simp [row0CoeffSeqRev]
 
 /--
-Pure support lemma: coefficients vanish for n ≥ 6.
+Pure support lemma: coefficients vanish for n >= 6.
 -/
 lemma convCoeff_row0CoeffSeqRev_winSeqRev_ge6
     (s : OffSeed Xi) (w : Transport.Window 3) :
@@ -109,7 +118,7 @@ private lemma tail_from_345
     (h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0)
     (h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 4 = 0)
     (h5 : convCoeff (row0CoeffSeqRev s) (winSeqRev w) 5 = 0) :
-    ∀ n, 3 ≤ n → convCoeff (row0CoeffSeqRev s) (winSeqRev w) n = 0 := by
+    ∀ n, 3 ≤ n -> convCoeff (row0CoeffSeqRev s) (winSeqRev w) n = 0 := by
   intro n hn
   cases n with
   | zero =>
@@ -137,10 +146,13 @@ private lemma tail_from_345
                           simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using this
 
 theorem jetConvRev_w0At_trueAnalytic
-    (m : ℕ) (s : OffSeed Xi) [XiJetConvolutionTail345AtOrderTrueAnalytic] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetConvolutionTail345AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     JetConvolutionAtRev s s.ρ (w0At m s) := by
   classical
-  rcases xiRouteA_jetPkg_w0At (m := m) (s := s) with ⟨G, hfac, hjet, _⟩
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_w0At (m := m) (s := s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
   have h3 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail3_w0At (m := m) (s := s)
   have h4 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail4_w0At (m := m) (s := s)
   have h5 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail5_w0At (m := m) (s := s)
@@ -148,10 +160,13 @@ theorem jetConvRev_w0At_trueAnalytic
   exact tail_from_345 (s := s) (w := w0At m s) h3 h4 h5
 
 theorem jetConvRev_wp2At_trueAnalytic
-    (m : ℕ) (s : OffSeed Xi) [XiJetConvolutionTail345AtOrderTrueAnalytic] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetConvolutionTail345AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     JetConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
-  rcases xiRouteA_jetPkg_wp2At (m := m) (s := s) with ⟨G, hfac, hjet, _⟩
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
   have h3 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail3_wp2At (m := m) (s := s)
   have h4 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail4_wp2At (m := m) (s := s)
   have h5 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail5_wp2At (m := m) (s := s)
@@ -159,10 +174,13 @@ theorem jetConvRev_wp2At_trueAnalytic
   exact tail_from_345 (s := s) (w := wp2At m s) h3 h4 h5
 
 theorem jetConvRev_wp3At_trueAnalytic
-    (m : ℕ) (s : OffSeed Xi) [XiJetConvolutionTail345AtOrderTrueAnalytic] :
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetConvolutionTail345AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     JetConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
-  rcases xiRouteA_jetPkg_wp3At (m := m) (s := s) with ⟨G, hfac, hjet, _⟩
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
+    ⟨G, hfac, hjet, _, _, _, _⟩
   have h3 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail3_wp3At (m := m) (s := s)
   have h4 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail4_wp3At (m := m) (s := s)
   have h5 := XiJetConvolutionTail345AtOrderTrueAnalytic.tail5_wp3At (m := m) (s := s)
@@ -172,11 +190,18 @@ theorem jetConvRev_wp3At_trueAnalytic
 end JetQuotOp
 
 instance (priority := 1000)
-    [XiJetConvolutionTail345AtOrderTrueAnalytic] :
+    [XiJetConvolutionTail345AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetConvolutionAtRevAtOrderTrueAnalytic where
-  jet_w0At  := by intro m s; exact JetQuotOp.jetConvRev_w0At_trueAnalytic (m := m) (s := s)
-  jet_wp2At := by intro m s; exact JetQuotOp.jetConvRev_wp2At_trueAnalytic (m := m) (s := s)
-  jet_wp3At := by intro m s; exact JetQuotOp.jetConvRev_wp3At_trueAnalytic (m := m) (s := s)
+  jet_w0At := by
+    intro m s
+    exact JetQuotOp.jetConvRev_w0At_trueAnalytic (m := m) (s := s)
+  jet_wp2At := by
+    intro m s
+    exact JetQuotOp.jetConvRev_wp2At_trueAnalytic (m := m) (s := s)
+  jet_wp3At := by
+    intro m s
+    exact JetQuotOp.jetConvRev_wp3At_trueAnalytic (m := m) (s := s)
 
 end XiPacket
 end Targets

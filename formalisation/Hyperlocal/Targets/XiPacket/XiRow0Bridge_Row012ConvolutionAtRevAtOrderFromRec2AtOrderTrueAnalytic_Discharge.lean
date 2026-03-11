@@ -9,10 +9,15 @@
   * does NOT import the analytic extractor coords corridor
   * keeps the historical analytic discharge file unchanged
   * adds the explicit Rec2 provider gate where needed
+
+  2026-03-11:
+  Retargeted from the legacy ambient Route-A Leibniz wrapper to the
+  theorem-side wrapper with explicit gate
+    [TAC.XiJetWindowEqAtOrderQuotProvider].
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderFromRec2AtOrderTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Reduce
@@ -26,14 +31,19 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open Hyperlocal.Transport
 open Hyperlocal.Cancellation
 
 theorem row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)] :
-    Row012ConvolutionAtRev s (s.ρ) (w0At m s) := by
+    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    Row012ConvolutionAtRev s s.ρ (w0At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
@@ -42,7 +52,7 @@ theorem row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic
     xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
   have HL : Row012ExtraLin s (w0At m s) := HLall.hw0At
 
-  rcases JetQuotOp.xiRouteA_jetPkg_w0At (m := m) (s := s) with
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_w0At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
@@ -61,7 +71,8 @@ theorem row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic
 
 theorem row012ConvolutionAtRev_wp2At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)] :
+    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
@@ -71,7 +82,7 @@ theorem row012ConvolutionAtRev_wp2At_fromRec2AtOrderTrueAnalytic
     xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
   have HL : Row012ExtraLin s (wp2At m s) := HLall.hwp2At
 
-  rcases JetQuotOp.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
@@ -90,7 +101,8 @@ theorem row012ConvolutionAtRev_wp2At_fromRec2AtOrderTrueAnalytic
 
 theorem row012ConvolutionAtRev_wp3At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)] :
+    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
@@ -100,7 +112,7 @@ theorem row012ConvolutionAtRev_wp3At_fromRec2AtOrderTrueAnalytic
     xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
   have HL : Row012ExtraLin s (wp3At m s) := HLall.hwp3At
 
-  rcases JetQuotOp.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
+  rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by
@@ -119,7 +131,8 @@ theorem row012ConvolutionAtRev_wp3At_fromRec2AtOrderTrueAnalytic
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_discharge
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)] :
+    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
   refine ⟨?_, ?_, ?_⟩
   · exact row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
