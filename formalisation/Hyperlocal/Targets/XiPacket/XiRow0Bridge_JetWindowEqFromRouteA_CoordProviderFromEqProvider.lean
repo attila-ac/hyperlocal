@@ -6,7 +6,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderDraft
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderFromScalars
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
