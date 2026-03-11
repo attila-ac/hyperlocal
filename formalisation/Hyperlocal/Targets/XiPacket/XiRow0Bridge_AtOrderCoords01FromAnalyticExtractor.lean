@@ -9,10 +9,13 @@
   Any division by `JetQuotOp.aRk1 s 0` must assume it explicitly.
   Therefore this theorem requires `[A0Nonzero s]`.
 
-  Strip branch must NOT import this file; it should import the strip-specialised
-  extractor file:
-
-    XiRow0Bridge_AtOrderCoords01FromAnalyticExtractorStrip.lean
+  Graph discipline:
+  * this file must remain on the historical extractor corridor
+  * it may consume the installed sigma surface
+  * it may consume the DAG-clean coords fallback surface
+  * it must NOT switch to the theorem-side packaged extractor endpoint,
+    because that endpoint itself requires `[XiAtOrderCoords01Provider]`,
+    which would make this file circular
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor

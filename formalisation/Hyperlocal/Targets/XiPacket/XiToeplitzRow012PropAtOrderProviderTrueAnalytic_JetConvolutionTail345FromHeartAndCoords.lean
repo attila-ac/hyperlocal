@@ -12,9 +12,13 @@
       to manufacture Row012ConvolutionAtRev for each window,
     * project the 9 convCoeff equalities.
 
+  UPDATE (2026-03-11):
+    expose explicit-coords theorem surfaces first, and keep the historical
+    provider-based wrappers as thin compatibility shells.
+
   IMPORTANT:
     `XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromHeartAndCoords.lean`
-    is now theorem-side and explicitly requires
+    is theorem-side and explicitly requires
 
         [TAC.XiJetWindowEqAtOrderQuotProvider]
 
@@ -58,7 +62,25 @@ private theorem tail345_of_row012ConvolutionAtRev
   rcases H with ⟨G, hfac, hjet, h3, h4, h5⟩
   exact ⟨h3, h4, h5⟩
 
-/-- Push C: tail(3/4/5) for `w0At` from heart+coords. -/
+/-- Push C: tail(3/4/5) for `w0At` from heart + explicit coords. -/
+theorem tail345_w0At_from_heart_and_coords_of_coords
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (HC : XiAtOrderCoords01Out m s) :
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 5 = 0 := by
+  classical
+  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
+  have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
+    xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
+      (m := m) (s := s) Hheart HC
+  exact tail345_of_row012ConvolutionAtRev
+    (s := s) (z := s.ρ) (w := w0At m s) Hrow012.hw0At
+
+/-- Historical provider-based wrapper for `w0At`. -/
 theorem tail345_w0At_from_heart_and_coords
     (m : ℕ) (s : OffSeed Xi)
     [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
@@ -67,17 +89,30 @@ theorem tail345_w0At_from_heart_and_coords
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 5 = 0 := by
   classical
-  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
-    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
     xiAtOrderCoords01Out_provided (m := m) (s := s)
+  exact tail345_w0At_from_heart_and_coords_of_coords
+    (m := m) (s := s) Hcoords
+
+/-- Push C: tail(3/4/5) for `wp2At` from heart + explicit coords. -/
+theorem tail345_wp2At_from_heart_and_coords_of_coords
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (HC : XiAtOrderCoords01Out m s) :
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 5 = 0 := by
+  classical
+  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
     xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
-      (m := m) (s := s) Hheart Hcoords
+      (m := m) (s := s) Hheart HC
   exact tail345_of_row012ConvolutionAtRev
-    (s := s) (z := s.ρ) (w := w0At m s) Hrow012.hw0At
+    (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) Hrow012.hwp2At
 
-/-- Push C: tail(3/4/5) for `wp2At` from heart+coords. -/
+/-- Historical provider-based wrapper for `wp2At`. -/
 theorem tail345_wp2At_from_heart_and_coords
     (m : ℕ) (s : OffSeed Xi)
     [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
@@ -86,17 +121,30 @@ theorem tail345_wp2At_from_heart_and_coords
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 5 = 0 := by
   classical
-  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
-    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
     xiAtOrderCoords01Out_provided (m := m) (s := s)
+  exact tail345_wp2At_from_heart_and_coords_of_coords
+    (m := m) (s := s) Hcoords
+
+/-- Push C: tail(3/4/5) for `wp3At` from heart + explicit coords. -/
+theorem tail345_wp3At_from_heart_and_coords_of_coords
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (HC : XiAtOrderCoords01Out m s) :
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 ∧
+    convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 5 = 0 := by
+  classical
+  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
+    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
     xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
-      (m := m) (s := s) Hheart Hcoords
+      (m := m) (s := s) Hheart HC
   exact tail345_of_row012ConvolutionAtRev
-    (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) Hrow012.hwp2At
+    (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) Hrow012.hwp3At
 
-/-- Push C: tail(3/4/5) for `wp3At` from heart+coords. -/
+/-- Historical provider-based wrapper for `wp3At`. -/
 theorem tail345_wp3At_from_heart_and_coords
     (m : ℕ) (s : OffSeed Xi)
     [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
@@ -105,22 +153,17 @@ theorem tail345_wp3At_from_heart_and_coords
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 ∧
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 5 = 0 := by
   classical
-  have Hheart : XiJetQuotRow0AtOrderHeartOut m s :=
-    xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
   have Hcoords : XiAtOrderCoords01Out m s :=
     xiAtOrderCoords01Out_provided (m := m) (s := s)
-  have Hrow012 : XiRow012ConvolutionAtRevAtOrderOut m s :=
-    xiRow012ConvolutionAtRevAtOrderOut_of_heart_and_coords
-      (m := m) (s := s) Hheart Hcoords
-  exact tail345_of_row012ConvolutionAtRev
-    (s := s) (z := (1 - (starRingEnd ℂ) s.ρ)) (w := wp3At m s) Hrow012.hwp3At
+  exact tail345_wp3At_from_heart_and_coords_of_coords
+    (m := m) (s := s) Hcoords
 
 /--
 Install the Tail345 manuscript payload.
 
-Downstream, the adapter instance in
-`XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Manuscript.lean`
-upgrades this to `XiJetConvolutionTail345AtOrderTrueAnalytic`.
+For now the installed instance still uses the provider-based wrappers, but the
+explicit-coords theorem surfaces above are now available for the next installer
+retarget step.
 -/
 instance (priority := 1000)
     [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]

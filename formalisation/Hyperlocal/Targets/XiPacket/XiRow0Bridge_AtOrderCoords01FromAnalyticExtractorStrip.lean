@@ -6,6 +6,12 @@
   This file is **not** cycle-safe: it imports the analytic extractor endpoint.
   It is the strip-specialised version that avoids the global axiom
   `a0_ne_zero` by using the theorem `a0_ne_zero_of_strip`.
+
+  Graph discipline:
+  * this file must remain on the historical extractor corridor
+  * it must NOT switch to the theorem-side packaged extractor endpoint,
+    because that endpoint itself requires `[XiAtOrderCoords01Provider]`
+    and would therefore make this file circular
 -/
 
 import Hyperlocal.Transport.OffSeedStrip

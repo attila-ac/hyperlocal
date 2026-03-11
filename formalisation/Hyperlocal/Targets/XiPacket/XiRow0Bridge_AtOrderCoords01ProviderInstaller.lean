@@ -1,27 +1,23 @@
 /-
-  Installs the coords01-at-order provider instance.
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderCoords01ProviderInstaller.lean
 
-  Policy (DAG safety):
-  * Upstream analytic / extractor layers import THIS file.
-  * This file MUST NOT import Rec2-at-order true-analytic roots nor extractor glue.
+  Historical public installer for `XiAtOrderCoords01Provider`.
 
-  Today:
-  * Installs the DAG-clean axiom provider instance.
-  * A theorem-backed route can be installed via a separate “theorem installer”
-    imported only in end-claim cones (to avoid cycles).
+  UPDATED POLICY:
+  This file is now only a compatibility import surface.
+  The actual provider is installed theorem-side from:
+    * the sigma provider theorem surface
+    * the true-analytic Row012 convolution corridor
+    * XiSigma3Nonzero
+
+  This removes the fallback coords01 axiom installer from the main live cone.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstallerFromSigmaAndRow012TrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromUpstream
+import Hyperlocal.Targets.XiPacket.XiSigma3Nonzero
 
 set_option autoImplicit false
 noncomputable section
-
-namespace Hyperlocal
-namespace Targets
-namespace XiPacket
-
--- stable import surface only
-
-end XiPacket
-end Targets
-end Hyperlocal
