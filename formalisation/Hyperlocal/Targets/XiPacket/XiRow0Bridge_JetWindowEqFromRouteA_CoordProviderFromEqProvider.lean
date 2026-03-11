@@ -2,14 +2,14 @@
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider.lean
 
   Build full `RouteAJetCoordProvider` from Eq-provider for w0/wp2/wp3 and
-  from the tiny wc-only axiom boundary for wc.
+  from the theorem-side wc provider surface for wc.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderDraft
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcAxioms
 
 import Mathlib.Tactic
 
@@ -84,14 +84,14 @@ instance (priority := 1000)
     simpa [TAC.jet3, z_w0At_eq_rho (s := s)] using h2
 
   ---------------------------------------------------------------------------
-  -- wc : tiny wc-only boundary
+  -- wc : now from theorem-side upstream wc jet provider (draft)
   ---------------------------------------------------------------------------
   · intro s
-    simpa using RouteAJetCoordAxioms.Wc.ax_wc_0 s
+    exact RouteAWcCoordProvider.wc_0 s
   · intro s
-    simpa using RouteAJetCoordAxioms.Wc.ax_wc_1 s
+    exact RouteAWcCoordProvider.wc_1 s
   · intro s
-    simpa using RouteAJetCoordAxioms.Wc.ax_wc_2 s
+    exact RouteAWcCoordProvider.wc_2 s
 
   ---------------------------------------------------------------------------
   -- wp2 : from m = 0 pivot; z_wp2At simp
