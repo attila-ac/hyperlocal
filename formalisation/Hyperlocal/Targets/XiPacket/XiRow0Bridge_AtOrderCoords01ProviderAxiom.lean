@@ -1,7 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderCoords01ProviderAxiom.lean
 
-  DAG-clean fallback installer for the coords01-at-order payload.
+  DAG-clean *axiom* instance for coords01-at-order.
+
+  Purpose:
+  * extractor/upstream-safe fallback instance
+  * MUST NOT import Rec2-at-order / extractor / heart discharge modules
+
+  NOTE:
+  We intentionally keep the historical compatibility name
+    `xiAtOrderCoords01Out_axiom_stub`
+  alive here until the adapter/importer cone is fully evacuated.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
@@ -13,9 +22,9 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/-- DAG-clean placeholder axiom for coords01-at-order output. -/
 axiom xiAtOrderCoords01Out_axiom_stub
-    (m : ℕ) (s : OffSeed Xi) : XiAtOrderCoords01Out m s
+    (m : ℕ) (s : OffSeed Xi) :
+    XiAtOrderCoords01Out m s
 
 instance : XiAtOrderCoords01Provider where
   coords01 := xiAtOrderCoords01Out_axiom_stub
