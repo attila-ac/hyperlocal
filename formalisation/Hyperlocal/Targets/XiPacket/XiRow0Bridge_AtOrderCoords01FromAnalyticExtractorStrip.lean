@@ -15,7 +15,7 @@
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractorFromRec2TrueAnalyticStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracyFromStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
@@ -43,8 +43,10 @@ theorem xiAtOrderCoords01Out_fromAnalyticExtractor_strip
   have Hrec2 :
       JetQuotRec2 s0 (padSeq3 (w0At m s0)) ∧
       JetQuotRec2 s0 (padSeq3 (wp2At m s0)) ∧
-      JetQuotRec2 s0 (padSeq3 (wp3At m s0)) :=
-    xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor (m := m) (s := s0)
+      JetQuotRec2 s0 (padSeq3 (wp3At m s0)) := by
+    simpa [s0] using
+      (xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor_fromRec2TrueAnalytic_strip
+        (m := m) (s := s))
 
   have ha0 : a0 s0 ≠ (0 : ℂ) := by
     simpa [s0, a0] using (a0_ne_zero_of_strip (s := s))

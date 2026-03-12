@@ -1,0 +1,10 @@
+/-
+  Formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderRec2TrueAnalyticStripConsumer.lean
+-/
+
+import Hyperlocal.Transport.OffSeedStrip
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticRecurrencesStrictStrip
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticInstallerFromRec2TrueAnalyticStrip
+
+set_option autoImplicit false
+noncomputable section

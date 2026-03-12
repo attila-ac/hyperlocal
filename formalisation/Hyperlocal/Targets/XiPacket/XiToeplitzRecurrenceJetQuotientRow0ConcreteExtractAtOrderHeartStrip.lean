@@ -1,17 +1,15 @@
 /-
-  Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartStrip.lean
+  Formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartStrip.lean
 
-  Non-cycle-safe *strip* export layer for the Row0 heart.
+  Strip-specialised wrapper for the Row0 heart output.
 
-  Purpose:
-  Provide the strip-specialised theorem-level heart output without exposing the
-  global nondegeneracy axiom `a0_ne_zero`.
-
-  Downstream strip-threaded modules should import this file (or the underlying
-  heart file) and use `xiJetQuotRow0AtOrderHeartOut_strip`.
+  This file is intentionally thin: it just re-exports the analytic-strip heart
+  theorem at the strip surface, while exposing the Route-A quotient-window gate
+  required by the underlying proof.
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartFromAnalyticStrip
 
 set_option autoImplicit false
@@ -21,14 +19,29 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open Complex
-open Hyperlocal.Transport
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
-/-- Re-export: strip-specialised heart output. -/
+/--
+Preferred strip wrapper name.
+-/
+theorem xiJetQuotRow0AtOrderHeartOut_fromAnalyticStrip
+    (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) := by
+  exact
+    xiJetQuotRow0AtOrderHeartOut_strip (m := m) (s := s)
+
+/--
+Compatibility alias: some downstream files still use the underscored spelling.
+-/
 theorem xiJetQuotRow0AtOrderHeartOut_fromAnalytic_strip
-    (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi) :
-    XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) :=
-  xiJetQuotRow0AtOrderHeartOut_strip (m := m) (s := s)
+    (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) := by
+  exact
+    xiJetQuotRow0AtOrderHeartOut_fromAnalyticStrip (m := m) (s := s)
 
 end XiPacket
 end Targets
