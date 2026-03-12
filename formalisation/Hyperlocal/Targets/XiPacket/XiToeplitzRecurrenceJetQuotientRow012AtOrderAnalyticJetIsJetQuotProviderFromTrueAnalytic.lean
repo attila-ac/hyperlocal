@@ -10,27 +10,19 @@
     * true-analytic Rec2 provider on padSeq3(w?At)
     * ShiftBridge instances (available once an Eq-provider exists)
 
+  2026-03-12 fix:
+  the Rec2 true-analytic lemmas
+      `rec2_w0At_trueAnalytic`, `rec2_wp2At_trueAnalytic`, `rec2_wp3At_trueAnalytic`
+  are gated by
+      [XiRow012ConvolutionAtRevAtOrderTrueAnalytic].
+  Importing its producer chain is not enough here; the required class must be
+  present in the instance context explicitly.
+
   This file introduces NO axioms.
-
-  NOTE:
-  We work at the canonical Route–E anchors `TAC.z_w0At/z_wp2At/z_wp3At`
-  so the downstream Eq-provider / ShiftBridge installer stack stays hands-free.
-
-  Editor/CLI robustness note (2026-03-05):
-  The Rec2-at-order true-analytic source for (w0At/wp2At/wp3At) is gated by
-  `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.  When VS Code elaborates this file
-  in isolation (`lake setup-file`), that instance may not be present unless we import
-  its producer chain.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
-
--- Producer chain for `[XiRow012ConvolutionAtRevAtOrderTrueAnalytic]`.
--- (existing analytic Row012 endpoint) ⇒ `XiRow012UpstreamTrueAnalytic`
--- ⇒ `XiRow012ConvolutionAtRevAtOrderTrueAnalytic`.
-import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_Row012ConvolutionInstanceFromUpstream
-import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticFromUpstream
-
+import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiRouteA_QuotShiftBridgeInstancesFromTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 
@@ -53,12 +45,14 @@ end TAC
 /--
 E2: the quotient-jet provider is theorem-level once you have:
 
-* true-analytic sigma provider (to get the Rec2 facts), and
+* true-analytic Row012 reverse-convolution,
+* true-analytic sigma provider, and
 * an Eq-provider (to get the ShiftBridge instances via the installer).
 
 No axioms; pure glue.
 -/
 instance (priority := 1000)
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
     [XiAtOrderSigmaProvider]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     TAC.XiJetWindowIsJetAtOrderQuotProvider := by
@@ -66,11 +60,8 @@ instance (priority := 1000)
   refine ⟨?_, ?_, ?_⟩
 
   · intro m s
-    -- Recurrence from the true-analytic provider
     have hw : JetQuotRec2 s (padSeq3 (w0At m s)) :=
       rec2_w0At_trueAnalytic (m := m) (s := s)
-    -- ShiftBridge instance is now available (imported installer + Eq-provider)
-    -- and we use the stable bridge lemma:
     simpa using
       (TAC.isJet3AtOrderQuot_w0At_of_rec2 (m := m) (s := s) (z := TAC.z_w0At s) hw)
 
