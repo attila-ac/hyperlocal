@@ -3,17 +3,14 @@
 
   Strip-specialised theorem wrapper for the reverse-stencil Row012 bundle
   from the Rec2-at-order true-analytic corridor.
+
+  2026-03-12 cleanup:
+  the discharge theorem is now itself routed through the strip-specialised
+  extra-lin lane, so this wrapper no longer needs to reinstall `A0Nonzero`.
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
-
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromRec2AtOrderTrueAnalytic_Discharge
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracyFromStrip
-
--- canonical producer surfaces for the two inferred instances below
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -33,15 +30,7 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_strip
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m (s : OffSeed Xi) := by
-  classical
   let s0 : OffSeed Xi := (s : OffSeed Xi)
-
-  letI : XiAtOrderSigmaProvider := inferInstance
-  letI : XiJetQuotRec2AtOrderProvider := inferInstance
-  letI : A0Nonzero (s := s0) := ⟨by
-    simpa [s0] using (a0_ne_zero_of_strip (s := s))
-  ⟩
-
   simpa [s0] using
     (xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_discharge
       (m := m) (s := s0))

@@ -1,21 +1,20 @@
 /-
-  Coords01-at-order output derived from the TRUE-ANALYTIC Rec2-at-order route,
-  plus the single nondegeneracy boundary axiom `A0NonzeroBoundary`.
+  Coords01-at-order output derived from the TRUE-ANALYTIC Rec2-at-order route.
 
-  IMPORTANT:
-  * theorem-level only
-  * ROOT-FREE: do NOT import the strict true-analytic root here
-  * this file should depend only on the Rec2 provider interface
-      [XiJetQuotRec2AtOrderProvider]
-    together with the strict Rec2 theorems
+  2026-03-12 surgical retarget:
+  * remove the hidden dependency on `A0NonzeroBoundaryFromAxiom`
+  * keep the existing strict Rec2 padSeq3 proof body
+  * derive `a0 ≠ 0` locally from the strip nondegeneracy theorem
+  * strengthen the theorem gate to the honest true-analytic surface
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundaryFromAxiom
+import Hyperlocal.Targets.XiPacket.XiTrueAnalyticCriticalStripBridge
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracyFromStrip
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticRecurrencesStrict
 
 set_option autoImplicit false
@@ -25,16 +24,29 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open Hyperlocal.Transport
 
 theorem xiAtOrderCoords01Out_fromRec2AtOrderTrueAnalytic
-    [XiJetQuotRec2AtOrderProvider]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (m : ℕ) (s : OffSeed Xi) : XiAtOrderCoords01Out m s := by
   classical
+  letI : XiJetQuotRec2AtOrderProvider := inferInstance
 
-  have ha0 : JetQuotOp.aRk1 s 0 ≠ 0 :=
-    (A0Nonzero.a0_ne_zero (s := s))
+  rcases offSeed_in_critical_strip_of_trueanalytic (m := m) (s := s) with
+    ⟨hRe_pos, hRe_lt_one⟩
+  let ss : _root_.Hyperlocal.OffSeedStrip Xi :=
+    Hyperlocal.mkOffSeedStrip (s := s) (hRe_pos := hRe_pos) (hRe_lt_one := hRe_lt_one)
+  have hs : (ss : OffSeed Xi) = s := by
+    rfl
+
+  have ha0 : JetQuotOp.aRk1 s 0 ≠ 0 := by
+    simpa [hs] using (a0_ne_zero_of_strip (s := ss))
 
   have hw0 :
       (w0At m s) 0 = 0 ∧ (w0At m s) 1 = 0 ∧ (w0At m s) 2 = 0 :=

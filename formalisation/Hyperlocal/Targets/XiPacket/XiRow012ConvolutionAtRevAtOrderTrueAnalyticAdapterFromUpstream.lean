@@ -3,25 +3,26 @@
 
   Stable installed producer for `XiRow012UpstreamTrueAnalytic`.
 
-  UPDATE (2026-03-11):
-  This adapter now consumes the theorem-level coords01 surface directly,
-  via the explicit-coords Row012 analytic endpoint, instead of importing the
-  fallback coords01 provider axiom.
+  2026-03-12 retarget:
+  * remove the legacy analytic endpoint route
+  * do NOT reinstall `A0Nonzero`
+  * consume the already-retargeted true-analytic theorem wrapper directly
 
-  HONESTY FIX:
-  The explicit-coords analytic endpoint also requires the theorem-side
-  Route-A quotient window gate
+  This keeps the historical installed surface
 
-      [TAC.XiJetWindowEqAtOrderQuotProvider]
+      [XiRow012UpstreamTrueAnalytic]
 
-  so this adapter must state that dependency explicitly.
+  while routing through
+
+      xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic
+
+  which itself now bridges
+      OffSeed Xi -> OffSeedStrip Xi
+  via the critical-strip bridge and delegates to the strip-specialised theorem corridor.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromTrueAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -35,15 +36,13 @@ open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
 instance (priority := 1000)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012UpstreamTrueAnalytic where
   row012_out := by
     intro m s
-    letI : A0Nonzero (s := s) := by infer_instance
-    have HC : XiAtOrderCoords01Out m s :=
-      xiAtOrderCoords01Out_theorem (m := m) (s := s)
-    exact xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_of_coords
-      (m := m) (s := s) HC
+    simpa using
+      (xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic (m := m) (s := s))
 
 end XiPacket
 end Targets

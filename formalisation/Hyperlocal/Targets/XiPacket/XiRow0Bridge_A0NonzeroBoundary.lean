@@ -9,10 +9,8 @@
   route remains cycle-safe.
 
   2026-03-12 policy:
-  this file now provides only the class / axiom surface.
+  this file now provides only the class surface.
   It does NOT install a global default instance.
-
-  Legacy compatibility producers should live in separate files.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
@@ -29,11 +27,6 @@ open Complex
 /-- Boundary typeclass: `JetQuotOp.aRk1 s 0 ≠ 0`. -/
 class A0Nonzero (s : OffSeed Xi) : Prop where
   a0_ne_zero : JetQuotOp.aRk1 s 0 ≠ 0
-
-/--
-Admitted boundary fact (legacy compatibility surface only): `a0 ≠ 0`.
--/
-axiom a0_ne_zero_boundary (s : OffSeed Xi) : JetQuotOp.aRk1 s 0 ≠ 0
 
 end XiPacket
 end Targets

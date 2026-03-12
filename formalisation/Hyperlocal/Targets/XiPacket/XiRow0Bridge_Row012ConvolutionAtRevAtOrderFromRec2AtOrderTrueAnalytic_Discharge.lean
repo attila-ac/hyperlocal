@@ -14,15 +14,23 @@
   Retargeted from the legacy ambient Route-A Leibniz wrapper to the
   theorem-side wrapper with explicit gate
     [TAC.XiJetWindowEqAtOrderQuotProvider].
+
+  2026-03-12 surgical retarget:
+  * remove the explicit `[A0Nonzero (s := s)]` dependency from this Rec2 discharge lane
+  * derive the strip object from the true-analytic critical-strip bridge
+  * obtain the extra-linear payload through the strip-specialised theorem lane
+    instead of consuming the legacy ambient `A0Nonzero` seam directly
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeart
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderFromRec2AtOrderTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ExtraLinAtOrderFromRec2AtOrderTrueAnalyticStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic_Reduce
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
+import Hyperlocal.Targets.XiPacket.XiTrueAnalyticCriticalStripBridge
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
 
 set_option autoImplicit false
 noncomputable section
@@ -41,23 +49,34 @@ open Hyperlocal.Cancellation
 
 theorem row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row012ConvolutionAtRev s s.ρ (w0At m s) := by
   classical
+  letI : XiAtOrderSigmaProvider := inferInstance
+  letI : XiJetQuotRec2AtOrderProvider := inferInstance
+
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
 
-  have HLall : XiRow012ExtraLinAtOrderOut m s :=
-    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
-  have HL : Row012ExtraLin s (w0At m s) := HLall.hw0At
+  rcases hstrip : offSeed_in_critical_strip_of_trueanalytic (m := m) (s := s) with
+    ⟨hRe_pos, hRe_lt_one⟩
+  let ss : _root_.Hyperlocal.OffSeedStrip Xi :=
+    Hyperlocal.mkOffSeedStrip (s := s) (hRe_pos := hRe_pos) (hRe_lt_one := hRe_lt_one)
+  have hs : (ss : OffSeed Xi) = s := by
+    rfl
+
+  have HLall : XiRow012ExtraLinAtOrderOut m (ss : OffSeed Xi) :=
+    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic_strip (m := m) (s := ss)
+  have HL : Row012ExtraLin s (w0At m s) := by
+    simpa [hs] using HLall.hw0At
 
   rcases JetQuotOpTheorem.xiRouteA_jetPkg_w0At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 3 = 0 := by
-    have hs : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
-    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w0At m s)] using hs
+    have hsigma : row0Sigma s (w0At m s) = 0 := H.hw0AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := w0At m s)] using hsigma
 
   have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (w0At m s)) 4 = 0 := by
     rw [convCoeff_rev_eq_n4 (s := s) (w := w0At m s)]
@@ -71,23 +90,34 @@ theorem row012ConvolutionAtRev_w0At_fromRec2AtOrderTrueAnalytic
 
 theorem row012ConvolutionAtRev_wp2At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   classical
+  letI : XiAtOrderSigmaProvider := inferInstance
+  letI : XiJetQuotRec2AtOrderProvider := inferInstance
+
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
 
-  have HLall : XiRow012ExtraLinAtOrderOut m s :=
-    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
-  have HL : Row012ExtraLin s (wp2At m s) := HLall.hwp2At
+  rcases hstrip : offSeed_in_critical_strip_of_trueanalytic (m := m) (s := s) with
+    ⟨hRe_pos, hRe_lt_one⟩
+  let ss : _root_.Hyperlocal.OffSeedStrip Xi :=
+    Hyperlocal.mkOffSeedStrip (s := s) (hRe_pos := hRe_pos) (hRe_lt_one := hRe_lt_one)
+  have hs : (ss : OffSeed Xi) = s := by
+    rfl
+
+  have HLall : XiRow012ExtraLinAtOrderOut m (ss : OffSeed Xi) :=
+    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic_strip (m := m) (s := ss)
+  have HL : Row012ExtraLin s (wp2At m s) := by
+    simpa [hs] using HLall.hwp2At
 
   rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp2At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 3 = 0 := by
-    have hs : row0Sigma s (wp2At m s) = 0 := H.hwp2AtSigma
-    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp2At m s)] using hs
+    have hsigma : row0Sigma s (wp2At m s) = 0 := H.hwp2AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp2At m s)] using hsigma
 
   have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2At m s)) 4 = 0 := by
     rw [convCoeff_rev_eq_n4 (s := s) (w := wp2At m s)]
@@ -101,23 +131,34 @@ theorem row012ConvolutionAtRev_wp2At_fromRec2AtOrderTrueAnalytic
 
 theorem row012ConvolutionAtRev_wp3At_fromRec2AtOrderTrueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   classical
+  letI : XiAtOrderSigmaProvider := inferInstance
+  letI : XiJetQuotRec2AtOrderProvider := inferInstance
+
   have H : XiJetQuotRow0AtOrderHeartOut m s :=
     xiJetQuotRow0AtOrderHeartOut (m := m) (s := s)
 
-  have HLall : XiRow012ExtraLinAtOrderOut m s :=
-    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic (m := m) (s := s)
-  have HL : Row012ExtraLin s (wp3At m s) := HLall.hwp3At
+  rcases hstrip : offSeed_in_critical_strip_of_trueanalytic (m := m) (s := s) with
+    ⟨hRe_pos, hRe_lt_one⟩
+  let ss : _root_.Hyperlocal.OffSeedStrip Xi :=
+    Hyperlocal.mkOffSeedStrip (s := s) (hRe_pos := hRe_pos) (hRe_lt_one := hRe_lt_one)
+  have hs : (ss : OffSeed Xi) = s := by
+    rfl
+
+  have HLall : XiRow012ExtraLinAtOrderOut m (ss : OffSeed Xi) :=
+    xiRow012ExtraLinAtOrderOut_fromRec2AtOrderTrueAnalytic_strip (m := m) (s := ss)
+  have HL : Row012ExtraLin s (wp3At m s) := by
+    simpa [hs] using HLall.hwp3At
 
   rcases JetQuotOpTheorem.xiRouteA_jetPkg_wp3At (m := m) (s := s) with
     ⟨G, hfac, hjet, _, _, _, _⟩
 
   have h3 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 3 = 0 := by
-    have hs : row0Sigma s (wp3At m s) = 0 := H.hwp3AtSigma
-    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp3At m s)] using hs
+    have hsigma : row0Sigma s (wp3At m s) = 0 := H.hwp3AtSigma
+    simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wp3At m s)] using hsigma
 
   have h4 : convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3At m s)) 4 = 0 := by
     rw [convCoeff_rev_eq_n4 (s := s) (w := wp3At m s)]
@@ -131,7 +172,7 @@ theorem row012ConvolutionAtRev_wp3At_fromRec2AtOrderTrueAnalytic
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_discharge
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiJetQuotRec2AtOrderProvider] [A0Nonzero (s := s)]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
   refine ⟨?_, ?_, ?_⟩
