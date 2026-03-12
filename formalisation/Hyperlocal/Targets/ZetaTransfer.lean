@@ -138,6 +138,22 @@ theorem noOffSeed_zeta_of_noOffSeed_xi
   rcases hz with ⟨s⟩
   exact ⟨offSeed_xi_of_offSeed_zeta (s := s)⟩
 
+/-- RH-facing pointwise form of the ζ ← ξ transfer:
+every nontrivial zero of ζ lies on the critical line,
+provided ξ has no off-seed zeros. -/
+theorem criticalzero_zeta
+    (hxi : NoOffSeed Xi) {ρ : ℂ}
+    (hζ : Zeta ρ = 0) (hIm : ρ.im ≠ 0) :
+    ρ.re = (1 / 2 : ℝ) := by
+  by_contra hcrit
+  have hz_off : Hyperlocal.OffSeed Zeta :=
+    { ρ := ρ
+      hρ := hζ
+      hσ := hcrit
+      ht := hIm }
+  have hz_no : NoOffSeed Zeta := noOffSeed_zeta_of_noOffSeed_xi hxi
+  exact hz_no ⟨hz_off⟩
+
 end ZetaTransfer
 end Targets
 end Hyperlocal
