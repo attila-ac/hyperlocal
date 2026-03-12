@@ -8,8 +8,11 @@
   We firewall that denominator as a small, explicit boundary so the rest of the
   route remains cycle-safe.
 
-  IMPORTANT:
-  This file is intentionally *small* and may be discharged extractor-side later.
+  2026-03-12 policy:
+  this file now provides only the class / axiom surface.
+  It does NOT install a global default instance.
+
+  Legacy compatibility producers should live in separate files.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
@@ -28,17 +31,9 @@ class A0Nonzero (s : OffSeed Xi) : Prop where
   a0_ne_zero : JetQuotOp.aRk1 s 0 ≠ 0
 
 /--
-Admitted boundary fact (to be discharged later): `a0 ≠ 0`.
-
-If you want to keep this as a *lemma* (not an instance), keep this axiom and
-remove the `instance` below; then downstream files can do
-`letI : A0Nonzero (s := s) := ⟨a0_ne_zero_boundary (s := s)⟩`.
+Admitted boundary fact (legacy compatibility surface only): `a0 ≠ 0`.
 -/
 axiom a0_ne_zero_boundary (s : OffSeed Xi) : JetQuotOp.aRk1 s 0 ≠ 0
-
-/-- Convenience instance so downstream files can just use `infer_instance`. -/
-instance (s : OffSeed Xi) : A0Nonzero (s := s) :=
-  ⟨a0_ne_zero_boundary (s := s)⟩
 
 end XiPacket
 end Targets

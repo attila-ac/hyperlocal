@@ -2,12 +2,13 @@
   Hyperlocal/Targets/XiPacket/XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345ManuscriptFromSigmaAndRow012.lean
 
   Build the manuscript-facing 9-lemma tail instance from *coordinate* facts
-  (sigma + Row012 stencil + σ3≠0), not from convCoeff directly.
+  (sigma + Row012 stencil + true-analytic σ3≠0), not from convCoeff directly.
 
   Assumptions:
-    [XiAtOrderSigmaProvider]                      -- gives row0Sigma=0 for canonical windows
-    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]  -- gives Row012ConvolutionAtRev for canonical windows
-    [XiSigma3Nonzero]                             -- σ3(s) ≠ 0 (strip branch should prove this)
+    [XiAtOrderSigmaProvider]                         -- gives row0Sigma=0 for canonical windows
+    [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]   -- gives Row012ConvolutionAtRev for canonical windows
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
 
   Output:
     instance : XiJetConvolutionTail345AtOrderTrueAnalytic_Manuscript
@@ -18,9 +19,9 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalyt
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345ShiftCoord
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
-import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic   -- class XiRow012ConvolutionAtRevAtOrderTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchySemantics
-import Hyperlocal.Targets.XiPacket.XiSigma3Nonzero
+import Hyperlocal.Targets.XiPacket.XiSigma3NonzeroFromTrueAnalytic
 
 import Mathlib.Tactic
 
@@ -30,6 +31,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 namespace XiPacket
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 open Complex
 open Hyperlocal.Transport
@@ -84,7 +89,7 @@ theorem coords012_eq_zero_of_sigma_and_row012
 
   have hmul0 : (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = 0 := by
     have : (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = row0Sigma s w := by
-      simp [row0Sigma, hw1, hw2, add_assoc, add_left_comm, add_comm]
+      simp [row0Sigma, hw1, hw2]
     calc
       (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = row0Sigma s w := this
       _ = 0 := hSigma
@@ -95,17 +100,20 @@ theorem coords012_eq_zero_of_sigma_and_row012
   exact ⟨hw0, hw1, hw2⟩
 
 /--
-For a single window `w`, sigma + row012 + σ3≠0 implies the three tail vanishings at n=3,4,5.
+For a single window `w`, sigma + row012 + true-analytic σ3≠0 implies the three tail vanishings at n=3,4,5.
 -/
 theorem tail345_for_window_of_sigma_and_row012
-    [XiSigma3Nonzero]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (m : ℕ)
     (s : OffSeed Xi) (z : ℂ) (w : Transport.Window 3)
     (hSigma : row0Sigma s w = 0)
     (H : Row012ConvolutionAtRev s z w) :
     (Cancellation.convCoeff (row0CoeffSeqRev s) (winSeqRev w) 3 = 0) ∧
     (Cancellation.convCoeff (row0CoeffSeqRev s) (winSeqRev w) 4 = 0) ∧
     (Cancellation.convCoeff (row0CoeffSeqRev s) (winSeqRev w) 5 = 0) := by
-  have hσ3 : (JetQuotOp.σ3 s : ℂ) ≠ 0 := XiSigma3Nonzero.sigma3_ne_zero (s := s)
+  have hσ3 : (JetQuotOp.σ3 s : ℂ) ≠ 0 :=
+    sigma3_ne_zero_of_trueanalytic (m := m) (s := s)
 
   have hcoords :=
     coords012_eq_zero_of_sigma_and_row012
@@ -129,12 +137,13 @@ theorem tail345_for_window_of_sigma_and_row012
   exact ⟨ht3, ht4, ht5⟩
 
 /--
-Main result: global manuscript 9-lemma instance from global sigma + global Row012 + σ3≠0.
+Main result: global manuscript 9-lemma instance from global sigma + global Row012 + true-analytic σ3≠0.
 -/
 instance (priority := 900)
     [XiAtOrderSigmaProvider]
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
-    [XiSigma3Nonzero] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetConvolutionTail345AtOrderTrueAnalytic_Manuscript := by
   classical
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -144,21 +153,24 @@ instance (priority := 900)
       (xiAtOrderSigmaOut_provided (m := m) (s := s)).hw0AtSigma
     have H : Row012ConvolutionAtRev s s.ρ (w0At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At (m := m) (s := s)
-    exact (tail345_for_window_of_sigma_and_row012 (s := s) (z := s.ρ) (w := w0At m s) hSigma H).1
+    exact (tail345_for_window_of_sigma_and_row012
+      (m := m) (s := s) (z := s.ρ) (w := w0At m s) hSigma H).1
 
   · intro m s
     have hSigma : row0Sigma s (w0At m s) = 0 :=
       (xiAtOrderSigmaOut_provided (m := m) (s := s)).hw0AtSigma
     have H : Row012ConvolutionAtRev s s.ρ (w0At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At (m := m) (s := s)
-    exact (tail345_for_window_of_sigma_and_row012 (s := s) (z := s.ρ) (w := w0At m s) hSigma H).2.1
+    exact (tail345_for_window_of_sigma_and_row012
+      (m := m) (s := s) (z := s.ρ) (w := w0At m s) hSigma H).2.1
 
   · intro m s
     have hSigma : row0Sigma s (w0At m s) = 0 :=
       (xiAtOrderSigmaOut_provided (m := m) (s := s)).hw0AtSigma
     have H : Row012ConvolutionAtRev s s.ρ (w0At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hw0At (m := m) (s := s)
-    exact (tail345_for_window_of_sigma_and_row012 (s := s) (z := s.ρ) (w := w0At m s) hSigma H).2.2
+    exact (tail345_for_window_of_sigma_and_row012
+      (m := m) (s := s) (z := s.ρ) (w := w0At m s) hSigma H).2.2
 
   · intro m s
     have hSigma : row0Sigma s (wp2At m s) = 0 :=
@@ -166,7 +178,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp2At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).1
+      (m := m) (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).1
 
   · intro m s
     have hSigma : row0Sigma s (wp2At m s) = 0 :=
@@ -174,7 +186,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp2At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).2.1
+      (m := m) (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).2.1
 
   · intro m s
     have hSigma : row0Sigma s (wp2At m s) = 0 :=
@@ -182,7 +194,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp2At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).2.2
+      (m := m) (s := s) (z := (starRingEnd ℂ) s.ρ) (w := wp2At m s) hSigma H).2.2
 
   · intro m s
     have hSigma : row0Sigma s (wp3At m s) = 0 :=
@@ -190,7 +202,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp3At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).1
+      (m := m) (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).1
 
   · intro m s
     have hSigma : row0Sigma s (wp3At m s) = 0 :=
@@ -198,7 +210,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp3At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).2.1
+      (m := m) (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).2.1
 
   · intro m s
     have hSigma : row0Sigma s (wp3At m s) = 0 :=
@@ -206,7 +218,7 @@ instance (priority := 900)
     have H : Row012ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) :=
       XiRow012ConvolutionAtRevAtOrderTrueAnalytic.hwp3At (m := m) (s := s)
     exact (tail345_for_window_of_sigma_and_row012
-      (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).2.2
+      (m := m) (s := s) (z := 1 - (starRingEnd ℂ) s.ρ) (w := wp3At m s) hSigma H).2.2
 
 end Tail345ManuscriptFromSigmaAndRow012
 

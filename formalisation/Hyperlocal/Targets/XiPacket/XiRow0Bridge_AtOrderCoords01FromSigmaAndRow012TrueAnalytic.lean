@@ -5,7 +5,7 @@
 
     * XiAtOrderSigmaProvider
     * XiRow012ConvolutionAtRevAtOrderTrueAnalytic
-    * XiSigma3Nonzero
+    * true-analytic σ3 nonvanishing
 
   Updated structure:
   * primary explicit-input theorem
@@ -15,16 +15,16 @@
       `xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic`
     recovers `Hσ` from `[XiAtOrderSigmaProvider]`
 
-  2026-03-11 downstream retarget:
-  * do NOT import the old manuscript installer-level tail file
-  * inline only the local coordinate-kill helper needed here
+  2026-03-12 careful retarget:
+  * do NOT rely on the global `[XiSigma3Nonzero]` class here
+  * use `sigma3_ne_zero_of_trueanalytic` directly
   * keep this file theorem-level only
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic
-import Hyperlocal.Targets.XiPacket.XiSigma3Nonzero
+import Hyperlocal.Targets.XiPacket.XiSigma3NonzeroFromTrueAnalytic
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345Reductions
 import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalytic_JetConvolutionTail345ShiftCoord
@@ -38,6 +38,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 namespace XiPacket
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 open Complex
 open Hyperlocal.Transport
@@ -93,7 +97,7 @@ private theorem coords012_eq_zero_of_sigma_and_row012
 
   have hmul0 : (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = 0 := by
     have : (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = row0Sigma s w := by
-      simp [row0Sigma, hw1, hw2, add_assoc, add_left_comm, add_comm]
+      simp [row0Sigma, hw1, hw2]
     calc
       (-(JetQuotOp.σ3 s : ℂ)) * (w 0) = row0Sigma s w := this
       _ = 0 := hSigma
@@ -107,17 +111,18 @@ private theorem coords012_eq_zero_of_sigma_and_row012
 Explicit-input coords01-at-order theorem from:
 * a concrete sigma payload `Hσ`
 * Row012 true-analytic convolution facts
-* σ3 ≠ 0
+* true-analytic `σ3 ≠ 0`
 -/
 theorem xiAtOrderCoords01Out_of_sigmaAndRow012TrueAnalytic
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
-    [XiSigma3Nonzero]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (m : ℕ) (s : OffSeed Xi)
     (Hσ : XiAtOrderSigmaOut m s) :
     XiAtOrderCoords01Out m s := by
   classical
   let hσ3 : (JetQuotOp.σ3 s : ℂ) ≠ 0 :=
-    XiSigma3Nonzero.sigma3_ne_zero s
+    sigma3_ne_zero_of_trueanalytic (m := m) (s := s)
 
   have Hw0 :
       (w0At m s) 0 = 0 ∧ (w0At m s) 1 = 0 ∧ (w0At m s) 2 = 0 :=
@@ -157,7 +162,8 @@ Wrapper theorem recovering the sigma payload from `[XiAtOrderSigmaProvider]`.
 theorem xiAtOrderCoords01Out_fromSigmaAndRow012TrueAnalytic
     [XiAtOrderSigmaProvider]
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
-    [XiSigma3Nonzero]
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (m : ℕ) (s : OffSeed Xi) :
     XiAtOrderCoords01Out m s := by
   classical

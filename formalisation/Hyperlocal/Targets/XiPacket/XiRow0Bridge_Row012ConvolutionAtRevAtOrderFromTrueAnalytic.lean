@@ -4,18 +4,14 @@
   TRUE-ANALYTIC theorem wrapper for the AtOrder reverse-stencil Row012 bundle.
 
   Policy:
-  * the implementation now runs through the Rec2-enabled theorem-side discharge lane
-  * we keep the historical exported theorem name
-      `xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic`
-    for downstream stability
-  * this file is theorem-level only
+  * the implementation now routes through the strip-specialised Rec2 theorem lane
+  * the global `OffSeed Xi` input is converted explicitly via the critical-strip bridge
+  * the historical exported theorem name is preserved for downstream stability
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromRec2AtOrderTrueAnalytic_Discharge
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromRec2AtOrderTrueAnalyticStrip
+import Hyperlocal.Targets.XiPacket.XiTrueAnalyticCriticalStripBridge
 
 set_option autoImplicit false
 noncomputable section
@@ -24,22 +20,23 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-/--
-Backwards-compatible theorem surface:
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
-the historical exported name now delegates to the Rec2-enabled discharge lane.
--/
 theorem xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiJetQuotRec2AtOrderTrueAnalytic] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
-  classical
-  letI : XiAtOrderSigmaProvider := inferInstance
-  letI : XiJetQuotRec2AtOrderProvider := inferInstance
-  letI : A0Nonzero (s := s) := by infer_instance
-  exact
-    xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_discharge
-      (m := m) (s := s)
+  rcases hstrip : offSeed_in_critical_strip_of_trueanalytic (m := m) (s := s) with ⟨hRe_pos, hRe_lt_one⟩
+  let ss : _root_.Hyperlocal.OffSeedStrip Xi :=
+    Hyperlocal.mkOffSeedStrip (s := s) (hRe_pos := hRe_pos) (hRe_lt_one := hRe_lt_one)
+  have hs : ss.toOffSeed = s := by
+    rfl
+  simpa [ss, hs] using
+    xiRow012ConvolutionAtRevAtOrderOut_fromRec2AtOrderTrueAnalytic_strip
+      (m := m) (s := ss)
 
 end XiPacket
 end Targets

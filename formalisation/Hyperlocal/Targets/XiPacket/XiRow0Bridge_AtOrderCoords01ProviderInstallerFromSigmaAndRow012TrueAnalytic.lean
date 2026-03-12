@@ -20,10 +20,15 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 instance (priority := 50)
     [XiAtOrderSigmaProvider]
     [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
-    [XiSigma3Nonzero] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiAtOrderCoords01Provider where
   coords01 := by
     intro m s
