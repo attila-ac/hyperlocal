@@ -9,11 +9,21 @@
 
   This is the exact theorem shape the future “true analytic recurrence extractor” should
   eventually prove directly.
+
+  2026-03-12 correction:
+  the upstream theorem
+      `xiJetQuotRec2AtOrder_fromRecurrenceA_theorem`
+  now exposes the honest true-analytic gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+  rather than ambient sigma / coords providers.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA_Theorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 
 set_option autoImplicit false
@@ -22,6 +32,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 namespace XiPacket
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 open Complex
 open Hyperlocal.Transport
@@ -44,19 +58,28 @@ def J3At (m : ℕ) (s : OffSeed Xi) : ℕ → ℂ :=
 
 /-- Theorem-level recurrence on the canonical sequence `J0At`. -/
 theorem jetQuotRec2_J0At_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (J0At m s) := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    JetQuotRec2 s (J0At m s) := by
   simpa [J0At] using
     (xiJetQuotRec2AtOrder_fromRecurrenceA_theorem (m := m) (s := s)).h_w0At
 
 /-- Same, for `J2At`. -/
 theorem jetQuotRec2_J2At_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (J2At m s) := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    JetQuotRec2 s (J2At m s) := by
   simpa [J2At] using
     (xiJetQuotRec2AtOrder_fromRecurrenceA_theorem (m := m) (s := s)).h_wp2At
 
 /-- Same, for `J3At`. -/
 theorem jetQuotRec2_J3At_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : JetQuotRec2 s (J3At m s) := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    JetQuotRec2 s (J3At m s) := by
   simpa [J3At] using
     (xiJetQuotRec2AtOrder_fromRecurrenceA_theorem (m := m) (s := s)).h_wp3At
 

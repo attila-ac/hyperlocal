@@ -6,13 +6,13 @@
   IMPORTANT:
   * preserve the historical theorem/def names
   * keep the ambient-instance API surface for downstream compatibility
-  * re-export the clean theorem-side row0 semantics
-  * restore the needed theorem-provider surfaces explicitly by import
+  * do NOT re-export the theorem-side true-analytic gate from here
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder_Theorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
 set_option autoImplicit false
 noncomputable section
@@ -26,11 +26,12 @@ open scoped BigOperators
 open Hyperlocal.Transport
 
 theorem xiJetQuotOpZeroAtOrder (m : ℕ) (s : OffSeed Xi) : XiJetQuotOpZeroAtOrder m s := by
-  simpa using xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
+  simpa using xiJetQuotOpZeroAtOrder_fromRecurrenceA (m := m) (s := s)
 
 noncomputable def xiJetQuotRow0WitnessCAtOrder (m : ℕ) (s : OffSeed Xi) :
     XiJetQuotRow0WitnessCAtOrder m s := by
-  simpa using xiJetQuotRow0WitnessCAtOrder_theorem (m := m) (s := s)
+  exact xiJetQuotRow0WitnessCAtOrder_of_opZero (m := m) (s := s)
+    (xiJetQuotOpZeroAtOrder (m := m) (s := s))
 
 end XiPacket
 end Targets

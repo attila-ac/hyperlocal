@@ -1,20 +1,18 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromAnalyticExtractor.lean
 
-  Non-cycle-safe glue instance:
-    rec2AtOrder provider := xiJetQuotRec2AtOrder_fromAnalyticExtractor_theorem
+  Non-cycle-safe legacy glue instance:
+    rec2AtOrder provider := historical ambient extractor theorem
 
   IMPORTANT:
-  * This imports extractor-facing code and must NOT be imported by analytic-only modules.
-  * This is a theorem-parametric provider shim.
-  * The installed provider is conditional on the explicit theorem-side
-    producer surfaces:
-      [XiAtOrderSigmaProvider]
-      [XiAtOrderCoords01Provider]
+  * this file is the legacy provider shim
+  * it must stay on the ambient sigma/coords provider corridor
+  * do NOT point it at the theorem-side true-analytic gate
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor_Theorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 
@@ -31,7 +29,14 @@ instance
     XiJetQuotRec2AtOrderProvider where
   rec2AtOrder := by
     intro m s
-    exact xiJetQuotRec2AtOrder_fromAnalyticExtractor_theorem (m := m) (s := s)
+    have htriple :
+        JetQuotRec2 s (padSeq3 (w0At m s)) ∧
+        JetQuotRec2 s (padSeq3 (wp2At m s)) ∧
+        JetQuotRec2 s (padSeq3 (wp3At m s)) :=
+      xiJetQuotRec2_padSeq3_triple_fromAnalyticExtractor (m := m) (s := s)
+    rcases htriple with ⟨hw0, hrest⟩
+    rcases hrest with ⟨hwp2, hwp3⟩
+    exact ⟨hw0, hwp2, hwp3⟩
 
 end XiPacket
 end Targets

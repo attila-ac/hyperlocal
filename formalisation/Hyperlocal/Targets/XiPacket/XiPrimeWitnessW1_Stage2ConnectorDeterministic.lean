@@ -13,13 +13,25 @@
   - We removed the det23 axiom. This file now *reduces* the needed 2×2 determinant
     to the explicit sine micro-gate via the axiom-free closed form in
     `XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy.lean`.
+
+  2026-03-12 correction:
+  - the theorem-side row0 semantics surface now exposes the honest gate
+
+        [XiJetQuotRec2AtOrderTrueAnalytic]
+        [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+    rather than ambient sigma / coords providers.
+  - therefore this deterministic Stage-2 connector should depend on that same
+    theorem-side gate and should not import the legacy ambient row0-semantics wrapper.
 -/
+
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder_Theorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.WindowPayload
 import Hyperlocal.Targets.XiPacket.XiPrimeWitnessW1_FWiredFromOpZeroAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrder
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivot_wpAtExpand
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracy
 
@@ -32,6 +44,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 namespace XiPacket
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 open scoped BigOperators
 open scoped Real
@@ -150,6 +166,8 @@ The determinant nondegeneracy is discharged via the axiom-free closed form:
 -/
 theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (h2 : (FWired (m := m) (s := s)) (wp2At m s) = 0)
     (h3 : (FWired (m := m) (s := s)) (wp3At m s) = 0)
     (htv :
@@ -157,10 +175,8 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     ∃ c : Fin 3 → ℝ, c ≠ 0 ∧ toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wc s) = 0 := by
   classical
 
-  -- semantic OpZeroAtOrder package gives w0/wp2/wp3 annihilation for the JetQuot Toeplitz operator
   let Hop : XiJetQuotOpZeroAtOrder m s := xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
 
-  -- Define the real stencil: take Re of the first 3 Toeplitz coefficients
   let c : Fin 3 → ℝ := fun i => (JetQuotOp.aRk1 s i.1).re
 
   have hc : c ≠ 0 := by
@@ -170,7 +186,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
       simpa [JetQuotOp.aRk1_nat2_eq_neg_two (s := s)]
     simpa [c, h2re] using this
 
-  -- Show coeffsNat3(c) agrees with aRk1(s) on {0,1,2}.
   have hcoeff0 : ToeplitzLToRow3.coeffsNat3 c 0 = JetQuotOp.aRk1 s 0 := by
     have hre : ((JetQuotOp.aRk1 s 0).re : ℂ) = JetQuotOp.aRk1 s 0 := by
       apply Complex.ext <;> simp [JetQuotOp.aRk1_im0 (s := s)]
@@ -186,7 +201,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
       apply Complex.ext <;> simp [JetQuotOp.aRk1_im2 (s := s)]
     simpa [ToeplitzLToRow3.coeffsNat3, c, hre]
 
-  -- Toeplitz operator with coeffsNat3(c) equals Toeplitz operator with aRk1(s), since only 0/1/2 matter.
   have htoe_eq (w : Transport.Window 3) :
       toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) w
         = toeplitzL 2 (JetQuotOp.aRk1 s) w := by
@@ -196,7 +210,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     · simp [toeplitzL_two_apply_fin1, hcoeff0, hcoeff1, hcoeff2]
     · simp [toeplitzL_two_apply_fin2, hcoeff0, hcoeff1, hcoeff2]
 
-  -- Turn w0/wp2/wp3 annihilation of aRk1 into annihilation for this concrete stencil.
   have hw0 : toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (w0At m s) = 0 := by
     simpa [htoe_eq (w := w0At m s)] using Hop.hop_w0At
 
@@ -206,7 +219,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
   have hwp3 : toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (wp3At m s) = 0 := by
     simpa [htoe_eq (w := wp3At m s)] using Hop.hop_wp3At
 
-  -- expansions
   let A2 : ℂ := (aCoeff (σ s) (t s) (2 : ℝ) : ℂ)
   let B2 : ℂ := (bCoeff (σ s) (t s) (2 : ℝ) : ℂ)
   let A3 : ℂ := (aCoeff (σ s) (t s) (3 : ℝ) : ℂ)
@@ -222,7 +234,6 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
     funext i
     simp [wp3At_apply, A3, B3, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
 
-  -- determinant nonzero: now **directly** from `tval ≠ 0`
   have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
     simpa [A2, B2, A3, B3, sub_eq_add_neg] using
       (W1.det23C_ne_zero_of_tval_ne_zero (σ := σ s) (t := t s) htv)

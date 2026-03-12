@@ -6,13 +6,10 @@
   IMPORTANT:
   * preserve the historical theorem name
   * keep the ambient-instance API surface for downstream compatibility
-  * re-export the clean theorem-side bridge
-  * restore the needed theorem-provider surfaces explicitly by import
+  * do NOT re-export the theorem-side true-analytic gate from here
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA_Theorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor
 
 set_option autoImplicit false
 noncomputable section
@@ -23,7 +20,7 @@ namespace XiPacket
 
 theorem xiJetQuotRec2AtOrder_fromRecurrenceA
     (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
-  simpa using xiJetQuotRec2AtOrder_fromRecurrenceA_theorem (m := m) (s := s)
+  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor (m := m) (s := s)
 
 end XiPacket
 end Targets
