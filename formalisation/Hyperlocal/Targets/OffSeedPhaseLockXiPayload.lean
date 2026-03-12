@@ -13,6 +13,7 @@
 -/
 
 import Hyperlocal.Targets.XiPacket.OffSeedPhaseLockXiPayloadAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -20,11 +21,17 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 /-- Canonical target function. Matches the rest of the Targets layer. -/
 abbrev Xi : ℂ → ℂ := Hyperlocal.xi
 
 /-- Canonical Stage-3 theorem (re-export). -/
-abbrev offSeedPhaseLock_Xi :
+abbrev offSeedPhaseLock_Xi
+    [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
+    [Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider] :
     Hyperlocal.Transport.OffSeedPhaseLock Xi :=
   Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
 
