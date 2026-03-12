@@ -9,16 +9,19 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcrete
 
 -- Option A pieces already exist here (bCoeff-level facts via recurrence identity):
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceSemantics
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
 
 namespace Hyperlocal.Targets.XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open scoped Real
 open Hyperlocal.Transport.PrimeTrigPacket
-
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 /-
 Option A (direct bCoeff-level phase lock)
@@ -29,23 +32,31 @@ def XiRecurrencePhaseLock (s : Hyperlocal.OffSeed Xi) : Prop :=
   bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
   bCoeff (σ s) (t s) (3 : ℝ) = 0
 
-theorem xiBcoeff2_eq_zero (s : Hyperlocal.OffSeed Xi) :
+theorem xiBcoeff2_eq_zero
+    (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [XiKappaPivotNonzero s] :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 := by
-  classical
-  haveI : XiKappaPivotNonzero s := inferInstance
   simpa using xiToeplitz_hb2_fromRecurrence (s := s)
 
-theorem xiBcoeff3_eq_zero (s : Hyperlocal.OffSeed Xi) :
+theorem xiBcoeff3_eq_zero
+    (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [XiKappaPivotNonzero s] :
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
-  classical
-  haveI : XiKappaPivotNonzero s := inferInstance
   simpa using xiToeplitz_hb3_fromRecurrence (s := s)
 
 /--
 Hook A: recurrence extraction gives phase lock.
 (Currently discharged by the existing recurrence→bCoeff lemmas; later replace by manuscript proof.)
 -/
-theorem xiRecurrencePhaseLock_fromMinimalModel (s : Hyperlocal.OffSeed Xi) :
+theorem xiRecurrencePhaseLock_fromMinimalModel
+    (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [XiKappaPivotNonzero s] :
     XiRecurrencePhaseLock s := by
   exact ⟨xiBcoeff2_eq_zero s, xiBcoeff3_eq_zero s⟩
 
@@ -66,7 +77,10 @@ abbrev XiToeplitzSpanOutB := XiToeplitzSpanOut
 abbrev xiToeplitzSpanOut_fromRecurrenceB := xiToeplitzSpanOut_fromRecurrence
 
 /-- Convenience: recurrence ⇒ ell-out (use the collision-free endpoint). -/
-theorem xiToeplitzEllOut_fromRecurrenceB (s : Hyperlocal.OffSeed Xi) :
+theorem xiToeplitzEllOut_fromRecurrenceB
+    (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiToeplitzEllOut s := by
   exact xiToeplitzEllOut_fromRecurrenceC (s := s)
 

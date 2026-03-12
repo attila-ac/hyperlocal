@@ -8,6 +8,14 @@
   but source the `wc` row-0 fact from the gated parallel producer
   `XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil`
   instead of the historical `xiJetQuot_row0_wc_spec_proof`.
+
+  2026-03-13 honest post-axiom state:
+  * the old global coords01 fallback provider has been removed
+  * therefore these exported theorem surfaces can no longer remain assumption-free
+  * they must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
@@ -17,6 +25,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrderPro
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -31,7 +40,9 @@ open Hyperlocal.Transport
 open ToeplitzLToRow3
 open ToeplitzEllOutAtOrderProof
 
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 lemma toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero
     (c : Fin 3 → ℝ) (w : Window 3)
@@ -56,7 +67,9 @@ lemma toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero
   simpa [toeplitzRow3] using this
 
 theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
-    (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s)) = 0 := by
   classical
@@ -105,15 +118,13 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
     toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero (c := cOp s) (w := wp3At m s) hwp3_row0
 
   refine ⟨?_, ?_⟩
-  ·
-    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+  · exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
       (u0 := imVec3 (w0At m s))
       (uc := reVec3 (wc s))
       (v := imVec3 (wp2At m s))
       (c := cOp s)
       hc hU0 hUc hV2
-  ·
-    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+  · exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
       (u0 := imVec3 (w0At m s))
       (uc := reVec3 (wc s))
       (v := imVec3 (wp3At m s))
@@ -121,7 +132,9 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
       hc hU0 hUc hV3
 
 theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
-    (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0 := by
   classical
@@ -170,15 +183,13 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
     toeplitzRow3_reVec3_of_toeplitzL_two_fin0_eq_zero (cOp s) (wp3At m s) hwp3_row0
 
   refine ⟨?_, ?_⟩
-  ·
-    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+  · exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
       (u0 := imVec3 (w0At m s))
       (uc := reVec3 (wc s))
       (v := reVec3 (wp2At m s))
       (c := cOp s)
       hc hU0 hUc hV2
-  ·
-    exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
+  · exact Hyperlocal.Targets.XiPacket.ell_eq_zero_of_toeplitzRow3
       (u0 := imVec3 (w0At m s))
       (uc := reVec3 (wc s))
       (v := reVec3 (wp3At m s))
@@ -186,7 +197,9 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
       hc hU0 hUc hV3
 
 theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof
-    (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 := by
   classical
 

@@ -8,6 +8,14 @@
   but source the `wc` row-0 fact from the gated parallel producer
   `XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil`
   instead of the historical `xiJetQuot_row0_wc_spec_proof`.
+
+  2026-03-13 honest post-axiom state:
+  * the old global coords01 fallback provider has been removed
+  * therefore this theorem can no longer remain assumption-free
+  * it must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
@@ -17,6 +25,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -30,7 +39,9 @@ open scoped BigOperators Real
 open Hyperlocal.Transport
 open ToeplitzLToRow3
 
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 namespace ToeplitzEllOutAtOrderProof
 
@@ -94,7 +105,9 @@ end ToeplitzEllOutAtOrderProof
 open ToeplitzEllOutAtOrderProof
 
 theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
-    (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiToeplitzEllOutAt m s := by
   classical
 

@@ -1,11 +1,5 @@
 /-
   Formalisation/Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartStrip.lean
-
-  Strip-specialised wrapper for the Row0 heart output.
-
-  This file is intentionally thin: it just re-exports the analytic-strip heart
-  theorem at the strip surface, while exposing the Route-A quotient-window gate
-  required by the underlying proof.
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
@@ -23,25 +17,19 @@ namespace TAC
 open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
-/--
-Preferred strip wrapper name.
--/
 theorem xiJetQuotRow0AtOrderHeartOut_fromAnalyticStrip
     (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) := by
-  exact
-    xiJetQuotRow0AtOrderHeartOut_strip (m := m) (s := s)
+  exact xiJetQuotRow0AtOrderHeartOut_strip (m := m) (s := s)
 
-/--
-Compatibility alias: some downstream files still use the underscored spelling.
--/
 theorem xiJetQuotRow0AtOrderHeartOut_fromAnalytic_strip
     (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) := by
-  exact
-    xiJetQuotRow0AtOrderHeartOut_fromAnalyticStrip (m := m) (s := s)
+  exact xiJetQuotRow0AtOrderHeartOut_fromAnalyticStrip (m := m) (s := s)
 
 end XiPacket
 end Targets

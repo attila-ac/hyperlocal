@@ -20,13 +20,8 @@
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderRow012Target
-
--- Recurrence payload interface (provider)
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProvider
-
--- Toeplitz row normal forms: toeplitzL_two_apply_fin0/fin1/fin2
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceToeplitzLToRow3
-
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -40,7 +35,6 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
 
-/-- On `Fin 3`, rowwise equalities imply function equality. -/
 lemma toeplitzL_eq_zero_of_rows
     {s : OffSeed Xi} {w : Hyperlocal.Transport.Window 3}
     (h0 : (toeplitzL 2 (JetQuotOp.aRk1 s) w) (0 : Fin 3) = 0)
@@ -53,7 +47,6 @@ lemma toeplitzL_eq_zero_of_rows
   · simpa using h1
   · simpa using h2
 
-/-- Upgrade row012 equalities into the full-window contract. -/
 theorem xiJetQuotOpZeroAtOrder_of_row012
     (m : ℕ) (s : OffSeed Xi)
     (h0 : XiJetQuotRow0WitnessCAtOrder m s)
@@ -65,14 +58,11 @@ theorem xiJetQuotOpZeroAtOrder_of_row012
     (h2_wp3At : (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (2 : Fin 3) = 0)
     : XiJetQuotOpZeroAtOrder m s := by
   refine ⟨?_, ?_, ?_⟩
-  ·
-    exact toeplitzL_eq_zero_of_rows (s := s) (w := w0At m s)
+  · exact toeplitzL_eq_zero_of_rows (s := s) (w := w0At m s)
       h0.hop_w0At h1_w0At h2_w0At
-  ·
-    exact toeplitzL_eq_zero_of_rows (s := s) (w := wp2At m s)
+  · exact toeplitzL_eq_zero_of_rows (s := s) (w := wp2At m s)
       h0.hop_wp2At h1_wp2At h2_wp2At
-  ·
-    exact toeplitzL_eq_zero_of_rows (s := s) (w := wp3At m s)
+  · exact toeplitzL_eq_zero_of_rows (s := s) (w := wp3At m s)
       h0.hop_wp3At h1_wp3At h2_wp3At
 
 private lemma row0_eq_zero_of_rec2
@@ -104,13 +94,6 @@ private lemma row2_eq_zero_of_rec2
     simpa [JetQuotRec2, padSeq3, Nat.add_assoc] using (hrec 2)
   simpa [toeplitzL_two_apply_fin2] using h2'
 
-/--
-Core discharge theorem from an explicit recurrence payload.
-
-This theorem is the true semantic target for clean upstream routes:
-once `Hrec` is supplied directly, no provider/class indirection remains in the
-proof term.
--/
 theorem xiJetQuotOpZeroAtOrder_of_rec2
     (m : ℕ) (s : OffSeed Xi)
     (Hrec : XiJetQuotRec2AtOrder m s) :
@@ -146,11 +129,6 @@ theorem xiJetQuotOpZeroAtOrder_of_rec2
     (h1_wp2At := h1_wp2At) (h2_wp2At := h2_wp2At)
     (h1_wp3At := h1_wp3At) (h2_wp3At := h2_wp3At)
 
-/--
-Route–A discharge point: theorem-level, derived from the *provided* recurrence payload.
-
-No axiom imports here; the only remaining cliff is the provider instance.
--/
 theorem xiJetQuotOpZeroAtOrder_fromRecurrenceA
     (m : ℕ) (s : OffSeed Xi) [XiJetQuotRec2AtOrderProvider] :
     XiJetQuotOpZeroAtOrder m s := by

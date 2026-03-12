@@ -1,18 +1,10 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalyticStrip.lean
-
-  Theorem-side retarget for the analytic-strip Route–A package usage.
-
-  We keep the existing analytic-strip heart/coords sources, but consume the
-  Route–A jet package through `JetQuotOpTheorem` rather than the legacy mixed
-  wrapper.
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
-
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01FromAnalyticStrip
-
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionFromRow0AndCoords
@@ -25,6 +17,10 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
@@ -32,6 +28,7 @@ open Hyperlocal.Cancellation
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_strip
     (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m (s : OffSeed Xi) := by
   classical

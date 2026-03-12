@@ -6,6 +6,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRow012PropAtOrderProviderTrueAnalyt
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderTrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRec2TrueAnalytic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderInstallerFromSigmaAndRow012TrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.OffSeedPhaseLockXi
 import Hyperlocal.Transport.OffSeedBridge
@@ -18,7 +19,13 @@ namespace Targets
 
 abbrev Xi := Hyperlocal.Targets.XiPacket.Xi
 
-variable [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
+variable
+  [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
+  [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
 
 /-- Mainline: `OffSeedPhaseLock Xi`. -/
 theorem xi_phaseLock : Hyperlocal.Transport.OffSeedPhaseLock Xi :=

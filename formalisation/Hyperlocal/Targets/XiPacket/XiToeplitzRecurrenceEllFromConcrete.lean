@@ -8,13 +8,17 @@
   The AtOrder proof/export lane is now cleaner. So the non-AtOrder endpoint should be
   obtained by specializing the AtOrder theorem at `m = 0`.
 
-  This is the exact proof/export seam cut suggested by the second-wave measurement:
-  `xiToeplitzEllOutAt_fromRecurrenceC` is already off `xiJetQuot_row0_wc_spec`,
-  while `xiToeplitzEllOut_fromRecurrenceC` is not.
+  2026-03-13 honest post-axiom state:
+  * the AtOrder theorem is now theorem-gated
+  * therefore this non-AtOrder specialization wrapper must expose the same gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOut
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProviderFromEqProvider
 
 set_option autoImplicit false
@@ -24,11 +28,16 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 /-- Project-facing endpoint (collision-free): obtain the non-AtOrder ℓ-output by
 specializing the clean AtOrder theorem at `m = 0`. -/
-theorem xiToeplitzEllOut_fromRecurrenceC (s : Hyperlocal.OffSeed Xi) :
+theorem xiToeplitzEllOut_fromRecurrenceC
+    (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiToeplitzEllOut s := by
   let h0 := xiToeplitzEllOutAt_fromRecurrenceC (m := 0) (s := s)
   refine ⟨?_, ?_⟩

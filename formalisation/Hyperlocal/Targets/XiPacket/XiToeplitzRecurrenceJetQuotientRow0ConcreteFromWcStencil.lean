@@ -10,6 +10,14 @@
     the Route-A stencil discharge lane;
   * expose the honest gate `[TAC.XiJetWindowEqAtOrderQuotProvider]` exactly here.
 
+  2026-03-13 honest post-axiom state:
+  * the old global coords01 fallback provider has been removed
+  * the reused AtOrder row-0 spec proofs are now theorem-gated
+  * therefore this file must expose the honest theorem-side gate as well
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
+
   Policy:
   * `w0/wp2/wp3` are reused from the existing theorem-side AtOrder route.
   * `wc` is discharged directly via the packaged row-0 sigma theorem.
@@ -19,6 +27,7 @@ import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0SigmaToToeplitzRow0
 import Hyperlocal.Transport.TACToeplitz
@@ -29,6 +38,10 @@ noncomputable section
 namespace Hyperlocal
 namespace Targets
 namespace XiPacket
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
 
 open Complex
 open scoped BigOperators
@@ -48,6 +61,7 @@ lemma wp3At_zero_fromWcStencil (s : OffSeed Xi) : wp3At 0 s = wp3 s := by
 
 theorem xiJetQuot_row0_w0_fromWcStencil
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (w0 s)) (0 : Fin 3) = 0 := by
   simpa [w0At_zero_fromWcStencil (s := s)] using
@@ -64,6 +78,7 @@ theorem xiJetQuot_row0_wc_fromWcStencil
 
 theorem xiJetQuot_row0_wp2_fromWcStencil
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2 s)) (0 : Fin 3) = 0 := by
   simpa [wp2At_zero_fromWcStencil (s := s)] using
@@ -71,6 +86,7 @@ theorem xiJetQuot_row0_wp2_fromWcStencil
 
 theorem xiJetQuot_row0_wp3_fromWcStencil
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3 s)) (0 : Fin 3) = 0 := by
   simpa [wp3At_zero_fromWcStencil (s := s)] using

@@ -3,15 +3,14 @@
 
   Extractor-side derivation of the AtOrder coordinate bundle (strip branch).
 
-  This file is **not** cycle-safe: it imports the analytic extractor endpoint.
-  It is the strip-specialised version that avoids the global axiom
-  `a0_ne_zero` by using the theorem `a0_ne_zero_of_strip`.
+  This file is non-cycle-safe: it imports the strip analytic extractor endpoint.
+  It is strip-specialised and avoids the global `a0_ne_zero` axiom by using
+  `a0_ne_zero_of_strip`.
 
-  Graph discipline:
-  * this file must remain on the historical extractor corridor
-  * it must NOT switch to the theorem-side packaged extractor endpoint,
-    because that endpoint itself requires `[XiAtOrderCoords01Provider]`
-    and would therefore make this file circular
+  2026-03-12 follow-up refactor:
+  * consume the theorem-clean strip extractor
+  * remove the ambient coords01 fallback dependency
+  * expose the honest gate explicitly
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
@@ -19,8 +18,6 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrde
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracyFromStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Defs
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
 set_option autoImplicit false
 noncomputable section
@@ -29,12 +26,17 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open Hyperlocal.Transport
 
-/-- Extractor-side discharged coords bundle from the analytic extractor (strip-specialised). -/
 theorem xiAtOrderCoords01Out_fromAnalyticExtractor_strip
-    (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi) :
+    (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiAtOrderCoords01Out m (s : OffSeed Xi) := by
   classical
 

@@ -1,28 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow012ConvolutionAtRevAtOrderTrueAnalyticAdapterFromUpstream.lean
 
-  Stable installed producer for `XiRow012UpstreamTrueAnalytic`.
+  Legacy ambient adapter for the Row012 true-analytic upstream surface.
 
-  2026-03-12 retarget:
-  * remove the legacy analytic endpoint route
-  * do NOT reinstall `A0Nonzero`
-  * consume the already-retargeted true-analytic theorem wrapper directly
+  2026-03-12 / 2026-03-13:
+  * keep the historical theorem name
+  * keep the ambient sigma/coords compatibility wrapper
+  * but route the proof through the cleaned analytic discharge endpoint
 
-  This keeps the historical installed surface
+      xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
 
-      [XiRow012UpstreamTrueAnalytic]
-
-  while routing through
-
-      xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic
-
-  which itself now bridges
-      OffSeed Xi -> OffSeedStrip Xi
-  via the critical-strip bridge and delegates to the strip-specialised theorem corridor.
+  This is the last adapter/importer seam above the old coords01 fallback owner.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromTrueAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderFromAnalytic
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_A0NonzeroBoundary
 
 set_option autoImplicit false
 noncomputable section
@@ -35,14 +28,14 @@ namespace TAC
 open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
-instance (priority := 1000)
-    [XiJetQuotRec2AtOrderTrueAnalytic]
+theorem xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic_upstream
+    (m : ℕ) (s : OffSeed Xi)
+    [XiAtOrderSigmaProvider]
+    [XiAtOrderCoords01Provider]
+    [A0Nonzero (s := s)]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
-    XiRow012UpstreamTrueAnalytic where
-  row012_out := by
-    intro m s
-    simpa using
-      (xiRow012ConvolutionAtRevAtOrderOut_trueAnalytic (m := m) (s := s))
+    XiRow012ConvolutionAtRevAtOrderOut m s := by
+  exact xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic (m := m) (s := s)
 
 end XiPacket
 end Targets

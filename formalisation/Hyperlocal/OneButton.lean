@@ -44,7 +44,6 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsA
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderRecurrenceA_Theorem
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpecProofUpstream
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
 set_option autoImplicit false
 noncomputable section
@@ -103,6 +102,5 @@ namespace Hyperlocal
 /-!
   Shared coords01 producer root.
 -/
-#print axioms Hyperlocal.Targets.XiPacket.xiAtOrderCoords01Out_axiom_stub
 
 end Hyperlocal

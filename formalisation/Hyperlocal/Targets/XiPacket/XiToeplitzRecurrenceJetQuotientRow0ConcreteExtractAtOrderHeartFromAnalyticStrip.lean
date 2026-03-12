@@ -3,20 +3,19 @@
 
   Strip-only theorem provider for the Row0 heart.
 
-  Goal: provide `xiJetQuotRow0AtOrderHeartOut_strip` WITHOUT importing the global
-  nondegeneracy module/axiom `a0_ne_zero`.
+  Goal: provide `xiJetQuotRow0AtOrderHeartOut_strip` without importing the
+  ambient coords01 fallback installer.
 
-  This file is non-cycle-safe (imports the analytic extractor endpoint).
+  2026-03-12 follow-up refactor:
+  * consume the theorem-clean strip extractor
+  * expose the honest true-analytic gate explicitly
 -/
 
 import Hyperlocal.Transport.OffSeedStrip
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteExtractAtOrderHeartDefs
-
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractorFromRec2TrueAnalyticStrip
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Rec2PadSeq3ToCoords
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorNondegeneracyFromStrip
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -26,26 +25,21 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-open Complex
-open Hyperlocal.Transport
-
 namespace TAC
 open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
-/--
-Strip-specialised heart output discharged from the analytic extractor Rec2 triple,
-using `a0_ne_zero_of_strip` (no global axiom import).
--/
+open Complex
+open Hyperlocal.Transport
+
 theorem xiJetQuotRow0AtOrderHeartOut_strip
     (m : ℕ) (s : _root_.Hyperlocal.OffSeedStrip Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetQuotRow0AtOrderHeartOut m (s : OffSeed Xi) := by
   classical
 
   let s0 : OffSeed Xi := (s : OffSeed Xi)
-  letI : XiAtOrderSigmaProvider := inferInstance
-  letI : XiAtOrderCoords01Provider := inferInstance
 
   have Hrec2 :
       JetQuotRec2 s0 (padSeq3 (w0At m s0)) ∧

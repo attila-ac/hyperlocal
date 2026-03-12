@@ -4,11 +4,20 @@
   Real-pivot half only:
     * order-m lemma consuming `kappaAt m s ≠ 0`
     * order-0 wrapper in `{2,3}` API form
+
+  2026-03-13 honest post-axiom state:
+  * `xiToeplitzEllOutAt_fromRecurrenceC` is now theorem-gated
+  * therefore these exported theorem surfaces can no longer remain assumption-free
+  * they must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
 import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappaAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAtOrder
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -18,11 +27,13 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open scoped Real
 open Hyperlocal.Transport
 open Hyperlocal.Transport.PrimeTrigPacket
-
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 /--
 Identity route at order `m` (real pivot):
@@ -31,6 +42,8 @@ ell-out at order `m` + `kappaAt m s ≠ 0` ⇒ `bCoeff(2)=0 ∧ bCoeff(3)=0`.
 -/
 theorem xiToeplitzRecurrenceIdentity_atOrder
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (hk : kappaAt m s ≠ 0) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
@@ -70,6 +83,8 @@ Order-0 wrapper in the `{2,3}` API form, consuming only `kappaAt 0 s ≠ 0`.
 -/
 theorem xiToeplitzRecurrenceIdentity_p_of_kappaAt0
     (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (hk0 : kappaAt (0 : ℕ) s ≠ 0)
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by
