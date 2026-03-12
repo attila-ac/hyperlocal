@@ -1,18 +1,21 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_AtOrderSigmaProviderTheorem.lean
 
-  Historical name `xiAtOrderSigmaOut_axiom`.
+  Historical compatibility surface for the AtOrder sigma bundle.
 
-  IMPORTANT (new meaning):
-  It is now a theorem derived from the Row0-frontier-at-order route.
+  CURRENT POLICY:
+  * keep the historical constant name `xiAtOrderSigmaOut_axiom`
+  * keep this file DAG-clean
+  * do NOT import the Row0-frontier-at-order theorem route here
 
-  This preserves the old constant name for downstream stability,
-  while removing it from the axiom cone.
+  Reason:
+  this file sits on the consumer side of the row0 witness / concrete-extract
+  corridor. If it imports the theorem route through
+    `XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder`
+  then it closes the cycle that blocks elimination of the Row0 frontier trio.
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_WcSpecFromRouteAStencil
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderFromRow0FrontierAtOrder
 
 set_option autoImplicit false
 noncomputable section
@@ -23,20 +26,9 @@ namespace XiPacket
 
 open Hyperlocal.Transport
 
-/--
-Historical name preserved for downstream stability.
+axiom xiAtOrderSigmaOut_axiom
+    (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s
 
-Now derived from the Row0-frontier-at-order theorem route.
--/
-theorem xiAtOrderSigmaOut_axiom
-    (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s :=
-  xiAtOrderSigmaOut_fromRow0FrontierAtOrder (m := m) (s := s)
-
-/--
-Provider instance (historical site).
-
-Backed by the theorem above instead of an axiom.
--/
 instance (priority := 10) : XiAtOrderSigmaProvider where
   sigma := xiAtOrderSigmaOut_axiom
 

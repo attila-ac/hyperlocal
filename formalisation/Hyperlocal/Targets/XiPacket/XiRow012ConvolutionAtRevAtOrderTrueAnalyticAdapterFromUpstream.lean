@@ -8,8 +8,13 @@
   via the explicit-coords Row012 analytic endpoint, instead of importing the
   fallback coords01 provider axiom.
 
-  This removes the fallback provider from the adapter root while keeping the
-  build cycle-safe.
+  HONESTY FIX:
+  The explicit-coords analytic endpoint also requires the theorem-side
+  Route-A quotient window gate
+
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+  so this adapter must state that dependency explicitly.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow012ConvolutionAtRevAtOrderTrueAnalyticInterface
@@ -25,7 +30,13 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
-instance (priority := 1000) : XiRow012UpstreamTrueAnalytic where
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
+instance (priority := 1000)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiRow012UpstreamTrueAnalytic where
   row012_out := by
     intro m s
     letI : A0Nonzero (s := s) := by infer_instance

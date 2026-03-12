@@ -4,30 +4,20 @@
   Theorem-level row-0 witness at order, sourced from the Row012-upstream
   recurrence route.
 
-  IMPORTANT DIAGNOSTIC OUTCOME:
-  Do NOT try to synthesize
-      [XiRow012ConvolutionAtRevAtOrderTrueAnalytic]
-  locally in this file.
-
-  Reason:
-  the available producer route in this cone is conditional / cyclic on the
-  true-analytic side, so asking for it here pulls this file into the Row012
-  true-analytic adapter cycle.
-
-  Therefore this file stays consumer-side:
-  * restore only the healthy sigma/coords producer surfaces at this boundary,
-  * obtain the explicit Rec2 payload from the Row012-upstream theorem,
-  * feed that payload directly into `xiJetQuotOpZeroAtOrder_of_rec2`.
+  CYCLE DISCIPLINE:
+  * consume only provider surfaces here
+  * keep the sigma side on the historical DAG-clean fallback surface
+  * keep the coords01 side on the DAG-clean axiom provider surface
+  * do NOT import the theorem coords01 installer, because that installer
+    currently routes through the analytic extractor corridor and closes a cycle
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 
--- restore only the healthy producer surfaces needed by
--- `xiJetQuotRec2AtOrder_fromRow012Upstream`
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTheorem
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderTheorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01ProviderAxiom
 
 set_option autoImplicit false
 noncomputable section

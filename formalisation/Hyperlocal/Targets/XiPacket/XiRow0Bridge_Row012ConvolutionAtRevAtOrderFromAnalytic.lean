@@ -10,6 +10,15 @@
   UPDATE (2026-03-11):
   We expose an explicit-coords theorem first, and keep the historical
   provider-based endpoint as a compatibility wrapper.
+
+  IMPORTANT (2026-03-11, honesty fix):
+  The discharge corridor now depends on the theorem-side Route-A quotient window gate
+
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
+
+  via `XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem`.
+
+  Therefore this wrapper must thread that gate explicitly as well.
 -/
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row012ConvolutionAtRevAtOrderDefs
@@ -23,9 +32,14 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_of_coords
     (m : ℕ) (s : OffSeed Xi)
     [XiAtOrderSigmaProvider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (HC : XiAtOrderCoords01Out m s) :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
   exact xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_discharge_of_coords
@@ -33,10 +47,9 @@ theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_of_coords
 
 theorem xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic
     (m : ℕ) (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] [A0Nonzero (s := s)]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiRow012ConvolutionAtRevAtOrderOut m s := by
-  classical
-  letI : A0Nonzero (s := s) := by infer_instance
   exact xiRow012ConvolutionAtRevAtOrderOut_fromAnalytic_discharge
     (m := m) (s := s)
 

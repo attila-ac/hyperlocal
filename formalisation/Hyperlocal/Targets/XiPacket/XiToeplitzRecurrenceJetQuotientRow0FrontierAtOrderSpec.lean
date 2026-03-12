@@ -1,18 +1,16 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpec.lean
 
-  Axiom-thin interface for Row0 frontier-at-order facts used downstream.
+  Theorem-backed interface for Row0 frontier-at-order facts used downstream.
 
-  IMPORTANT:
-  * Names are suffixed `_spec` to avoid collisions with the legacy frontier module.
-  * This file is intentionally minimal.
+  POLICY:
+  * keep the public `_spec` names stable
+  * discharge them from the upstream proof lane
+  * the upstream proof lane is kept acyclic by consuming only the DAG-clean
+    sigma / coords provider surfaces
 -/
 
-import Hyperlocal.Transport.PrimeTrigPacket
-import Hyperlocal.Transport.TACToeplitz
-
-import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
 
 set_option autoImplicit false
 noncomputable section
@@ -24,17 +22,20 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-axiom xiJetQuot_row0_w0At_spec
+theorem xiJetQuot_row0_w0At_spec
   (m : ℕ) (s : OffSeed Xi) :
-  (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s)) (0 : Fin 3) = 0
+  (toeplitzL 2 (JetQuotOp.aRk1 s) (w0At m s)) (0 : Fin 3) = 0 := by
+  exact xiJetQuot_row0_w0At_spec_proof (m := m) (s := s)
 
-axiom xiJetQuot_row0_wp2At_spec
+theorem xiJetQuot_row0_wp2At_spec
   (m : ℕ) (s : OffSeed Xi) :
-  (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (0 : Fin 3) = 0
+  (toeplitzL 2 (JetQuotOp.aRk1 s) (wp2At m s)) (0 : Fin 3) = 0 := by
+  exact xiJetQuot_row0_wp2At_spec_proof (m := m) (s := s)
 
-axiom xiJetQuot_row0_wp3At_spec
+theorem xiJetQuot_row0_wp3At_spec
   (m : ℕ) (s : OffSeed Xi) :
-  (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (0 : Fin 3) = 0
+  (toeplitzL 2 (JetQuotOp.aRk1 s) (wp3At m s)) (0 : Fin 3) = 0 := by
+  exact xiJetQuot_row0_wp3At_spec_proof (m := m) (s := s)
 
 end XiPacket
 end Targets
