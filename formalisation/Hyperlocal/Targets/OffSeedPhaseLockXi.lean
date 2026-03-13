@@ -19,7 +19,8 @@ end TAC
 /-- Stage-3 consumer (AXIOM-FREE mainline): `OffSeedPhaseLock Xi`. -/
 theorem offSeedPhaseLock_Xi
     [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
-    [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
+    [_root_.Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider] :
     Hyperlocal.Transport.OffSeedPhaseLock Hyperlocal.Targets.XiPacket.Xi :=
   Hyperlocal.Targets.OffSeedPhaseLockXiPayloadAtOrder.offSeedPhaseLock_Xi
 

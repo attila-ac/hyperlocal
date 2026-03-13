@@ -10,11 +10,13 @@
 
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
+      [RouteAWcScalarProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrderProofUpstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Theorem
 
 set_option autoImplicit false
 noncomputable section
@@ -31,7 +33,8 @@ end TAC
 theorem xiToeplitzEllOutAt_fromRecurrenceC
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     XiToeplitzEllOutAt m s :=
   xiToeplitzEllOutAt_fromRecurrenceC_proof (m := m) (s := s)
 

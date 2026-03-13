@@ -26,6 +26,7 @@ end TAC
 variable
   [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
   [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
+  [_root_.Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
 
 /-- Mainline: `OffSeedPhaseLock Xi`. -/
 theorem xi_phaseLock : Hyperlocal.Transport.OffSeedPhaseLock Xi :=

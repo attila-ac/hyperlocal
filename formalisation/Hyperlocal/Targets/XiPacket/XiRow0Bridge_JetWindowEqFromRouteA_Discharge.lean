@@ -1,18 +1,17 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_Discharge.lean
 
-  Route–A discharge surface: provide a `RouteAJetCoordProvider`.
+  Legacy Route–A discharge surface.
 
   IMPORTANT (2026-03-13):
-  * the AtOrder coordinates are discharged theorem-level from quotient-jet facts
-  * the base-window coordinates for `w0/wp2/wp3` are now also theorem-level,
-    by specializing the same quotient-jet provider at `m = 0`
-  * the only remaining fallback axiom is the residual `wc`-only payload in
-      `XiRow0Bridge_JetWindowEqFromRouteA_BaseDischarge.lean`
+  * this legacy producer is now parameterized over `[RouteAWcCoordProvider]`
+  * it no longer hardwires the residual `base` fallback into the full
+    `RouteAJetCoordProvider` constant
+  * any remaining fallback now sits strictly below this file
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_BaseDischarge
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderFromScalars
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_AtCoordsFromQuotJets
 
 set_option autoImplicit false
@@ -26,7 +25,7 @@ open Complex
 open Hyperlocal.Transport
 
 instance (priority := 900)
-    [TAC.XiJetWindowIsJetAtOrderQuotProvider] :
+    [TAC.XiJetWindowIsJetAtOrderQuotProvider] [RouteAWcCoordProvider] :
     RouteAJetCoordProvider := by
   classical
   haveI : RouteAJetCoordProviderAt := inferInstance
@@ -61,13 +60,13 @@ instance (priority := 900)
     simpa [w0At_zero] using (RouteAJetCoordProviderAt.w0At_2 (m := 0) (s := s))
 
   · intro s
-    exact RouteAJetCoordAxioms.Discharge.ax_wc_0 s
+    exact RouteAWcCoordProvider.wc_0 s
 
   · intro s
-    exact RouteAJetCoordAxioms.Discharge.ax_wc_1 s
+    exact RouteAWcCoordProvider.wc_1 s
 
   · intro s
-    exact RouteAJetCoordAxioms.Discharge.ax_wc_2 s
+    exact RouteAWcCoordProvider.wc_2 s
 
   · intro s
     simpa [wp2At_zero] using (RouteAJetCoordProviderAt.wp2At_0 (m := 0) (s := s))

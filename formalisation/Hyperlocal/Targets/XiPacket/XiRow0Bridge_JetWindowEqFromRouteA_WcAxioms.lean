@@ -7,6 +7,7 @@
   * this file is no longer an axiom boundary
   * keep the old theorem names `ax_wc_0/1/2` for compatibility
   * re-export them from the theorem-side wc bridge layer
+  * the honest prerequisite is now `[RouteAWcScalarProvider]`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderFromScalars
@@ -26,19 +27,19 @@ namespace Wc
 
 theorem ax_wc_0
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ) := by
   simpa using (JetQuotOp.routeA_G_wc_coord0 (s := s)).symm
 
 theorem ax_wc_1
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ) := by
   simpa using (JetQuotOp.routeA_G_wc_coord1 (s := s)).symm
 
 theorem ax_wc_2
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ) := by
   simpa using (JetQuotOp.routeA_G_wc_coord2 (s := s)).symm
 

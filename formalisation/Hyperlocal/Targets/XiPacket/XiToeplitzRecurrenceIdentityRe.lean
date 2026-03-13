@@ -12,12 +12,14 @@
 
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
+      [RouteAWcScalarProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
 import Hyperlocal.Targets.XiPacket.XiLemmaC_RecurrenceToEllKappaAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceKappaAtOrder
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Theorem
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -44,6 +46,7 @@ theorem xiToeplitzRecurrenceIdentity_atOrder
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider]
     (hk : kappaAt m s ≠ 0) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
@@ -85,6 +88,7 @@ theorem xiToeplitzRecurrenceIdentity_p_of_kappaAt0
     (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider]
     (hk0 : kappaAt (0 : ℕ) s ≠ 0)
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by

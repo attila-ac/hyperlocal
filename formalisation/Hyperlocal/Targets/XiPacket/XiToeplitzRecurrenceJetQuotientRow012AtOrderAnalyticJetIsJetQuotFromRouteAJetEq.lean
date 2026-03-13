@@ -10,14 +10,13 @@
       TAC.XiJetWindowIsJetAtOrderQuotProvider
 
   IMPORTANT:
-  This file is not a root producer.  It is a bridge layer.
+  This file is not a root producer. It is a bridge layer.
   Therefore the required Eq-provider must be stated explicitly.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow012AtOrderAnalyticJetProviderFromJets
 import Hyperlocal.Targets.XiPacket.XiJet3AtOrderQuotDefs
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Theorem
-
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -47,45 +46,32 @@ instance (priority := 1000)
     TAC.XiJetWindowIsJetAtOrderQuotProvider where
   jet_w0At := by
     intro m s
-
-    have hz : TAC.z_w0At s = s.ρ := by
-      apply Complex.ext
-      · simp [TAC.z_w0At, sc, t, Hyperlocal.Targets.XiTransport.delta]
-      · simp [TAC.z_w0At, sc, t, Hyperlocal.Targets.XiTransport.delta]
-
     have hw : w0At m s = jet3 (routeA_G s) (TAC.z_w0At s) := by
-      simpa [hz] using (w0At_eq_jet3_routeA (m := m) (s := s))
-
+      simpa [TAC.jet3] using
+        (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).w0At_eq
     have hj : IsJet3At (routeA_G s) (TAC.z_w0At s) (w0At m s) := by
-      simpa [hw] using
-        (isJet3At_jet3 (G := routeA_G s) (z := TAC.z_w0At s))
-
+      rw [hw]
+      exact isJet3At_jet3 (routeA_G s) (TAC.z_w0At s)
     simpa [IsJet3AtOrderQuot] using hj
 
   jet_wp2At := by
     intro m s
-
     have hw : wp2At m s = jet3 (routeA_G s) (TAC.z_wp2At s) := by
-      simpa [TAC.z_wp2At] using
-        (wp2At_eq_jet3_routeA (m := m) (s := s))
-
+      simpa [TAC.jet3] using
+        (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).wp2At_eq
     have hj : IsJet3At (routeA_G s) (TAC.z_wp2At s) (wp2At m s) := by
-      simpa [hw] using
-        (isJet3At_jet3 (G := routeA_G s) (z := TAC.z_wp2At s))
-
+      rw [hw]
+      exact isJet3At_jet3 (routeA_G s) (TAC.z_wp2At s)
     simpa [IsJet3AtOrderQuot] using hj
 
   jet_wp3At := by
     intro m s
-
     have hw : wp3At m s = jet3 (routeA_G s) (TAC.z_wp3At s) := by
-      simpa [TAC.z_wp3At] using
-        (wp3At_eq_jet3_routeA (m := m) (s := s))
-
+      simpa [TAC.jet3] using
+        (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).wp3At_eq
     have hj : IsJet3At (routeA_G s) (TAC.z_wp3At s) (wp3At m s) := by
-      simpa [hw] using
-        (isJet3At_jet3 (G := routeA_G s) (z := TAC.z_wp3At s))
-
+      rw [hw]
+      exact isJet3At_jet3 (routeA_G s) (TAC.z_wp3At s)
     simpa [IsJet3AtOrderQuot] using hj
 
 end XiPacket

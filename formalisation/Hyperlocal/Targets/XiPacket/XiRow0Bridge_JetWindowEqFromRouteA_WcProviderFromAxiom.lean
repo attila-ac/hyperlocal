@@ -7,6 +7,7 @@
   * no axiom payload remains here
   * keep this file only as a low-priority compatibility installer
   * the real live producer is theorem-side
+  * the honest prerequisite is now `[RouteAWcScalarProvider]`
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcProvider
@@ -23,7 +24,7 @@ open Complex
 open Hyperlocal.Transport
 
 instance (priority := 10)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] : RouteAWcCoordProvider where
+    [RouteAWcScalarProvider] : RouteAWcCoordProvider where
   wc_0 := by
     intro s
     exact RouteAJetCoordAxioms.Wc.ax_wc_0 s

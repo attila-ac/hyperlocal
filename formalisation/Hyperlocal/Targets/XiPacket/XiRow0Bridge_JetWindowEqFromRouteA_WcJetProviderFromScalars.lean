@@ -1,3 +1,15 @@
+/-
+  Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderFromScalars.lean
+
+  Build the Route-A `wc` jet theorem from the three scalar normalization facts.
+
+  IMPORTANT (2026-03-13):
+  * the theorem constants in this file now depend only on
+      `[RouteAWcScalarProvider]`
+  * this file must remain theorem-only
+  * do NOT import the residual fallback installer here
+-/
+
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAt_Discharge
 import Hyperlocal.Targets.XiPacket.XiRouteA_GDefs
@@ -40,7 +52,7 @@ private theorem xiRouteA_jetPkg_jet3_local
 
 theorem routeA_G_wc_coord0
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     (routeA_G s) (1 - s.ρ) = wc s (0 : Fin 3) := by
   calc
     (routeA_G s) (1 - s.ρ) = 0 := routeA_G_at_one_sub_rho (s := s)
@@ -50,7 +62,7 @@ theorem routeA_G_wc_coord0
 
 theorem routeA_G_wc_coord1
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     deriv (routeA_G s) (1 - s.ρ) = wc s (1 : Fin 3) := by
   calc
     deriv (routeA_G s) (1 - s.ρ) = (1 : ℂ) := routeA_G_deriv_at_one_sub_rho (s := s)
@@ -60,7 +72,7 @@ theorem routeA_G_wc_coord1
 
 theorem routeA_G_wc_coord2
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     deriv (deriv (routeA_G s)) (1 - s.ρ) = wc s (2 : Fin 3) := by
   calc
     deriv (deriv (routeA_G s)) (1 - s.ρ) = (XiTransport.delta s : ℂ) :=
@@ -71,7 +83,7 @@ theorem routeA_G_wc_coord2
 
 theorem wc_isJet3At_routeA
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [RouteAWcScalarProvider] :
     IsJet3At (routeA_G s) (1 - s.ρ) (wc s) := by
   constructor
   · symm
@@ -83,7 +95,7 @@ theorem wc_isJet3At_routeA
     exact routeA_G_wc_coord2 (s := s)
 
 instance (priority := 1000)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] : RouteAWcJetProvider where
+    [RouteAWcScalarProvider] : RouteAWcJetProvider where
   jet_wc := by
     intro s
     exact wc_isJet3At_routeA (s := s)

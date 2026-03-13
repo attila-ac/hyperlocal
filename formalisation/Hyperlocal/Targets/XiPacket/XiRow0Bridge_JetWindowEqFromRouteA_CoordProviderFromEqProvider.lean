@@ -3,6 +3,12 @@
 
   Build full `RouteAJetCoordProvider` from Eq-provider for w0/wp2/wp3 and
   from the theorem-side wc provider surface for wc.
+
+  IMPORTANT (2026-03-13):
+  * this instance is now parameterized over `[RouteAWcCoordProvider]`
+  * therefore the full coord-provider theorem constant no longer hardwires the
+    historical `base` fallback
+  * the residual fallback, if used, now sits strictly below this file
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_CoordProvider
@@ -50,7 +56,8 @@ private theorem z_w0At_eq_rho (s : OffSeed Xi) : TAC.z_w0At s = s.ρ := by
   · simp [TAC.z_w0At, sc, σ, t, Hyperlocal.Targets.XiTransport.delta]
 
 instance (priority := 1000)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] : RouteAJetCoordProvider := by
+    [TAC.XiJetWindowEqAtOrderQuotProvider] [RouteAWcCoordProvider] :
+    RouteAJetCoordProvider := by
   classical
   refine
     { w0_0 := ?_, w0_1 := ?_, w0_2 := ?_
@@ -84,7 +91,7 @@ instance (priority := 1000)
     simpa [TAC.jet3, z_w0At_eq_rho (s := s)] using h2
 
   ---------------------------------------------------------------------------
-  -- wc : now from theorem-side upstream wc jet provider (draft)
+  -- wc : from theorem-side upstream wc provider surface
   ---------------------------------------------------------------------------
   · intro s
     exact RouteAWcCoordProvider.wc_0 s

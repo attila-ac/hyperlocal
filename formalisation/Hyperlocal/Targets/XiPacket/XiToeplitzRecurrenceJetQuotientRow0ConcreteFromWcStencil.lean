@@ -1,26 +1,5 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil.lean
-
-  Parallel theorem-side row-0 concrete producer.
-
-  Purpose:
-  * keep the historical ungated `XiToeplitzRecurrenceJetQuotientRow0Concrete.lean`
-    untouched and build-green;
-  * provide a parallel producer in which only the `wc` component is upgraded to
-    the Route-A stencil discharge lane;
-  * expose the honest gate `[TAC.XiJetWindowEqAtOrderQuotProvider]` exactly here.
-
-  2026-03-13 honest post-axiom state:
-  * the old global coords01 fallback provider has been removed
-  * the reused AtOrder row-0 spec proofs are now theorem-gated
-  * therefore this file must expose the honest theorem-side gate as well
-
-      [XiJetQuotRec2AtOrderTrueAnalytic]
-      [TAC.XiJetWindowEqAtOrderQuotProvider]
-
-  Policy:
-  * `w0/wp2/wp3` are reused from the existing theorem-side AtOrder route.
-  * `wc` is discharged directly via the packaged row-0 sigma theorem.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
@@ -69,7 +48,8 @@ theorem xiJetQuot_row0_w0_fromWcStencil
 
 theorem xiJetQuot_row0_wc_fromWcStencil
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
   have hsigma : row0Sigma s (wc s) = 0 :=
     row0Sigma_wc_eq_zero_fromWcStencil (s := s)

@@ -1,8 +1,15 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_WcCoordsFromRouteAJetLeibniz.lean
+
+  Upstream theorem-side `wc` coordinate facts from the Route-A jet equality.
+
+  IMPORTANT (2026-03-13):
+  * this file is independent of `...WcJetProviderFromScalars`
+  * it works from the axiom-free Route-A window=jet3 core
+  * the honest prerequisite is `[RouteAJetCoordProvider]`
 -/
 
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_Core
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Mathlib.Tactic
 
@@ -16,18 +23,14 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+variable [RouteAJetCoordProvider]
 
 namespace JetQuotOp
 
 private lemma isJet3At_wc_routeA (s : OffSeed Xi) :
     IsJet3At (routeA_G s) (1 - s.ρ) (wc s) := by
-  classical
-  have H := JetQuotOpTheorem.xiRouteA_jetPkg_jet3 (s := s) (z := (1 - s.ρ))
-  have hjet :
-      IsJet3At (routeA_G s) (1 - s.ρ) (jet3 (routeA_G s) (1 - s.ρ)) :=
-    H.2.1
-  simpa [wc_eq_jet3_routeA (s := s)] using hjet
+  simpa [wc_eq_jet3_routeA (s := s)] using
+    (isJet3At_jet3 (routeA_G s) (1 - s.ρ))
 
 lemma wc_0_from_routeAJetPkg (s : OffSeed Xi) :
     wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ) := by

@@ -19,16 +19,8 @@ open scoped BigOperators
 
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 variable [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+variable [RouteAWcScalarProvider]
 
-/--
-Parametric theorem-side sibling of the row-0 scalar-goals wrapper.
-
-Policy:
-* consume the clean parametric trio lane for `w0/wp2/wp3`
-* consume the new parallel theorem-side `wc` sigma discharge
-* do NOT install any instances here
-* do NOT replace the public stable wrapper yet
--/
 noncomputable def xiJetQuot_row0_scalarGoals_parametric
     (s : Hyperlocal.OffSeed Xi) :
     XiJetQuotRow0ScalarGoals s where

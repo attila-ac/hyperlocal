@@ -23,6 +23,10 @@ namespace XiPacket
 open Complex
 open Hyperlocal.Transport
 
+private theorem z_w0At_eq_rho (s : OffSeed Xi) : TAC.z_w0At s = s.ρ := by
+  apply Complex.ext <;>
+    simp [TAC.z_w0At, sc, σ, t, Hyperlocal.Targets.XiTransport.delta]
+
 namespace JetQuotOpTheorem
 
 theorem xiRouteA_jetPkg_jet3 (s : OffSeed Xi) (z : ℂ) :
@@ -53,12 +57,17 @@ theorem xiRouteA_jetPkg_w0
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hw0 : w0 s = jet3 (routeA_G s) (s.ρ) := by
+    simpa [w0At_zero, TAC.jet3, z_w0At_eq_rho (s := s)] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot 0 s).w0At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [w0_eq_jet3_routeA (s := s)] using hjet
+  rw [hw0]
+  exact hjet
 
 theorem xiRouteA_jetPkg_wc
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     ∃ G : ℂ → ℂ,
       Hyperlocal.Factorization.FactorisedByQuartet Xi s.ρ 1 G ∧
       IsJet3At G (1 - s.ρ) (wc s) ∧
@@ -85,8 +94,12 @@ theorem xiRouteA_jetPkg_wp2
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := (starRingEnd ℂ) s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hwp2 : wp2 s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) := by
+    simpa [wp2At_zero, TAC.z_wp2At] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot 0 s).wp2At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [wp2_eq_jet3_routeA (s := s)] using hjet
+  rw [hwp2]
+  exact hjet
 
 theorem xiRouteA_jetPkg_wp3
     (s : OffSeed Xi)
@@ -101,8 +114,12 @@ theorem xiRouteA_jetPkg_wp3
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := 1 - (starRingEnd ℂ) s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hwp3 : wp3 s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) := by
+    simpa [wp3At_zero, TAC.z_wp3At] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot 0 s).wp3At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [wp3_eq_jet3_routeA (s := s)] using hjet
+  rw [hwp3]
+  exact hjet
 
 theorem xiRouteA_jetPkg_w0At
     (m : ℕ) (s : OffSeed Xi)
@@ -117,8 +134,12 @@ theorem xiRouteA_jetPkg_w0At
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hw0 : w0At m s = jet3 (routeA_G s) (s.ρ) := by
+    simpa [TAC.jet3, z_w0At_eq_rho (s := s)] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).w0At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [w0At_eq_jet3_routeA (m := m) (s := s)] using hjet
+  rw [hw0]
+  exact hjet
 
 theorem xiRouteA_jetPkg_wp2At
     (m : ℕ) (s : OffSeed Xi)
@@ -133,8 +154,12 @@ theorem xiRouteA_jetPkg_wp2At
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := (starRingEnd ℂ) s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hwp2 : wp2At m s = jet3 (routeA_G s) ((starRingEnd ℂ) s.ρ) := by
+    simpa [TAC.z_wp2At] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).wp2At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [wp2At_eq_jet3_routeA (m := m) (s := s)] using hjet
+  rw [hwp2]
+  exact hjet
 
 theorem xiRouteA_jetPkg_wp3At
     (m : ℕ) (s : OffSeed Xi)
@@ -149,8 +174,12 @@ theorem xiRouteA_jetPkg_wp3At
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := 1 - (starRingEnd ℂ) s.ρ)
   rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  have hwp3 : wp3At m s = jet3 (routeA_G s) (1 - (starRingEnd ℂ) s.ρ) := by
+    simpa [TAC.z_wp3At] using
+      (TAC.XiJetWindowEqAtOrderQuotProvider.windowEqAtOrderQuot m s).wp3At_eq
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [wp3At_eq_jet3_routeA (m := m) (s := s)] using hjet
+  rw [hwp3]
+  exact hjet
 
 theorem xiJetLeibnizAt_w0
     (s : OffSeed Xi)
@@ -161,7 +190,8 @@ theorem xiJetLeibnizAt_w0
 
 theorem xiJetLeibnizAt_wc
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     JetLeibnizAt s (1 - s.ρ) (wc s) := by
   exact jetLeibnizAt_from_RouteA (s := s) (z := 1 - s.ρ) (w := wc s)
     (xiRouteA_jetPkg_wc (s := s))

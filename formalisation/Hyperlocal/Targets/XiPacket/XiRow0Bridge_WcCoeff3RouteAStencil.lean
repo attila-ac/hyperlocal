@@ -36,7 +36,8 @@ Rewrite the wc coeff-3 convolution as the exact Route-A scalar stencil.
 -/
 theorem wc_convCoeff3_eq_routeA_stencil
     (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3
       =
       (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
@@ -63,6 +64,7 @@ theorem wc_convCoeff3_eq_routeA_stencil
             rw [← JetQuotOp.routeA_G_wc_coord2 (s := s),
                 ← JetQuotOp.routeA_G_wc_coord1 (s := s),
                 ← JetQuotOp.routeA_G_wc_coord0 (s := s)]
+
 /--
 Bridge lemma: if the Route-A stencil vanishes, then the coeff-3
 convolution vanishes.
@@ -70,6 +72,7 @@ convolution vanishes.
 theorem wc_convCoeff3_clean_of_routeA_stencil
     (s : OffSeed Xi)
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider]
     (hStencil :
       (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
         + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
@@ -84,6 +87,7 @@ Clean coeff-3 theorem once the Route-A stencil vanishing is available.
 theorem wc_convCoeff3_clean
     (s : OffSeed Xi)
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider]
     (hStencil :
       (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
         + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)

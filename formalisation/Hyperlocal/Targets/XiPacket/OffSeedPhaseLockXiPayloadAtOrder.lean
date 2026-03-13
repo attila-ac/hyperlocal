@@ -14,6 +14,15 @@
 
   This removes the last dependency on the legacy anchor-based real-part nonvanishing
   constructor path.
+
+  2026-03-13 honest post-axiom state:
+  * the downstream recurrence-identity theorems are now theorem-gated
+  * therefore this stage-3 consumer can no longer remain assumption-free
+  * it must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
+      [RouteAWcScalarProvider]
 -/
 
 import Hyperlocal.Transport.OffSeedBridge
@@ -55,7 +64,8 @@ lemma sin_eq_zero_of_bCoeff_eq_zero (σ t p : ℝ)
 
 theorem offSeedPhaseLock_Xi
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     Hyperlocal.Transport.OffSeedPhaseLock Xi := by
   intro s
   classical
