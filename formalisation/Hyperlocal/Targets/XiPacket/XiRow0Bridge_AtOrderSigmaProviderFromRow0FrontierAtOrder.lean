@@ -1,5 +1,6 @@
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpec
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_ToeplitzRow0ToRow0Sigma
 
 set_option autoImplicit false
@@ -9,11 +10,18 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open Hyperlocal.Transport
 
 theorem xiAtOrderSigmaOut_fromRow0FrontierAtOrder
-    (m : ℕ) (s : OffSeed Xi) : XiAtOrderSigmaOut m s := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiAtOrderSigmaOut m s := by
   classical
   refine ⟨?_, ?_, ?_⟩
   ·
