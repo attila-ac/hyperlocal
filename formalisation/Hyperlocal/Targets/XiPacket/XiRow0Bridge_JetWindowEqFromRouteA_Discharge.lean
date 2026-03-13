@@ -104,21 +104,21 @@ instance (priority := 900)
 
   refine
     { -- base windows (compressed axiom payload)
-      w0_0  := RouteAJetCoordAxioms.ax_w0_0
-      w0_1  := RouteAJetCoordAxioms.ax_w0_1
-      w0_2  := RouteAJetCoordAxioms.ax_w0_2
+      w0_0  := RouteAJetCoordAxioms.Discharge.ax_w0_0
+      w0_1  := RouteAJetCoordAxioms.Discharge.ax_w0_1
+      w0_2  := RouteAJetCoordAxioms.Discharge.ax_w0_2
 
-      wc_0  := RouteAJetCoordAxioms.ax_wc_0
-      wc_1  := RouteAJetCoordAxioms.ax_wc_1
-      wc_2  := RouteAJetCoordAxioms.ax_wc_2
+      wc_0  := RouteAJetCoordAxioms.Discharge.ax_wc_0
+      wc_1  := RouteAJetCoordAxioms.Discharge.ax_wc_1
+      wc_2  := RouteAJetCoordAxioms.Discharge.ax_wc_2
 
-      wp2_0 := RouteAJetCoordAxioms.ax_wp2_0
-      wp2_1 := RouteAJetCoordAxioms.ax_wp2_1
-      wp2_2 := RouteAJetCoordAxioms.ax_wp2_2
+      wp2_0 := RouteAJetCoordAxioms.Discharge.ax_wp2_0
+      wp2_1 := RouteAJetCoordAxioms.Discharge.ax_wp2_1
+      wp2_2 := RouteAJetCoordAxioms.Discharge.ax_wp2_2
 
-      wp3_0 := RouteAJetCoordAxioms.ax_wp3_0
-      wp3_1 := RouteAJetCoordAxioms.ax_wp3_1
-      wp3_2 := RouteAJetCoordAxioms.ax_wp3_2
+      wp3_0 := RouteAJetCoordAxioms.Discharge.ax_wp3_0
+      wp3_1 := RouteAJetCoordAxioms.Discharge.ax_wp3_1
+      wp3_2 := RouteAJetCoordAxioms.Discharge.ax_wp3_2
 
       -- AtOrder windows (theorem-level from quotient jets)
       w0At_0  := RouteAJetCoordProviderAt.w0At_0

@@ -3,13 +3,19 @@
 
   RecurrenceA bridge surfaces.
 
-  IMPORTANT:
-  * preserve the historical ambient theorem unchanged
-  * add a theorem-gated sibling on the honest Rec2 true-analytic corridor
-  * do NOT collapse the legacy ambient lane yet
+  2026-03-13 honest post-axiom state:
+  * the old ambient packaged extractor route is no longer admissible as an
+    assumption-free surface
+  * therefore the exported RecurrenceA wrapper must expose the honest
+    theorem-side gate
+  * keep the historical theorem names stable, but make their required premises
+    explicit
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderFromAnalyticExtractor_Theorem
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderAnalyticExtractor
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceToRow012Bridge
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
@@ -26,10 +32,13 @@ namespace TAC
 open Hyperlocal.Targets.XiPacket.TAC
 end TAC
 
-/-- Historical ambient RecurrenceA theorem. -/
+/-- Historical RecurrenceA theorem name, now on the honest theorem-side gate. -/
 theorem xiJetQuotRec2AtOrder_fromRecurrenceA
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRec2AtOrder m s := by
-  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor (m := m) (s := s)
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRec2AtOrder m s := by
+  simpa using xiJetQuotRec2AtOrder_fromAnalyticExtractor_theorem (m := m) (s := s)
 
 /-- Theorem-gated RecurrenceA theorem on the honest Rec2 true-analytic corridor. -/
 theorem xiJetQuotRec2AtOrder_fromRecurrenceA_fromRec2TrueAnalytic

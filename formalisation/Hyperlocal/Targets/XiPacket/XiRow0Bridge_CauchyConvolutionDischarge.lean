@@ -9,14 +9,16 @@
     `row0ConvolutionAtRev_wp2`, `row0ConvolutionAtRev_wp3`
   are theorem-side results that now depend on the explicit provider gate
 
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider].
 
-  Therefore this file must carry that gate explicitly rather than hoping
+  Therefore this file must carry both gates explicitly rather than hoping
   instance synthesis finds a global default producer.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Mathlib.Tactic
 
@@ -28,6 +30,7 @@ namespace Hyperlocal.Targets.XiPacket
 open Complex
 open scoped BigOperators
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 namespace JetQuotOp

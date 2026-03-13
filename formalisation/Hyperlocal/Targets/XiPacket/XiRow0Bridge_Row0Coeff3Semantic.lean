@@ -9,10 +9,19 @@
 
   The `wc` theorem therefore stays on the extractor route.
   The clean Route-A theorem is consumed downstream instead.
+
+  2026-03-13 honest post-axiom state:
+  * the upstream coeff-3 extractor is now theorem-gated
+  * therefore these semantic exports can no longer remain assumption-free
+  * they must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0Coeff3Extractor
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -21,25 +30,39 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open scoped BigOperators
 open Hyperlocal.Cancellation
 
-variable [TAC.XiJetWindowEqAtOrderQuotProvider]
-
-theorem row0ConvCoeff3_eq_zero_w0 (s : OffSeed Xi) :
+theorem row0ConvCoeff3_eq_zero_w0
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_w0 (s := s))
 
-theorem row0ConvCoeff3_eq_zero_wc (s : OffSeed Xi) :
+theorem row0ConvCoeff3_eq_zero_wc
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wc (s := s))
 
-theorem row0ConvCoeff3_eq_zero_wp2 (s : OffSeed Xi) :
+theorem row0ConvCoeff3_eq_zero_wp2
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wp2 (s := s))
 
-theorem row0ConvCoeff3_eq_zero_wp3 (s : OffSeed Xi) :
+theorem row0ConvCoeff3_eq_zero_wp3
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wp3 (s := s))
 

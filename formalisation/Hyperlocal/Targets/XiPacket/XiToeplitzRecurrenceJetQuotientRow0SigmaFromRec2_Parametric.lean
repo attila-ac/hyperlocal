@@ -1,8 +1,7 @@
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderProviderFromRow012Upstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SemanticsAtOrderFromRecurrenceA
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivotDefs
 
 set_option autoImplicit false
@@ -12,11 +11,16 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Hyperlocal.Transport
 
 theorem row0Sigma_w0_eq_zero_fromRec2_parametric
     (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     row0Sigma s (w0 s) = 0 := by
   have Hrec : XiJetQuotRec2AtOrder 0 s :=
     xiJetQuotRec2AtOrder_fromRow012Upstream (m := 0) (s := s)
@@ -28,7 +32,8 @@ theorem row0Sigma_w0_eq_zero_fromRec2_parametric
 
 theorem row0Sigma_wp2_eq_zero_fromRec2_parametric
     (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     row0Sigma s (wp2 s) = 0 := by
   have Hrec : XiJetQuotRec2AtOrder 0 s :=
     xiJetQuotRec2AtOrder_fromRow012Upstream (m := 0) (s := s)
@@ -40,7 +45,8 @@ theorem row0Sigma_wp2_eq_zero_fromRec2_parametric
 
 theorem row0Sigma_wp3_eq_zero_fromRec2_parametric
     (s : OffSeed Xi)
-    [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider] :
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     row0Sigma s (wp3 s) = 0 := by
   have Hrec : XiJetQuotRec2AtOrder 0 s :=
     xiJetQuotRec2AtOrder_fromRow012Upstream (m := 0) (s := s)

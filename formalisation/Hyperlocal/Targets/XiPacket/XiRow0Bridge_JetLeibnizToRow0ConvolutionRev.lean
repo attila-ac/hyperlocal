@@ -14,11 +14,20 @@
   * use the theorem namespace explicitly during consumer retarget
   * do NOT import the legacy mixed Route–A JetLeibniz wrapper here
   * do NOT alias theorem-side names back into `JetQuotOp` yet
+
+  2026-03-13 honest post-axiom state:
+  * the coeff-3 semantic lane is now theorem-gated
+  * therefore this file can no longer remain assumption-free
+  * it must expose the honest theorem-side gate
+
+      [XiJetQuotRec2AtOrderTrueAnalytic]
+      [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0Coeff3Semantic
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -28,6 +37,10 @@ namespace Hyperlocal
 namespace Targets
 namespace XiPacket
 
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
 open Complex
 open scoped BigOperators
 open Hyperlocal.Cancellation
@@ -36,6 +49,7 @@ open Hyperlocal.Cancellation
 
 theorem row0ConvolutionAtRev_w0
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (s.ρ) (w0 s) := by
   have hL : JetLeibnizAt s (s.ρ) (w0 s) :=
@@ -47,6 +61,7 @@ theorem row0ConvolutionAtRev_w0
 
 theorem row0ConvolutionAtRev_wc
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (1 - s.ρ) (wc s) := by
   have hL : JetLeibnizAt s (1 - s.ρ) (wc s) :=
@@ -58,6 +73,7 @@ theorem row0ConvolutionAtRev_wc
 
 theorem row0ConvolutionAtRev_wp2
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2 s) := by
   have hL : JetLeibnizAt s ((starRingEnd ℂ) s.ρ) (wp2 s) :=
@@ -69,6 +85,7 @@ theorem row0ConvolutionAtRev_wp2
 
 theorem row0ConvolutionAtRev_wp3
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) := by
   have hL : JetLeibnizAt s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) :=

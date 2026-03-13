@@ -7,12 +7,19 @@
   This version avoids `XiToeplitzRecurrenceJetQuotientRow0ConcreteExtract`
   and instead uses the constructive scalar-goals witness route.
 
-  Since `xiJetQuot_row0_scalarGoals` is provider-gated, this file must
-  carry the same gate explicitly.
+  Since `xiJetQuot_row0_scalarGoals` is now gated by the installed provider
+  surfaces, this file must carry those gates explicitly.
+
+  Honest gates:
+    [XiAtOrderSigmaProvider]
+    [XiAtOrderCoords01Provider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Analytic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
 
 set_option autoImplicit false
 noncomputable section
@@ -23,6 +30,8 @@ namespace XiPacket
 
 open Hyperlocal.Transport
 
+variable [XiAtOrderSigmaProvider]
+variable [XiAtOrderCoords01Provider]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 
 theorem xiJetQuot_row0_wc_spec_proof (s : OffSeed Xi) :
