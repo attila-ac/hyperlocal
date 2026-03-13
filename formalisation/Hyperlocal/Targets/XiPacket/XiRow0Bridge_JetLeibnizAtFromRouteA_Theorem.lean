@@ -68,9 +68,9 @@ theorem xiRouteA_jetPkg_wc
       Differentiable ℂ (fun t => deriv G t) := by
   classical
   have H := xiRouteA_jetPkg_jet3 (s := s) (z := 1 - s.ρ)
-  rcases H with ⟨hfac, hjet, hR, hG, hR', hG'⟩
+  rcases H with ⟨hfac, _, hR, hG, hR', hG'⟩
   refine ⟨routeA_G s, hfac, ?_, hR, hG, hR', hG'⟩
-  simpa [wc_eq_jet3_routeA (s := s)] using hjet
+  exact JetQuotOp.wc_isJet3At_routeA (s := s)
 
 theorem xiRouteA_jetPkg_wp2
     (s : OffSeed Xi)

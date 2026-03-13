@@ -1,5 +1,6 @@
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischarge
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_WcCoeff3RouteAStencil
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -13,13 +14,15 @@ open Complex
 open Hyperlocal.Transport
 open Hyperlocal.Cancellation
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
+variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+
 /--
 Sharpened Route-A recurrence at `1 - ρ`, derived from the historical
 `row0Sigma_wc_eq_zero` theorem.
 -/
 theorem routeA_recurrence_at_one_sub_rho_from_row0Sigma_wc
-    (s : OffSeed Xi)
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    (s : OffSeed Xi) :
       2 * deriv (deriv (routeA_G s)) (1 - s.ρ)
         =
       (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)

@@ -50,16 +50,19 @@ theorem wc_convCoeff3_eq_routeA_stencil
           - (JetQuotOp.σ3 s) * (wc s ⟨0, by decide⟩) := by
             simpa using convCoeff3_eq_lincomb (s := s) (w := wc s)
     _ =
-        (-2 : ℂ) * ((jet3 (routeA_G s) (1 - s.ρ)) ⟨2, by decide⟩)
-          + (JetQuotOp.σ2 s) * ((jet3 (routeA_G s) (1 - s.ρ)) ⟨1, by decide⟩)
-          - (JetQuotOp.σ3 s) * ((jet3 (routeA_G s) (1 - s.ρ)) ⟨0, by decide⟩) := by
-            simpa [wc_eq_jet3_routeA (s := s)]
-    _ =
         (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
           + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
           - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) := by
-            simp [jet3]
-
+            change (-2 : ℂ) * (wc s (2 : Fin 3))
+              + (JetQuotOp.σ2 s) * (wc s (1 : Fin 3))
+              - (JetQuotOp.σ3 s) * (wc s (0 : Fin 3))
+              =
+              (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+                + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+                - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ)
+            rw [← JetQuotOp.routeA_G_wc_coord2 (s := s),
+                ← JetQuotOp.routeA_G_wc_coord1 (s := s),
+                ← JetQuotOp.routeA_G_wc_coord0 (s := s)]
 /--
 Bridge lemma: if the Route-A stencil vanishes, then the coeff-3
 convolution vanishes.

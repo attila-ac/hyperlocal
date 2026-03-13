@@ -10,14 +10,14 @@
   * Instead consume only:
       - row-0 scalar rewrite from `...Row0ConcreteProof`
       - theorem-side `w0/wp2/wp3` AtOrder proofs at `m = 0`
-      - the thin theorem-side `wc` discharge lane
+      - the historical public `wc` frontier wrapper
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierSpec
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0FrontierAtOrderSpecProofUpstream
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
-import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -52,8 +52,14 @@ theorem row0ConvCoeff3_w0 (s : OffSeed Xi) :
 
 theorem row0ConvCoeff3_wc (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
-  have hs : row0Sigma s (wc s) = 0 := row0Sigma_wc_eq_zero_fromWcStencil (s := s)
-  simpa [row0Sigma_eq_convCoeff_rev (s := s) (w := wc s)] using hs
+  have ht :
+      (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
+    exact xiJetQuot_row0_wc_spec (s := s)
+  have hs : row0Sigma s (wc s) = 0 := by
+    rw [toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)] at ht
+    exact ht
+  rw [row0Sigma_eq_convCoeff_rev (s := s) (w := wc s)] at hs
+  exact hs
 
 theorem row0ConvCoeff3_wp2 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by
