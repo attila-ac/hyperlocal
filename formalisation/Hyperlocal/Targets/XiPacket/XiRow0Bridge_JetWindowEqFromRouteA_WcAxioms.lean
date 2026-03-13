@@ -1,18 +1,15 @@
 /-
   Hyperlocal/Targets/XiPacket/XiRow0Bridge_JetWindowEqFromRouteA_WcAxioms.lean
 
-  Tiny wc-only axiom surface for the Route-A jet-window coordinates.
+  Historical wc-only compatibility surface.
 
-  Purpose:
-  * shrink the old bundled RouteA provider boundary
-  * isolate the remaining dirty edge to the three `wc` coordinate equalities
-  * allow theorem-backed installation of all other RouteA fields
-
-  This file should contain ONLY the `wc` coordinate boundary.
+  IMPORTANT (2026-03-13):
+  * this file is no longer an axiom boundary
+  * keep the old theorem names `ax_wc_0/1/2` for compatibility
+  * re-export them from the theorem-side wc bridge layer
 -/
 
-import Hyperlocal.Targets.XiPacket.XiWindowDefs
-import Hyperlocal.Targets.XiPacket.XiRouteA_GDefs
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetWindowEqFromRouteA_WcJetProviderFromScalars
 
 set_option autoImplicit false
 noncomputable section
@@ -27,26 +24,23 @@ open Hyperlocal.Transport
 namespace RouteAJetCoordAxioms
 namespace Wc
 
-/-- Tiny bundled axiom payload for the three `wc` Route-A coordinates. -/
-structure Payload where
-  wc_0 : ∀ s : OffSeed Xi, wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ)
-  wc_1 : ∀ s : OffSeed Xi, wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ)
-  wc_2 : ∀ s : OffSeed Xi, wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ)
+theorem ax_wc_0
+    (s : OffSeed Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ) := by
+  simpa using (JetQuotOp.routeA_G_wc_coord0 (s := s)).symm
 
-/-- The only remaining wc-only axiom payload. -/
-axiom payload : Payload
+theorem ax_wc_1
+    (s : OffSeed Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ) := by
+  simpa using (JetQuotOp.routeA_G_wc_coord1 (s := s)).symm
 
-theorem ax_wc_0 (s : OffSeed Xi) :
-    wc s ⟨0, by decide⟩ = (routeA_G s) (1 - s.ρ) :=
-  payload.wc_0 s
-
-theorem ax_wc_1 (s : OffSeed Xi) :
-    wc s ⟨1, by decide⟩ = deriv (routeA_G s) (1 - s.ρ) :=
-  payload.wc_1 s
-
-theorem ax_wc_2 (s : OffSeed Xi) :
-    wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ) :=
-  payload.wc_2 s
+theorem ax_wc_2
+    (s : OffSeed Xi)
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    wc s ⟨2, by decide⟩ = deriv (deriv (routeA_G s)) (1 - s.ρ) := by
+  simpa using (JetQuotOp.routeA_G_wc_coord2 (s := s)).symm
 
 end Wc
 end RouteAJetCoordAxioms
