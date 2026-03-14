@@ -13,6 +13,8 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+
+  plus the explicit Route-A scalar-zero payload required by the `wc` branch.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceEllFromConcreteAtOrder
@@ -47,13 +49,17 @@ theorem xiToeplitzRecurrenceIdentity_atOrder
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0)
     (hk : kappaAt m s ≠ 0) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
   classical
 
   have hell : XiToeplitzEllOutAt m s :=
-    xiToeplitzEllOutAt_fromRecurrenceC (m := m) (s := s)
+    xiToeplitzEllOutAt_fromRecurrenceC (m := m) (s := s) (hroute := hroute)
 
   refine ⟨?_, ?_⟩
   ·
@@ -89,11 +95,15 @@ theorem xiToeplitzRecurrenceIdentity_p_of_kappaAt0
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0)
     (hk0 : kappaAt (0 : ℕ) s ≠ 0)
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by
   classical
-  have hb := xiToeplitzRecurrenceIdentity_atOrder (m := 0) (s := s) hk0
+  have hb := xiToeplitzRecurrenceIdentity_atOrder (m := 0) (s := s) (hroute := hroute) hk0
   rcases hp with rfl | rfl
   · exact hb.1
   · exact hb.2

@@ -50,10 +50,16 @@ theorem xiJetQuot_row0_wc_fromWcStencil
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
   have hsigma : row0Sigma s (wc s) = 0 :=
-    row0Sigma_wc_eq_zero_fromWcStencil (s := s)
+    row0Sigma_wc_eq_zero_fromWcStencil
+      (s := s)
+      (hroute := hroute)
   exact
     toeplitz_row0_eq_zero_of_row0Sigma_eq_zero (s := s) (w := wc s) hsigma
 

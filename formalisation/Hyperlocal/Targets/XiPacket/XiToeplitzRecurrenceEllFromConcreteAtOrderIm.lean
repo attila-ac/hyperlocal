@@ -11,6 +11,8 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+
+  plus the explicit Route-A scalar-zero payload required by the `wc` branch.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
@@ -42,10 +44,14 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s)) = 0 :=
-  xiToeplitzEllOutAtIm_fromRecurrenceC_proof (m := m) (s := s)
+  xiToeplitzEllOutAtIm_fromRecurrenceC_proof (m := m) (s := s) (hroute := hroute)
 
 /--
 Ell-out at order `m` for the mixed imag-pivot configuration:
@@ -55,10 +61,14 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0 :=
-  xiToeplitzEllOutAtImRe_fromRecurrenceC_proof (m := m) (s := s)
+  xiToeplitzEllOutAtImRe_fromRecurrenceC_proof (m := m) (s := s) (hroute := hroute)
 
 /--
 Auxiliary ell-out at order `m` for the mixed configuration with `up = reVec3(w0At m s)`.
@@ -67,9 +77,13 @@ theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 :=
-  xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof (m := m) (s := s)
+  xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof (m := m) (s := s) (hroute := hroute)
 
 end XiPacket
 end Targets

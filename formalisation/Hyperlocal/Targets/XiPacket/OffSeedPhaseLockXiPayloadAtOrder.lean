@@ -23,6 +23,8 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+
+  plus an explicit Route-A scalar-zero payload for each `s`.
 -/
 
 import Hyperlocal.Transport.OffSeedBridge
@@ -65,7 +67,12 @@ lemma sin_eq_zero_of_bCoeff_eq_zero (σ t p : ℝ)
 theorem offSeedPhaseLock_Xi
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      ∀ s : Hyperlocal.OffSeed Xi,
+        (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+          + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+          - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Hyperlocal.Transport.OffSeedPhaseLock Xi := by
   intro s
   classical
@@ -85,7 +92,8 @@ theorem offSeedPhaseLock_Xi
       have hb :
           bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
           bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
-        xiToeplitzRecurrenceIdentity_atOrder (m := m) (s := s) hRe
+        xiToeplitzRecurrenceIdentity_atOrder
+          (m := m) (s := s) (hroute := hroute s) (hk := hRe)
 
       have hsin2 : Real.sin ((t s) * Real.log (2 : ℝ)) = 0 := by
         simpa [XiPacket.t, XiPacket.σ] using
@@ -105,7 +113,8 @@ theorem offSeedPhaseLock_Xi
       have hb :
           bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
           bCoeff (σ s) (t s) (3 : ℝ) = 0 :=
-        xiToeplitzRecurrenceIdentity_atOrder_im (m := m) (s := s) hIm
+        xiToeplitzRecurrenceIdentity_atOrder_im
+          (m := m) (s := s) (hroute := hroute s) (hk := hIm)
 
       have hsin2 : Real.sin ((t s) * Real.log (2 : ℝ)) = 0 := by
         simpa [XiPacket.t, XiPacket.σ] using

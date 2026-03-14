@@ -29,13 +29,28 @@ variable
   [_root_.Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
 
 /-- Mainline: `OffSeedPhaseLock Xi`. -/
-theorem xi_phaseLock : Hyperlocal.Transport.OffSeedPhaseLock Xi :=
-  Hyperlocal.Targets.offSeedPhaseLock_Xi
+theorem xi_phaseLock
+    (hroute :
+      ∀ s : Hyperlocal.OffSeed Xi,
+        (-2 : ℂ) * deriv (deriv (Hyperlocal.Targets.XiPacket.routeA_G s)) (1 - s.ρ)
+          + (Hyperlocal.Targets.XiPacket.JetQuotOp.σ2 s) *
+              deriv (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ)
+          - (Hyperlocal.Targets.XiPacket.JetQuotOp.σ3 s) *
+              (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ) = 0) :
+    Hyperlocal.Transport.OffSeedPhaseLock Xi :=
+  Hyperlocal.Targets.offSeedPhaseLock_Xi (hroute := hroute)
 
 /-- Stage-3 bridge: build `Conclusion.OffSeedToTAC.Stage3Bridge Xi`. -/
-theorem Stage3Bridge :
+theorem Stage3Bridge
+    (hroute :
+      ∀ s : Hyperlocal.OffSeed Xi,
+        (-2 : ℂ) * deriv (deriv (Hyperlocal.Targets.XiPacket.routeA_G s)) (1 - s.ρ)
+          + (Hyperlocal.Targets.XiPacket.JetQuotOp.σ2 s) *
+              deriv (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ)
+          - (Hyperlocal.Targets.XiPacket.JetQuotOp.σ3 s) *
+              (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ) = 0) :
     Hyperlocal.Conclusion.OffSeedToTAC.Stage3Bridge Xi := by
-  exact Hyperlocal.Transport.stage3Bridge_of_phaseLock (H := Xi) xi_phaseLock
+  exact Hyperlocal.Transport.stage3Bridge_of_phaseLock (H := Xi) (xi_phaseLock hroute)
 
 end Targets
 end Hyperlocal

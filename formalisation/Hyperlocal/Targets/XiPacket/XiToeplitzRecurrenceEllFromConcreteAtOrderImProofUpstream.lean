@@ -17,6 +17,8 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+
+  plus the explicit Route-A scalar-zero payload required by the `wc` branch.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
@@ -72,7 +74,11 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (imVec3 (wp3At m s)) = 0 := by
   classical
@@ -98,7 +104,8 @@ theorem xiToeplitzEllOutAtIm_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
+      hreal0 hreal1 hreal2
+      (xiJetQuot_row0_wc_fromWcStencil (s := s) (hroute := hroute))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
@@ -138,7 +145,11 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp2At m s)) = 0 ∧
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (wp3At m s)) = 0 := by
   classical
@@ -164,7 +175,8 @@ theorem xiToeplitzEllOutAtImRe_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
+      hreal0 hreal1 hreal2
+      (xiJetQuot_row0_wc_fromWcStencil (s := s) (hroute := hroute))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
@@ -204,7 +216,11 @@ theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     Transport.ell (imVec3 (w0At m s)) (reVec3 (wc s)) (reVec3 (w0At m s)) = 0 := by
   classical
 
@@ -229,7 +245,8 @@ theorem xiToeplitzEllOutAtImRe_w0_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
+      hreal0 hreal1 hreal2
+      (xiJetQuot_row0_wc_fromWcStencil (s := s) (hroute := hroute))
 
   have hU0 : toeplitzRow3 (cOp s) (imVec3 (w0At m s)) :=
     toeplitzRow3_imVec3_of_toeplitzL_two_fin0_eq_zero (c := cOp s) (w := w0At m s) hw0_row0

@@ -17,6 +17,8 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+
+  plus the explicit Route-A scalar-zero payload required by the `wc` branch.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceIdentityRe
@@ -54,6 +56,10 @@ theorem xiToeplitzRecurrenceIdentity_atOrder_im
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0)
     (hk : kappaAtIm m s ≠ 0) :
     bCoeff (σ s) (t s) (2 : ℝ) = 0 ∧
     bCoeff (σ s) (t s) (3 : ℝ) = 0 := by
@@ -67,12 +73,14 @@ theorem xiToeplitzRecurrenceIdentity_atOrder_im
       Transport.ell U0 Uc (reVec3 (wp2At m s)) = 0 ∧
       Transport.ell U0 Uc (reVec3 (wp3At m s)) = 0 := by
     simpa [U0, Uc] using
-      (Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC (m := m) (s := s))
+      (Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_fromRecurrenceC
+        (m := m) (s := s) (hroute := hroute))
 
   have ELL_W0 :
       Transport.ell U0 Uc (reVec3 (w0At m s)) = 0 := by
     simpa [U0, Uc] using
-      (Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_w0_fromRecurrenceC (m := m) (s := s))
+      (Hyperlocal.Targets.XiPacket.xiToeplitzEllOutAtImRe_w0_fromRecurrenceC
+        (m := m) (s := s) (hroute := hroute))
 
   have hkappa : Transport.kappa U0 Uc Us ≠ 0 := by
     simpa [kappaAtIm, U0, Uc, Us] using hk
@@ -171,19 +179,25 @@ theorem xiToeplitzRecurrenceIdentity_p
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     [XiKappaPivotNonzero s]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0)
     (p : ℝ) (hp : p = (2 : ℝ) ∨ p = (3 : ℝ)) :
     bCoeff (σ s) (t s) p = 0 := by
   classical
   rcases (xiKappaPivotNonzero_out (s := s)) with hRe | hIm
   ·
     rcases hRe with ⟨m, hk⟩
-    have hb := xiToeplitzRecurrenceIdentity_atOrder (m := m) (s := s) hk
+    have hb := xiToeplitzRecurrenceIdentity_atOrder
+      (m := m) (s := s) (hroute := hroute) (hk := hk)
     rcases hp with rfl | rfl
     · exact hb.1
     · exact hb.2
   ·
     rcases hIm with ⟨m, hk⟩
-    have hb := xiToeplitzRecurrenceIdentity_atOrder_im (m := m) (s := s) hk
+    have hb := xiToeplitzRecurrenceIdentity_atOrder_im
+      (m := m) (s := s) (hroute := hroute) (hk := hk)
     rcases hp with rfl | rfl
     · exact hb.1
     · exact hb.2

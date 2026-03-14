@@ -3,22 +3,19 @@
 
   Route-C discharge of the row-0 scalar sigma goals.
 
-  IMPORTANT:
-  The canonical Move-3 theorems
-    `row0ConvolutionAtRev_w0`, `row0ConvolutionAtRev_wc`,
-    `row0ConvolutionAtRev_wp2`, `row0ConvolutionAtRev_wp3`
-  are theorem-side results that now depend on the explicit provider gate
+  The new core file
+    `XiRow0Bridge_CauchyConvolutionDischargeCore.lean`
+  exposes a direct parametric insertion point for the `wc` branch:
+  abstract coeff-3 proof in, sigma/toeplitz row-0 fact out.
 
-    [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider].
-
-  Therefore this file must carry all three gates explicitly rather than hoping
-  instance synthesis finds a global default producer.
+  This wrapper preserves the current downstream surface by feeding in the
+  existing semantic theorem for coeff-3.
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizToRow0ConvolutionRev
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeCore
+import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0Coeff3Semantic
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Mathlib.Tactic
@@ -58,8 +55,9 @@ theorem row0Sigma_w0_eq_zero (s : OffSeed Xi) : row0Sigma s (w0 s) = 0 := by
     (s := s) (z := s.ρ) (w := w0 s) (JetQuotOp.row0Conv_w0 s)
 
 theorem row0Sigma_wc_eq_zero (s : OffSeed Xi) : row0Sigma s (wc s) = 0 := by
-  exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev
-    (s := s) (z := 1 - s.ρ) (w := wc s) (JetQuotOp.row0Conv_wc s)
+  exact row0Sigma_wc_eq_zero_of_coeff3
+    (s := s)
+    (h3 := row0ConvCoeff3_eq_zero_wc (s := s))
 
 theorem row0Sigma_wp2_eq_zero (s : OffSeed Xi) : row0Sigma s (wp2 s) = 0 := by
   exact row0Sigma_eq_zero_from_Row0ConvolutionAtRev

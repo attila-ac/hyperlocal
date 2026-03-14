@@ -68,9 +68,17 @@ theorem routeA_recurrence_at_one_sub_rho_of_row0Frontier_wc
 
 /--
 Wrapper using the current thin public seam.
+
+Since `xiJetQuot_row0_wc_spec` now takes the Route-A scalar zero as an
+explicit argument, this wrapper must thread that argument through.
 -/
 theorem routeA_recurrence_at_one_sub_rho_from_row0Frontier_wc
-    (s : OffSeed Xi) :
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
       2 * deriv (deriv (routeA_G s)) (1 - s.ρ)
         =
       (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
@@ -78,7 +86,7 @@ theorem routeA_recurrence_at_one_sub_rho_from_row0Frontier_wc
       (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) := by
   exact routeA_recurrence_at_one_sub_rho_of_row0Frontier_wc
     (s := s)
-    (ht := xiJetQuot_row0_wc_spec (s := s))
+    (ht := xiJetQuot_row0_wc_spec (s := s) (hroute := hroute))
 
 end XiPacket
 end Targets

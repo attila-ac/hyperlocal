@@ -17,6 +17,7 @@
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
       [RouteAWcScalarProvider]
+      plus the explicit Route-A scalar-zero payload for the `wc` branch
 -/
 
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceOutAtOrder
@@ -110,7 +111,11 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
     (m : ℕ) (s : Hyperlocal.OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     XiToeplitzEllOutAt m s := by
   classical
 
@@ -135,7 +140,8 @@ theorem xiToeplitzEllOutAt_fromRecurrenceC_proof
 
   have hwc_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wc s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wc s)
-      hreal0 hreal1 hreal2 (xiJetQuot_row0_wc_fromWcStencil (s := s))
+      hreal0 hreal1 hreal2
+      (xiJetQuot_row0_wc_fromWcStencil (s := s) (hroute := hroute))
 
   have hwp2_row0 : (toeplitzL 2 (coeffsNat3 (cOp s)) (wp2At m s)) (0 : Fin 3) = 0 :=
     row0_eq_zero_of_op_row0_eq_zero (s := s) (w := wp2At m s)
