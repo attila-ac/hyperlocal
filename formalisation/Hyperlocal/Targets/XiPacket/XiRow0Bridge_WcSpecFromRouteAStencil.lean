@@ -1,4 +1,5 @@
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -13,6 +14,7 @@ open Hyperlocal.Cancellation
 
 theorem xiJetQuot_row0_wc_fromStencil
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider] :
     row0Sigma s (wc s) = 0 := by

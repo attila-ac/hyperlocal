@@ -3,6 +3,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcretePr
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SigmaFromRec2_Parametric
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWcStencil
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -13,6 +14,7 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 variable [XiAtOrderSigmaProvider]
 variable [XiAtOrderCoords01Provider]

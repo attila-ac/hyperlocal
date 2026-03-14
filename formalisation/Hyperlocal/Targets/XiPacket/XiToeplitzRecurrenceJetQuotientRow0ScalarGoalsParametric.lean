@@ -5,6 +5,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischargeFromWc
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SigmaFromRec2_Parametric
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -17,8 +18,10 @@ namespace XiPacket
 open Complex
 open scoped BigOperators
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
-variable [XiAtOrderSigmaProvider] [XiAtOrderCoords01Provider]
+variable [XiAtOrderSigmaProvider]
+variable [XiAtOrderCoords01Provider]
 variable [RouteAWcScalarProvider]
 
 noncomputable def xiJetQuot_row0_scalarGoals_parametric

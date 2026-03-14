@@ -3,23 +3,16 @@
 
   Upstream proof for the Row0 frontier `wc` spec fact.
 
-  IMPORTANT:
-  This version avoids `XiToeplitzRecurrenceJetQuotientRow0ConcreteExtract`
-  and instead uses the constructive scalar-goals witness route.
-
-  Since `xiJetQuot_row0_scalarGoals` is now gated by the installed provider
-  surfaces, this file must carry those gates explicitly.
-
-  Honest gates:
-    [XiAtOrderSigmaProvider]
-    [XiAtOrderCoords01Provider]
-    [TAC.XiJetWindowEqAtOrderQuotProvider]
+  POLICY:
+  * do NOT use the scalar-goals witness route here anymore
+  * consume the parallel theorem-side concrete `wc` producer directly
+  * this file is allowed to be theorem-gated
 -/
 
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0Analytic
-import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProvider
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderCoords01Provider
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -30,16 +23,15 @@ namespace XiPacket
 
 open Hyperlocal.Transport
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [XiAtOrderSigmaProvider]
 variable [XiAtOrderCoords01Provider]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+variable [RouteAWcScalarProvider]
 
 theorem xiJetQuot_row0_wc_spec_proof (s : OffSeed Xi) :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
-  let g : XiJetQuotRow0ScalarGoals s := xiJetQuot_row0_scalarGoals (s := s)
-  let h : _root_.Hyperlocal.Targets.XiPacket.XiJetQuotRow0WitnessC s :=
-    witnessC_of_scalarGoals (s := s) g
-  exact h.hop_wc
+  simpa using xiJetQuot_row0_wc_fromWcStencil (s := s)
 
 end XiPacket
 end Targets

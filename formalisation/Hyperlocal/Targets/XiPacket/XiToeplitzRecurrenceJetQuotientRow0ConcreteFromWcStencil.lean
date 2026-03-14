@@ -48,6 +48,7 @@ theorem xiJetQuot_row0_w0_fromWcStencil
 
 theorem xiJetQuot_row0_wc_fromWcStencil
     (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider] :
     (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by

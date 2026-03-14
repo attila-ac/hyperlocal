@@ -12,6 +12,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFr
 import Hyperlocal.Targets.XiPacket.XiWindowDefs
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientOperatorDefs
 import Hyperlocal.Transport.TACToeplitz
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -37,7 +38,9 @@ inductive XiJetQuotCanonicalWindowFromWcStencil
 
 section
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+variable [RouteAWcScalarProvider]
 
 theorem xiJetQuot_row0_of_canonical_fromWcStencil
     (s : Hyperlocal.OffSeed Xi) {w : Window 3} :

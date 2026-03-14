@@ -22,6 +22,7 @@
 
       [XiJetQuotRec2AtOrderTrueAnalytic]
       [TAC.XiJetWindowEqAtOrderQuotProvider]
+      [RouteAWcScalarProvider]
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_JetLeibnizAtFromRouteA_Theorem
@@ -50,7 +51,8 @@ open Hyperlocal.Cancellation
 theorem row0ConvolutionAtRev_w0
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     Row0ConvolutionAtRev s (s.ρ) (w0 s) := by
   have hL : JetLeibnizAt s (s.ρ) (w0 s) :=
     JetQuotOpTheorem.xiJetLeibnizAt_w0 (s := s)
@@ -62,7 +64,8 @@ theorem row0ConvolutionAtRev_w0
 theorem row0ConvolutionAtRev_wc
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     Row0ConvolutionAtRev s (1 - s.ρ) (wc s) := by
   have hL : JetLeibnizAt s (1 - s.ρ) (wc s) :=
     JetQuotOpTheorem.xiJetLeibnizAt_wc (s := s)
@@ -74,7 +77,8 @@ theorem row0ConvolutionAtRev_wc
 theorem row0ConvolutionAtRev_wp2
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2 s) := by
   have hL : JetLeibnizAt s ((starRingEnd ℂ) s.ρ) (wp2 s) :=
     JetQuotOpTheorem.xiJetLeibnizAt_wp2 (s := s)
@@ -86,7 +90,8 @@ theorem row0ConvolutionAtRev_wp2
 theorem row0ConvolutionAtRev_wp3
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) := by
   have hL : JetLeibnizAt s (1 - (starRingEnd ℂ) s.ρ) (wp3 s) :=
     JetQuotOpTheorem.xiJetLeibnizAt_wp3 (s := s)

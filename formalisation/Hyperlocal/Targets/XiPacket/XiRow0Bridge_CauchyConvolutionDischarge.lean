@@ -10,9 +10,10 @@
   are theorem-side results that now depend on the explicit provider gate
 
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider].
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider].
 
-  Therefore this file must carry both gates explicitly rather than hoping
+  Therefore this file must carry all three gates explicitly rather than hoping
   instance synthesis finds a global default producer.
 -/
 
@@ -32,6 +33,7 @@ open scoped BigOperators
 
 variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
+variable [RouteAWcScalarProvider]
 
 namespace JetQuotOp
 

@@ -41,28 +41,32 @@ open Hyperlocal.Cancellation
 theorem row0ConvCoeff3_eq_zero_w0
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_w0 (s := s))
 
 theorem row0ConvCoeff3_eq_zero_wc
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wc (s := s))
 
 theorem row0ConvCoeff3_eq_zero_wp2
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wp2 (s := s))
 
 theorem row0ConvCoeff3_eq_zero_wp3
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3 s)) 3 = 0 := by
   simpa using (row0ConvCoeff3_wp3 (s := s))
 

@@ -3,6 +3,7 @@ import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcretePr
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0SigmaFromRec2_Parametric
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyConvolutionDischarge
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticInterface
 
 set_option autoImplicit false
 noncomputable section
@@ -13,13 +14,16 @@ open Complex
 open scoped BigOperators
 open Hyperlocal.Transport
 
+variable [XiJetQuotRec2AtOrderTrueAnalytic]
 variable [TAC.XiJetWindowEqAtOrderQuotProvider]
 variable [XiAtOrderSigmaProvider]
 variable [XiAtOrderCoords01Provider]
+variable [RouteAWcScalarProvider]
 
 /--
 Analytic row0 scalar goals using the **clean Rec2 trio route**.
-`wc` remains on the legacy surface for now.
+The `wc` lane now honestly carries the same theorem-side gate as the
+retargeted Route-C discharge surface.
 -/
 noncomputable def xiJetQuot_row0_scalarGoals_analytic
     (s : OffSeed Xi) :
@@ -27,7 +31,6 @@ noncomputable def xiJetQuot_row0_scalarGoals_analytic
   hw0 :=
     row0Sigma_w0_eq_zero_fromRec2_parametric s
   hwc :=
-    -- still legacy for now
     Hyperlocal.Targets.XiPacket.row0Sigma_wc_eq_zero s
   hwp2 :=
     row0Sigma_wp2_eq_zero_fromRec2_parametric s
