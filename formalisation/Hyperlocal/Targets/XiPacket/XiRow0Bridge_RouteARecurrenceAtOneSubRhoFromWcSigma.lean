@@ -66,6 +66,22 @@ theorem routeA_recurrence_at_one_sub_rho_of_row0Frontier_wc
           rw [hs1]
           ring
 
+theorem routeA_recurrence_at_one_sub_rho_of_row0Sigma_wc
+    (s : OffSeed Xi)
+    (hsigma : row0Sigma s (wc s) = 0) :
+      2 * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        =
+      (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        -
+      (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) := by
+  have ht : (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
+    rw [toeplitzL_row0_eq_row0Sigma (s := s) (w := wc s)]
+    exact hsigma
+  exact routeA_recurrence_at_one_sub_rho_of_row0Frontier_wc
+    (s := s)
+    (ht := ht)
+
+
 /--
 Wrapper using the current thin public seam.
 

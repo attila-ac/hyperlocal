@@ -5,9 +5,9 @@
 
   POLICY:
   * w0/wp2/wp3 come from the parametric core
-  * wc is currently supplied by the Route-A scalar wrapper
-  * that wrapper is intentionally tiny, so a future independent wc theorem
-    can replace it with a one-line swap
+  * wc is now honestly theorem-gated on the Route-A scalar stencil
+  * do NOT fake a closed `wc` surface here until there is a genuinely independent
+    producer for it
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_Row0Coeff3ExtractorCore
@@ -41,7 +41,16 @@ theorem row0ConvCoeff3_w0 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
   simpa using row0ConvCoeff3_w0_core (s := s)
 
-theorem row0ConvCoeff3_wc (s : OffSeed Xi) :
+/--
+The `wc` lane is honestly theorem-gated on the Route-A scalar stencil.
+This removes the bad zero-argument use of `routeA_stencil_zero`.
+-/
+theorem row0ConvCoeff3_wc
+    (s : OffSeed Xi)
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
   exact
     row0ConvCoeff3_wc_core
@@ -49,7 +58,9 @@ theorem row0ConvCoeff3_wc (s : OffSeed Xi) :
       (h3 :=
         row0ConvCoeff3_wc_of_routeA_scalar
           (s := s)
-          (hroute := routeA_stencil_zero (s := s)))
+          (hroute := routeA_stencil_zero
+            (s := s)
+            (hroute := hroute)))
 
 theorem row0ConvCoeff3_wp2 (s : OffSeed Xi) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by

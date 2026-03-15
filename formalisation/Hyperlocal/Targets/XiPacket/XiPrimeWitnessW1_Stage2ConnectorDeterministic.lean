@@ -181,7 +181,8 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
 
   have hc : c ≠ 0 := by
     intro hcz
-    have : c (2 : Fin 3) = 0 := by simpa [hcz]
+    have : c (2 : Fin 3) = 0 := by
+      simp [hcz]
     have h2re : (JetQuotOp.aRk1 s 2).re = (-2 : ℝ) := by
       simpa [JetQuotOp.aRk1_nat2_eq_neg_two (s := s)]
     simpa [c, h2re] using this
@@ -201,14 +202,15 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
       apply Complex.ext <;> simp [JetQuotOp.aRk1_im2 (s := s)]
     simpa [ToeplitzLToRow3.coeffsNat3, c, hre]
 
+
   have htoe_eq (w : Transport.Window 3) :
       toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) w
         = toeplitzL 2 (JetQuotOp.aRk1 s) w := by
     funext i
     fin_cases i
     · simp [toeplitzL_two_apply_fin0, hcoeff0, hcoeff1, hcoeff2]
-    · simp [toeplitzL_two_apply_fin1, hcoeff0, hcoeff1, hcoeff2]
-    · simp [toeplitzL_two_apply_fin2, hcoeff0, hcoeff1, hcoeff2]
+    · simp [toeplitzL_two_apply_fin1, hcoeff0, hcoeff1]
+    · simp [toeplitzL_two_apply_fin2, hcoeff0]
 
   have hw0 : toeplitzL 2 (ToeplitzLToRow3.coeffsNat3 c) (w0At m s) = 0 := by
     simpa [htoe_eq (w := w0At m s)] using Hop.hop_w0At
@@ -227,12 +229,14 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
   have hwp2exp :
       wp2At m s = w0At m s + A2 • wc s + B2 • ws s := by
     funext i
-    simp [wp2At_apply, A2, B2, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
+    simp [wp2At_apply, A2, B2]
+    ring_nf
 
   have hwp3exp :
       wp3At m s = w0At m s + A3 • wc s + B3 • ws s := by
     funext i
-    simp [wp3At_apply, A3, B3, add_assoc, add_left_comm, add_comm, mul_assoc, mul_comm, mul_left_comm]
+    simp [wp3At_apply, A3, B3]
+    ring_nf
 
   have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
     simpa [A2, B2, A3, B3, sub_eq_add_neg] using
@@ -251,6 +255,57 @@ theorem toeplitzL_wc_of_Fwp2_Fwp3_zero
         (hdet := hdet))
 
   exact ⟨c, hc, hwc⟩
+
+/--
+W1 generic branch:
+if the explicit two-prime determinant micro-gate is nonzero, then the actual
+Jet-Quotient Toeplitz operator annihilates `wc s`.
+-/
+theorem toeplitzL_aRk1_wc_eq_zero_of_tval_ne_zero
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (htv :
+      ((Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
+    toeplitzL 2 (JetQuotOp.aRk1 s) (wc s) = 0 := by
+  classical
+
+  let Hop : XiJetQuotOpZeroAtOrder m s :=
+    xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
+
+  let A2 : ℂ := (aCoeff (σ s) (t s) (2 : ℝ) : ℂ)
+  let B2 : ℂ := (bCoeff (σ s) (t s) (2 : ℝ) : ℂ)
+  let A3 : ℂ := (aCoeff (σ s) (t s) (3 : ℝ) : ℂ)
+  let B3 : ℂ := (bCoeff (σ s) (t s) (3 : ℝ) : ℂ)
+
+  have hwp2exp :
+      wp2At m s = w0At m s + A2 • wc s + B2 • ws s := by
+    funext i
+    simp [wp2At_apply, A2, B2]
+    ring_nf
+
+  have hwp3exp :
+      wp3At m s = w0At m s + A3 • wc s + B3 • ws s := by
+    funext i
+    simp [wp3At_apply, A3, B3]
+    ring_nf
+
+  have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
+    simpa [A2, B2, A3, B3, sub_eq_add_neg] using
+      (W1.det23C_ne_zero_of_tval_ne_zero (σ := σ s) (t := t s) htv)
+
+  simpa [A2, B2, A3, B3] using
+    (wc_eq_zero_of_three_zeros_and_det
+      (coeffs := JetQuotOp.aRk1 s)
+      (w0 := w0At m s) (wc := wc s) (ws := ws s)
+      (wp2 := wp2At m s) (wp3 := wp3At m s)
+      (A2 := A2) (B2 := B2) (A3 := A3) (B3 := B3)
+      (hw0 := Hop.hop_w0At)
+      (hwp2 := Hop.hop_wp2At)
+      (hwp3 := Hop.hop_wp3At)
+      (hwp2exp := hwp2exp)
+      (hwp3exp := hwp3exp)
+      (hdet := hdet))
 
 end W1
 

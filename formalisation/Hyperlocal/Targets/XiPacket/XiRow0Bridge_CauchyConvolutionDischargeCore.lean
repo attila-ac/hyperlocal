@@ -57,6 +57,16 @@ theorem toeplitz_row0_wc_eq_zero_of_coeff3
     (w := wc s)
     (row0Sigma_wc_eq_zero_of_coeff3 (s := s) (h3 := h3))
 
+theorem toeplitz_row0_wc_eq_zero_of_row0Sigma_wc_zero
+    (s : OffSeed Xi)
+    (hsigma : row0Sigma s (wc s) = 0) :
+    (toeplitzL 2 (JetQuotOp.aRk1 s) (wc s)) (0 : Fin 3) = 0 := by
+  exact toeplitz_row0_eq_zero_of_row0Sigma_eq_zero
+    (s := s)
+    (w := wc s)
+    hsigma
+
+
 end XiPacket
 end Targets
 end Hyperlocal

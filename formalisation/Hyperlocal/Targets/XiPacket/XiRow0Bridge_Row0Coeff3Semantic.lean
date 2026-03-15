@@ -7,16 +7,9 @@
   This layer must stay extractor-only and must NOT import
   Route-A stencil files, otherwise we create a cycle.
 
-  The `wc` theorem therefore stays on the extractor route.
-  The clean Route-A theorem is consumed downstream instead.
-
-  2026-03-13 honest post-axiom state:
-  * the upstream coeff-3 extractor is now theorem-gated
-  * therefore these semantic exports can no longer remain assumption-free
-  * they must expose the honest theorem-side gate
-
-      [XiJetQuotRec2AtOrderTrueAnalytic]
-      [TAC.XiJetWindowEqAtOrderQuotProvider]
+  Honest current status:
+  * the upstream coeff-3 extractor is theorem-gated on the `wc` branch
+  * therefore the `wc` semantic export must expose the same theorem-side gate
 -/
 
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_CauchyProductAttempt
@@ -44,15 +37,19 @@ theorem row0ConvCoeff3_eq_zero_w0
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (w0 s)) 3 = 0 := by
-  simpa using (row0ConvCoeff3_w0 (s := s))
+  simpa using (row0ConvCoeff3_w0 s)
 
 theorem row0ConvCoeff3_eq_zero_wc
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
-    [RouteAWcScalarProvider] :
+    [RouteAWcScalarProvider]
+    (hroute :
+      (-2 : ℂ) * deriv (deriv (routeA_G s)) (1 - s.ρ)
+        + (JetQuotOp.σ2 s) * deriv (routeA_G s) (1 - s.ρ)
+        - (JetQuotOp.σ3 s) * (routeA_G s) (1 - s.ρ) = 0) :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wc s)) 3 = 0 := by
-  simpa using (row0ConvCoeff3_wc (s := s))
+  simpa using (row0ConvCoeff3_wc s hroute)
 
 theorem row0ConvCoeff3_eq_zero_wp2
     (s : OffSeed Xi)
@@ -60,7 +57,7 @@ theorem row0ConvCoeff3_eq_zero_wp2
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp2 s)) 3 = 0 := by
-  simpa using (row0ConvCoeff3_wp2 (s := s))
+  simpa using (row0ConvCoeff3_wp2 s)
 
 theorem row0ConvCoeff3_eq_zero_wp3
     (s : OffSeed Xi)
@@ -68,7 +65,7 @@ theorem row0ConvCoeff3_eq_zero_wp3
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider] :
     convCoeff (row0CoeffSeqRev s) (winSeqRev (wp3 s)) 3 = 0 := by
-  simpa using (row0ConvCoeff3_wp3 (s := s))
+  simpa using (row0ConvCoeff3_wp3 s)
 
 namespace Row0Coeff3SemanticExport
 export _root_.Hyperlocal.Targets.XiPacket
