@@ -41,16 +41,28 @@ by the true recurrence extraction theorem, this Gate becomes axiom-free
 without changing downstream code.
 -/
 theorem xiJetQuotRow0AtOrderConvolutionOut_axiom
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0AtOrderConvolutionOut m s := by
   exact xiJetQuotRow0AtOrderConvolutionOut_fromAnalytic (m := m) (s := s)
 
 theorem xiJetQuotRow0AtOrderConvolutionOut
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0AtOrderConvolutionOut m s := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0AtOrderConvolutionOut m s := by
   exact xiJetQuotRow0AtOrderConvolutionOut_axiom (m := m) (s := s)
 
 /-- Scalar goals derived from the convolution gate. -/
 noncomputable def xiJetQuotRow0ScalarGoalsAtOrder_fromGate
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ScalarGoalsAtOrder m s := by
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0ScalarGoalsAtOrder m s := by
   classical
   have H := xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)
   refine ⟨?_, ?_, ?_⟩
@@ -66,7 +78,11 @@ noncomputable def xiJetQuotRow0ScalarGoalsAtOrder_fromGate
 
 /-- Concrete extraction witness derived from the scalar goals. -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromGate
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0ConcreteExtractAtOrder m s :=
   extractAtOrder_of_scalarGoals (m := m) (s := s)
     (xiJetQuotRow0ScalarGoalsAtOrder_fromGate (m := m) (s := s))
 

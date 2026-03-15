@@ -25,17 +25,29 @@ open Complex
 open Hyperlocal.Transport
 
 /-- Build `Row0ConvolutionAtRev` for `w0At`. -/
-theorem row0ConvolutionAtRev_w0At (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_w0At
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (s.ρ) (w0At m s) := by
   exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hw0At
 
 /-- Build `Row0ConvolutionAtRev` for `wp2At`. -/
-theorem row0ConvolutionAtRev_wp2At (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_wp2At
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
   exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hwp2At
 
 /-- Build `Row0ConvolutionAtRev` for `wp3At`. -/
-theorem row0ConvolutionAtRev_wp3At (m : ℕ) (s : OffSeed Xi) :
+theorem row0ConvolutionAtRev_wp3At
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiAtOrderSigmaProvider]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
   exact (xiJetQuotRow0AtOrderConvolutionOut (m := m) (s := s)).hwp3At
 

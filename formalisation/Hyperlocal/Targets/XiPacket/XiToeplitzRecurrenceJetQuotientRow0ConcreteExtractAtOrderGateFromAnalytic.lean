@@ -22,12 +22,16 @@ open Hyperlocal.Cancellation
 
 /-- Local alias: the Route–B endpoint feeding the AtOrder Gate glue (Type-valued, so `def`). -/
 noncomputable def xiJetQuotRow0ConcreteExtractAtOrder_fromAnalytic
-    (m : ℕ) (s : OffSeed Xi) : XiJetQuotRow0ConcreteExtractAtOrder m s :=
+    (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    XiJetQuotRow0ConcreteExtractAtOrder m s :=
   xiJetQuotRow0ConcreteExtractAtOrder_fromRecurrenceB (m := m) (s := s)
 
 /-- Build `Row0ConvolutionAtRev` for `w0At m s` from the analytic Toeplitz witness. -/
 theorem row0ConvolutionAtRev_w0At_fromAnalytic
     (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [XiAtOrderSigmaProvider]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (s.ρ) (w0At m s) := by
@@ -49,6 +53,7 @@ theorem row0ConvolutionAtRev_w0At_fromAnalytic
 /-- Build `Row0ConvolutionAtRev` for `wp2At m s` from the analytic Toeplitz witness. -/
 theorem row0ConvolutionAtRev_wp2At_fromAnalytic
     (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [XiAtOrderSigmaProvider]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s ((starRingEnd ℂ) s.ρ) (wp2At m s) := by
@@ -70,6 +75,7 @@ theorem row0ConvolutionAtRev_wp2At_fromAnalytic
 /-- Build `Row0ConvolutionAtRev` for `wp3At m s` from the analytic Toeplitz witness. -/
 theorem row0ConvolutionAtRev_wp3At_fromAnalytic
     (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [XiAtOrderSigmaProvider]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     Row0ConvolutionAtRev s (1 - (starRingEnd ℂ) s.ρ) (wp3At m s) := by
@@ -91,6 +97,7 @@ theorem row0ConvolutionAtRev_wp3At_fromAnalytic
 /-- Package the three AtOrder Row--0 convolution facts (discharged from analytic Toeplitz witness). -/
 theorem xiJetQuotRow0AtOrderConvolutionOut_fromAnalytic
     (m : ℕ) (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
     [XiAtOrderSigmaProvider]
     [TAC.XiJetWindowEqAtOrderQuotProvider] :
     XiJetQuotRow0AtOrderConvolutionOut m s := by

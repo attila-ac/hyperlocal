@@ -307,6 +307,191 @@ theorem toeplitzL_aRk1_wc_eq_zero_of_tval_ne_zero
       (hwp3exp := hwp3exp)
       (hdet := hdet))
 
+/--
+Under the same three-zero + determinant package, the Toeplitz operator also
+annihilates `ws`.
+-/
+private lemma ws_eq_zero_of_three_zeros_and_det
+    (coeffs : ℕ → ℂ)
+    (w0 wc ws wp2 wp3 : Transport.Window 3)
+    (A2 B2 A3 B3 : ℂ)
+    (hw0  : toeplitzL 2 coeffs w0  = 0)
+    (hwp2 : toeplitzL 2 coeffs wp2 = 0)
+    (hwp3 : toeplitzL 2 coeffs wp3 = 0)
+    (hwp2exp : wp2 = w0 + A2 • wc + B2 • ws)
+    (hwp3exp : wp3 = w0 + A3 • wc + B3 • ws)
+    (hdet : A2 * B3 - A3 * B2 ≠ 0) :
+    toeplitzL 2 coeffs ws = 0 := by
+  classical
+  let L : (Transport.Window 3) →ₗ[ℂ] (Transport.Window 3) := toeplitzLM coeffs
+
+  have hwc : toeplitzL 2 coeffs wc = 0 := by
+    exact wc_eq_zero_of_three_zeros_and_det
+      (coeffs := coeffs)
+      (w0 := w0) (wc := wc) (ws := ws) (wp2 := wp2) (wp3 := wp3)
+      (A2 := A2) (B2 := B2) (A3 := A3) (B3 := B3)
+      (hw0 := hw0) (hwp2 := hwp2) (hwp3 := hwp3)
+      (hwp2exp := hwp2exp) (hwp3exp := hwp3exp)
+      (hdet := hdet)
+
+  have hwc' : L wc = 0 := by
+    simpa [L, toeplitzLM] using hwc
+
+  have eq2 : A2 • (L wc) + B2 • (L ws) = 0 := by
+    have hlin :
+        L wp2 = L w0 + (A2 • (L wc) + B2 • (L ws)) := by
+      calc
+        L wp2 = L (w0 + A2 • wc + B2 • ws) := by
+          simpa [hwp2exp]
+        _ = L w0 + L (A2 • wc + B2 • ws) := by
+          simp [map_add, add_assoc]
+        _ = L w0 + (A2 • (L wc) + B2 • (L ws)) := by
+          simp [map_add, map_smul]
+    have hwp2' : L wp2 = 0 := by simpa [L, toeplitzLM] using hwp2
+    have hw0' : L w0 = 0 := by simpa [L, toeplitzLM] using hw0
+    have : L w0 + (A2 • (L wc) + B2 • (L ws)) = 0 := by
+      simpa [hlin] using hwp2'
+    simpa [hw0'] using this
+
+  have eq3 : A3 • (L wc) + B3 • (L ws) = 0 := by
+    have hlin :
+        L wp3 = L w0 + (A3 • (L wc) + B3 • (L ws)) := by
+      calc
+        L wp3 = L (w0 + A3 • wc + B3 • ws) := by
+          simpa [hwp3exp]
+        _ = L w0 + L (A3 • wc + B3 • ws) := by
+          simp [map_add, add_assoc]
+        _ = L w0 + (A3 • (L wc) + B3 • (L ws)) := by
+          simp [map_add, map_smul]
+    have hwp3' : L wp3 = 0 := by simpa [L, toeplitzLM] using hwp3
+    have hw0' : L w0 = 0 := by simpa [L, toeplitzLM] using hw0
+    have : L w0 + (A3 • (L wc) + B3 • (L ws)) = 0 := by
+      simpa [hlin] using hwp3'
+    simpa [hw0'] using this
+
+  have hB : B2 ≠ 0 ∨ B3 ≠ 0 := by
+    by_contra hB
+    push_neg at hB
+    have hdet0 : A2 * B3 - A3 * B2 = 0 := by
+      simp [hB.1, hB.2]
+    exact hdet hdet0
+
+  cases hB with
+  | inl hB2 =>
+      have h : B2 • (L ws) = 0 := by
+        simpa [hwc'] using eq2
+      rcases smul_eq_zero.mp h with h0 | hws
+      · exact False.elim (hB2 (by simpa using h0))
+      · simpa [L, toeplitzLM] using hws
+  | inr hB3 =>
+      have h : B3 • (L ws) = 0 := by
+        simpa [hwc'] using eq3
+      rcases smul_eq_zero.mp h with h0 | hws
+      · exact False.elim (hB3 (by simpa using h0))
+      · simpa [L, toeplitzLM] using hws
+
+/--
+W1 generic branch:
+if the explicit two-prime determinant micro-gate is nonzero, then the actual
+Jet-Quotient Toeplitz operator also annihilates `ws s`.
+-/
+theorem toeplitzL_aRk1_ws_eq_zero_of_tval_ne_zero
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (htv :
+      ((Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
+    toeplitzL 2 (JetQuotOp.aRk1 s) (ws s) = 0 := by
+  classical
+
+  let Hop : XiJetQuotOpZeroAtOrder m s :=
+    xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
+
+  let A2 : ℂ := (aCoeff (σ s) (t s) (2 : ℝ) : ℂ)
+  let B2 : ℂ := (bCoeff (σ s) (t s) (2 : ℝ) : ℂ)
+  let A3 : ℂ := (aCoeff (σ s) (t s) (3 : ℝ) : ℂ)
+  let B3 : ℂ := (bCoeff (σ s) (t s) (3 : ℝ) : ℂ)
+
+  have hwp2exp :
+      wp2At m s = w0At m s + A2 • wc s + B2 • ws s := by
+    funext i
+    simp [wp2At_apply, A2, B2]
+    ring_nf
+
+  have hwp3exp :
+      wp3At m s = w0At m s + A3 • wc s + B3 • ws s := by
+    funext i
+    simp [wp3At_apply, A3, B3]
+    ring_nf
+
+  have hdet : A2 * B3 - A3 * B2 ≠ 0 := by
+    simpa [A2, B2, A3, B3, sub_eq_add_neg] using
+      (W1.det23C_ne_zero_of_tval_ne_zero (σ := σ s) (t := t s) htv)
+
+  simpa [A2, B2, A3, B3] using
+    (ws_eq_zero_of_three_zeros_and_det
+      (coeffs := JetQuotOp.aRk1 s)
+      (w0 := w0At m s) (wc := wc s) (ws := ws s)
+      (wp2 := wp2At m s) (wp3 := wp3At m s)
+      (A2 := A2) (B2 := B2) (A3 := A3) (B3 := B3)
+      (hw0 := Hop.hop_w0At)
+      (hwp2 := Hop.hop_wp2At)
+      (hwp3 := Hop.hop_wp3At)
+      (hwp2exp := hwp2exp)
+      (hwp3exp := hwp3exp)
+      (hdet := hdet))
+
+/--
+W1 generic branch:
+if the explicit two-prime determinant micro-gate is nonzero, then the actual
+Jet-Quotient Toeplitz operator annihilates every prime window `wpAt m s p`.
+-/
+theorem toeplitzL_aRk1_wpAt_eq_zero_of_tval_ne_zero
+    (m : ℕ) (s : Hyperlocal.OffSeed Xi) (p : ℕ)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (htv :
+      ((Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
+    toeplitzL 2 (JetQuotOp.aRk1 s) (wpAt m s p) = 0 := by
+  classical
+
+  let Hop : XiJetQuotOpZeroAtOrder m s :=
+    xiJetQuotOpZeroAtOrder_theorem (m := m) (s := s)
+
+  let A : ℂ := (aCoeff (σ s) (t s) (p : ℝ) : ℂ)
+  let B : ℂ := (bCoeff (σ s) (t s) (p : ℝ) : ℂ)
+  let L : (Transport.Window 3) →ₗ[ℂ] (Transport.Window 3) :=
+    toeplitzLM (JetQuotOp.aRk1 s)
+
+  have hwc :
+      toeplitzL 2 (JetQuotOp.aRk1 s) (wc s) = 0 :=
+    toeplitzL_aRk1_wc_eq_zero_of_tval_ne_zero (m := m) (s := s) htv
+
+  have hws :
+      toeplitzL 2 (JetQuotOp.aRk1 s) (ws s) = 0 :=
+    toeplitzL_aRk1_ws_eq_zero_of_tval_ne_zero (m := m) (s := s) htv
+
+  have hwp_exp :
+      wpAt m s p = w0At m s + A • wc s + B • ws s := by
+    funext i
+    simp [wpAt_apply, A, B]
+    ring_nf
+
+  have hw0' : L (w0At m s) = 0 := by
+    simpa [L, toeplitzLM] using Hop.hop_w0At
+
+  have hwc' : L (wc s) = 0 := by
+    simpa [L, toeplitzLM] using hwc
+
+  have hws' : L (ws s) = 0 := by
+    simpa [L, toeplitzLM] using hws
+
+  have hzero : L (wpAt m s p) = 0 := by
+    rw [hwp_exp, map_add, map_add, map_smul, map_smul, hw0', hwc', hws']
+    simp
+
+  simpa [L, toeplitzLM] using hzero
+
 end W1
 
 end XiPacket

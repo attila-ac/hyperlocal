@@ -1,7 +1,8 @@
 /-
   Hyperlocal/Targets/XiPacket/XiPrimeWitnessW1_Stage2Data_WireFromToeplitz.lean
 
-  W1 Stage-2 wiring milestone (Option A):
+  W1 Stage-2 wiring milestone (actual-prime family):
+
   Provide the *data layer* for the W1 interface:
     * generator family c : PrimeIdx → Window 3
     * linear map F : Window 3 →ₗ[ℂ] Window 3
@@ -10,12 +11,14 @@
   * Extractor-free.
   * Endpoint-free.
   * True-analytic-friendly imports only (no extractor/frontier).
-  * Uses fallback-to-0 for primes other than 2 and 3.
 
   Concrete choices:
   * V = W = Transport.Window 3
   * F = JetQuotOp.jetQuotToeplitzOp3 s
-  * c p = wp2At m s (if p=2), wp3At m s (if p=3), else 0
+  * c p = wpAt m s p.1
+
+  This is the honest W1 family: the actual prime windows, not the legacy
+  `{2,3,0}` placeholder wiring.
 -/
 
 import Hyperlocal.AdAbsurdumSetup
@@ -40,27 +43,14 @@ abbrev Xi : ℂ → ℂ := Hyperlocal.xi
 section
 
 /--
-Stage-2 data (c,F) wired from the Toeplitz operator and the jet-pivot prime windows.
-
-Parameter `m`:
-we wire against the jet-pivot windows `wp2At m s` and `wp3At m s`.
+Stage-2 data (c,F) wired from the Toeplitz operator and the actual jet-pivot
+prime family `wpAt m s p`.
 -/
 instance instXiPrimeWitnessW1Defs_xi_fromToeplitz
     (m : ℕ) (s : Hyperlocal.OffSeed Xi) :
     XiPrimeWitnessW1Defs (R := ℂ) (V := Hyperlocal.Transport.Window 3)
       (W := Hyperlocal.Transport.Window 3) (H := Xi) s where
-  c := fun p =>
-    if hp2 : (p.1 : ℕ) = 2 then
-      -- p = 2 (as a Nat equality on the underlying value)
-      by
-        -- No `subst`: just rewrite `p.1` in the expression.
-        simpa [hp2] using (wp2At m s)
-    else if hp3 : (p.1 : ℕ) = 3 then
-      -- p = 3
-      by
-        simpa [hp3] using (wp3At m s)
-    else
-      0
+  c := fun p => wpAt m s p.1
   F := JetQuotOp.jetQuotToeplitzOp3 (s := s)
 
 end
