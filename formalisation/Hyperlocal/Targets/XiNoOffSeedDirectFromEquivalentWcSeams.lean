@@ -42,7 +42,6 @@ for every off-seed `s`.
 -/
 theorem noOffSeed_Xi_of_row0Sigma_wc_zero
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma :
@@ -64,7 +63,6 @@ Direct ζ-side transfer from equivalent form (A).
 -/
 theorem noOffSeed_Zeta_of_row0Sigma_wc_zero
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma :
@@ -85,7 +83,6 @@ Direct RH-facing export from equivalent form (A).
 -/
 theorem criticalzero_zeta_of_row0Sigma_wc_zero
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma :
@@ -101,7 +98,6 @@ theorem criticalzero_zeta_of_row0Sigma_wc_zero
 
   exact Hyperlocal.Targets.ZetaTransfer.criticalzero_zeta_bridge
     (hxi := hxi) (hζ := hζ) (hIm := hIm)
-
 /--
 Direct Xi-side endgame from equivalent form (B):
 

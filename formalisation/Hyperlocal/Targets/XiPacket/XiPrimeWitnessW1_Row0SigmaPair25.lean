@@ -1,23 +1,3 @@
-/-
-  Hyperlocal/Targets/XiPacket/XiPrimeWitnessW1_Row0SigmaPair25.lean
-
-  Second-pair W1 resonant-branch attack.
-
-  Idea:
-    * the {2,3} branch has already forced us onto exact resonance
-          sin(t log(3/2)) = 0;
-    * but exact resonance at log(3/2) implies nonresonance at log(5/2);
-    * the same 2×2 row-0 linear algebra with the pair {2,5} then forces
-          row0Sigma s (wc s) = 0.
-
-  This is the cleanest next theorem move because it attacks the preferred
-  equivalent seam
-
-      (A) row0Sigma s (wc s) = 0
-
-  directly on the exact resonant branch.
--/
-
 import Hyperlocal.Cancellation.LogFiveDivTwoLogThreeDivTwoNotRat
 import Hyperlocal.Cancellation.TwoPrimePhaseLockCore
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTrueAnalytic
@@ -173,14 +153,16 @@ theorem det25C_ne_zero_of_tval_ne_zero
   ring
 
 /--
-If the pair `{2,5}` is nonresonant, then the 2×2 row-0 system from `wp2At` and
-`wpAt ... 5` forces `row0Sigma s (wc s) = 0`.
+The pair `{2,5}` row-0 linear algebra only needs one extra local input beyond
+the canonical `w0/wp2` row-0 zeroes: namely the row-0 zero for `wpAt ... 5`.
+
+This isolates the exact remaining generic-prime burden.
 -/
-theorem row0Sigma_wc_eq_zero_of_tval25_ne_zero
+theorem row0Sigma_wc_eq_zero_of_tval25_ne_zero_of_row0_wp5
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (hwp5 : row0Sigma s (wpAt 0 s 5) = 0)
     (htv :
       ((Real.sin ((t s) * Real.log ((5 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
     row0Sigma s (wc s) = 0 := by
@@ -194,9 +176,6 @@ theorem row0Sigma_wc_eq_zero_of_tval25_ne_zero
 
   have hw0 : row0Sigma s (w0At 0 s) = 0 := sigma_w0At (m := 0) (s := s)
   have hwp2 : row0Sigma s (wp2At 0 s) = 0 := sigma_wp2At (m := 0) (s := s)
-  have hwp5 : row0Sigma s (wpAt 0 s 5) = 0 := by
-    rw [← toeplitzL_row0_eq_row0Sigma (s := s) (w := wpAt 0 s 5)]
-    exact xiJetQuot_row0_wpAt_of_trueAnalyticPrime (m := 0) (s := s) (p := 5)
 
   have hwp2exp :
       wp2At 0 s = w0At 0 s + A2 • wc s + B2 • ws s := by
@@ -251,17 +230,38 @@ theorem row0Sigma_wc_eq_zero_of_tval25_ne_zero
   simpa [x] using hx0
 
 /--
-On the exact `log(3/2)`-resonant branch, the pair `{2,5}` is automatically
-nonresonant. Hence the pair-`{2,5}` row-0 theorem closes `(A)` on the resonant
-branch.
+Class-based wrapper: the previous theorem is discharged once the generic-prime
+row-0 zero for `wpAt ... 5` is available.
 -/
-theorem row0Sigma_wc_eq_zero_of_resonant32
+theorem row0Sigma_wc_eq_zero_of_tval25_ne_zero
     (s : OffSeed Xi)
     [XiJetQuotRec2AtOrderTrueAnalytic]
     [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (htv :
+      ((Real.sin ((t s) * Real.log ((5 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0) :
+    row0Sigma s (wc s) = 0 := by
+  have hwp5 : row0Sigma s (wpAt 0 s 5) = 0 := by
+    rw [← toeplitzL_row0_eq_row0Sigma (s := s) (w := wpAt 0 s 5)]
+    exact xiJetQuot_row0_wpAt_of_trueAnalyticPrime (m := 0) (s := s) (p := 5)
+  exact row0Sigma_wc_eq_zero_of_tval25_ne_zero_of_row0_wp5
+    (s := s) (hwp5 := hwp5) (htv := htv)
+
+/--
+On the exact `log(3/2)`-resonant branch, the pair `{2,5}` is automatically
+nonresonant. Therefore any resonant-branch proof of
+
+  row0Sigma s (wpAt 0 s 5) = 0
+
+already closes the preferred seam `(A)`.
+-/
+theorem row0Sigma_wc_eq_zero_of_resonant32_of_row0_wp5
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
     (hres :
-      Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) = 0) :
+      Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) = 0)
+    (hwp5 : row0Sigma s (wpAt 0 s 5) = 0) :
     row0Sigma s (wc s) = 0 := by
   have ht0 : t s ≠ 0 := by
     simpa [XiPacket.t] using s.ht
@@ -297,7 +297,8 @@ theorem row0Sigma_wc_eq_zero_of_resonant32
         simp [mul_div_cancel_left₀, ht0] at this
         exact this
 
-      have hm_neR : (m : ℝ) ≠ 0 := by exact Int.cast_ne_zero.mpr hm0
+      have hm_neR : (m : ℝ) ≠ 0 := by
+        exact Int.cast_ne_zero.mpr hm0
 
       calc
         Real.log ((5 : ℝ) / (2 : ℝ)) / Real.log ((3 : ℝ) / (2 : ℝ))
@@ -315,7 +316,25 @@ theorem row0Sigma_wc_eq_zero_of_resonant32
       ((Real.sin ((t s) * Real.log ((5 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0 := by
     exact Complex.ofReal_ne_zero.mpr hsin25
 
-  exact row0Sigma_wc_eq_zero_of_tval25_ne_zero (s := s) htv25
+  exact row0Sigma_wc_eq_zero_of_tval25_ne_zero_of_row0_wp5
+    (s := s) (hwp5 := hwp5) (htv := htv25)
+
+/--
+Class-based wrapper of the previous resonant-branch theorem.
+-/
+theorem row0Sigma_wc_eq_zero_of_resonant32
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (hres :
+      Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) = 0) :
+    row0Sigma s (wc s) = 0 := by
+  have hwp5 : row0Sigma s (wpAt 0 s 5) = 0 := by
+    rw [← toeplitzL_row0_eq_row0Sigma (s := s) (w := wpAt 0 s 5)]
+    exact xiJetQuot_row0_wpAt_of_trueAnalyticPrime (m := 0) (s := s) (p := 5)
+  exact row0Sigma_wc_eq_zero_of_resonant32_of_row0_wp5
+    (s := s) (hres := hres) (hwp5 := hwp5)
 
 /--
 Route–A recurrence on the exact resonant branch, obtained via the second pair

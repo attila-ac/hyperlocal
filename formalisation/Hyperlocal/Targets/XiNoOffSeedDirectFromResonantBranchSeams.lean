@@ -51,7 +51,6 @@ then `NoOffSeed Xi` already follows.
 -/
 theorem noOffSeed_Xi_of_row0Sigma_wc_zero_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma_res :
@@ -77,7 +76,6 @@ theorem noOffSeed_Xi_of_row0Sigma_wc_zero_on_resonant_branch
 -/
 theorem noOffSeed_Zeta_of_row0Sigma_wc_zero_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma_res :
@@ -101,7 +99,6 @@ RH-facing export of the same resonant-branch form (A) criterion.
 -/
 theorem criticalzero_zeta_of_row0Sigma_wc_zero_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hsigma_res :
@@ -120,7 +117,6 @@ theorem criticalzero_zeta_of_row0Sigma_wc_zero_on_resonant_branch
 
   exact Hyperlocal.Targets.ZetaTransfer.criticalzero_zeta_bridge
     (hxi := hxi) (hζ := hζ) (hIm := hIm)
-
 /--
 Resonant-branch version of equivalent form (B).
 
@@ -201,6 +197,7 @@ theorem criticalzero_zeta_of_wc_coeff3_zero_on_resonant_branch
   exact Hyperlocal.Targets.ZetaTransfer.criticalzero_zeta_bridge
     (hxi := hxi) (hζ := hζ) (hIm := hIm)
 
+
 /--
 Resonant-branch version of equivalent form (C):
 
@@ -209,7 +206,6 @@ if you can prove `σ2 = 2*delta` only on the exact resonance branch, then
 -/
 theorem noOffSeed_Xi_of_sigma2_eq_two_delta_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hσ2δ_res :
@@ -217,25 +213,17 @@ theorem noOffSeed_Xi_of_sigma2_eq_two_delta_on_resonant_branch
         Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) = 0 →
         JetQuotOp.σ2 s = (2 : ℂ) * (XiTransport.delta s : ℂ)) :
     NoOffSeed Xi := by
-  have hσ2δ :
-      ∀ s : Hyperlocal.OffSeed Xi,
-        JetQuotOp.σ2 s = (2 : ℂ) * (XiTransport.delta s : ℂ) := by
-    intro s
-    by_cases hres :
-        Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) = 0
-    · exact hσ2δ_res s hres
-    · have htv :
-          ((Real.sin ((t s) * Real.log ((3 : ℝ) / (2 : ℝ))) : ℝ) : ℂ) ≠ 0 := by
-        exact Complex.ofReal_ne_zero.mpr hres
-      exact sigma2_eq_two_delta_of_tval_ne_zero (s := s) htv
-  exact noOffSeed_Xi_of_sigma2_eq_two_delta (hσ2δ := hσ2δ)
+  exact noOffSeed_Xi_of_row0Sigma_wc_zero_on_resonant_branch
+    (hsigma_res := by
+      intro s hres
+      exact row0Sigma_wc_eq_zero_of_sigma2_eq_two_delta
+        (s := s) (hσ2δ := hσ2δ_res s hres))
 
 /--
 ζ-side transfer of the same resonant-branch form (C) criterion.
 -/
 theorem noOffSeed_Zeta_of_sigma2_eq_two_delta_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hσ2δ_res :
@@ -259,7 +247,6 @@ RH-facing export of the same resonant-branch form (C) criterion.
 -/
 theorem criticalzero_zeta_of_sigma2_eq_two_delta_on_resonant_branch
     [XiJetQuotRec2AtOrderTrueAnalytic]
-    [XiJetQuotRec2AtOrderTrueAnalyticPrime]
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarProvider]
     (hσ2δ_res :
