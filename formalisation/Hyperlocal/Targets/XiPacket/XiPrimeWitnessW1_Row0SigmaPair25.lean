@@ -1,3 +1,5 @@
+import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteFromWcStencil
+import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Hyperlocal.Cancellation.LogFiveDivTwoLogThreeDivTwoNotRat
 import Hyperlocal.Cancellation.TwoPrimePhaseLockCore
 import Hyperlocal.Targets.XiPacket.XiRow0Bridge_AtOrderSigmaProviderTrueAnalytic
@@ -6,6 +8,7 @@ import Hyperlocal.Targets.XiPacket.XiRow0Bridge_RouteARecurrenceAtOneSubRhoFromW
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientRow0ConcreteProof
 import Hyperlocal.Targets.XiPacket.XiWindowJetPivot_wpAtExpand
 import Hyperlocal.Transport.PrimeTrigPacket
+import Hyperlocal.Targets.XiPacket.XiWindowKappaClosedForm
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -357,6 +360,87 @@ theorem routeA_recurrence_at_one_sub_rho_of_resonant32
     (s := s)
     (hsigma := row0Sigma_wc_eq_zero_of_resonant32 (s := s) (hres := hres))
 
+@[simp] lemma row0Sigma_ws_closed
+    (s : OffSeed Xi) :
+    row0Sigma s (ws s) = (-(2 : ℂ)) := by
+  simp [row0Sigma, ws_eq_basis, basisW3, e2]
+
+@[simp] lemma row0Sigma_wc_closed
+    (s : OffSeed Xi) :
+    row0Sigma s (wc s)
+      = (JetQuotOp.σ2 s : ℂ) - (2 : ℂ) * (XiTransport.delta s : ℂ) := by
+  simp [row0Sigma, wc_eq_basis, basisW3, e1, e2]
+  ring
+
+theorem row0Sigma_wpAt5_closed_form
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider] :
+    row0Sigma s (wpAt 0 s 5)
+      =
+    ((aCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (wc s))
+      - (2 : ℂ) * (bCoeff (σ s) (t s) (5 : ℝ)) := by
+  have hw0At : row0Sigma s (w0At 0 s) = 0 := sigma_w0At (m := 0) (s := s)
+  have hw0 : row0Sigma s (w0 s) = 0 := by
+    simpa [w0At_zero_fromWcStencil (s := s)] using hw0At
+
+  have hwp5exp :
+      wpAt 0 s 5
+        =
+      w0 s
+        + ((aCoeff (σ s) (t s) (5 : ℝ) : ℂ)) • wc s
+        + ((bCoeff (σ s) (t s) (5 : ℝ) : ℂ)) • ws s := by
+    funext i
+    simp [wpAt, w0At_zero_fromWcStencil (s := s)]
+    ring_nf
+
+  calc
+    row0Sigma s (wpAt 0 s 5)
+        =
+      row0Sigma s
+        (w0 s
+          + ((aCoeff (σ s) (t s) (5 : ℝ) : ℂ)) • wc s
+          + ((bCoeff (σ s) (t s) (5 : ℝ) : ℂ)) • ws s) := by
+            simpa [hwp5exp]
+    _ =
+      row0Sigma s (w0 s)
+        + (((aCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (wc s))
+          + ((bCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (ws s))) := by
+            rw [row0Sigma_add, row0Sigma_add, row0Sigma_smul, row0Sigma_smul]
+            ring_nf
+    _ =
+      ((aCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (wc s))
+        + ((bCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (ws s)) := by
+            simp [hw0]
+    _ =
+      ((aCoeff (σ s) (t s) (5 : ℝ) : ℂ) * row0Sigma s (wc s))
+        - (2 : ℂ) * (bCoeff (σ s) (t s) (5 : ℝ)) := by
+            have hws : row0Sigma s (ws s) = (-(2 : ℂ)) :=
+              row0Sigma_ws_closed (s := s)
+            rw [hws]
+            ring
+
+theorem row0Sigma_wpAt5_eq_zero_of_row0Sigma_wc_zero_and_bCoeff5_zero
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    (hsigma : row0Sigma s (wc s) = 0)
+    (hb5 : bCoeff (σ s) (t s) (5 : ℝ) = 0) :
+    row0Sigma s (wpAt 0 s 5) = 0 := by
+  rw [row0Sigma_wpAt5_closed_form, hsigma, hb5]
+  simp
+
+theorem row0Sigma_wpAt5_eq_zero_of_sigma2_eq_two_delta_and_bCoeff5_zero
+    (s : OffSeed Xi)
+    [XiJetQuotRec2AtOrderTrueAnalytic]
+    [TAC.XiJetWindowEqAtOrderQuotProvider]
+    [RouteAWcScalarProvider]
+    (hσ2δ : JetQuotOp.σ2 s = (2 : ℂ) * (XiTransport.delta s : ℂ))
+    (hb5 : bCoeff (σ s) (t s) (5 : ℝ) = 0) :
+    row0Sigma s (wpAt 0 s 5) = 0 := by
+  apply row0Sigma_wpAt5_eq_zero_of_row0Sigma_wc_zero_and_bCoeff5_zero
+  · exact row0Sigma_wc_eq_zero_of_sigma2_eq_two_delta (s := s) (hσ2δ := hσ2δ)
+  · exact hb5
 end W1
 
 end XiPacket
