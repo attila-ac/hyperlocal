@@ -1,0 +1,30 @@
+import Hyperlocal.Targets.XiSigma2EqTwoDeltaOnResonantBranchFromWp5Row0
+import Mathlib.Tactic
+
+set_option autoImplicit false
+noncomputable section
+
+namespace Hyperlocal
+namespace Scratch
+
+namespace TAC
+open Hyperlocal.Targets.XiPacket.TAC
+end TAC
+
+open Hyperlocal.Targets
+open Hyperlocal.Targets.XiPacket
+open Hyperlocal.Transport.PrimeTrigPacket
+open scoped Real
+
+#check Hyperlocal.Targets.row0Sigma_wc_zero_on_resonant_branch_of_wp5_row0
+#check Hyperlocal.Targets.row0Sigma_wc_zero_on_resonant_branch_all_of_wp5_row0
+#check Hyperlocal.Targets.sigma2_eq_two_delta_on_resonant_branch_of_wp5_row0
+#check Hyperlocal.Targets.sigma2_eq_two_delta_on_resonant_branch_all_of_wp5_row0
+
+#print axioms Hyperlocal.Targets.row0Sigma_wc_zero_on_resonant_branch_of_wp5_row0
+#print axioms Hyperlocal.Targets.row0Sigma_wc_zero_on_resonant_branch_all_of_wp5_row0
+#print axioms Hyperlocal.Targets.sigma2_eq_two_delta_on_resonant_branch_of_wp5_row0
+#print axioms Hyperlocal.Targets.sigma2_eq_two_delta_on_resonant_branch_all_of_wp5_row0
+
+end Scratch
+end Hyperlocal
