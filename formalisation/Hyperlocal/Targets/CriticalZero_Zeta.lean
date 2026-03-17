@@ -1,22 +1,4 @@
-/-
-  Hyperlocal/Targets/CriticalZero_Zeta.lean
-
-  Final ζ-facing exports.
-
-  This file packages:
-    * `noOffSeed_Zeta`
-    * `criticalzero_zeta`
-
-  from the existing staged Xi-side chain
-
-      offSeedPhaseLock_Xi -> noOffSeed_xi_of_phaseLock
-
-  together with `Targets.ZetaTransfer`.
--/
-
-import Hyperlocal.Targets.OffSeedPhaseLockXi
-import Hyperlocal.Targets.Stage3SystemXiProof
-import Hyperlocal.Targets.ZetaTransfer
+import Hyperlocal.Targets.CriticalZero_Zeta_FromWp5Provider
 import Mathlib.Tactic
 
 set_option autoImplicit false
@@ -26,56 +8,34 @@ namespace Hyperlocal
 namespace Targets
 
 open Hyperlocal.Conclusion.OffSeedToTAC
-open Complex
 
-/-- Final ζ-facing export. -/
+/--
+Current public ζ-side endpoint on the smallest honest remaining seam.
+-/
 theorem noOffSeed_Zeta
     [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
-    [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
-    [_root_.Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
-    (hroute :
-      ∀ s : Hyperlocal.OffSeed Hyperlocal.Targets.XiPacket.Xi,
-        (-2 : ℂ) * deriv (deriv (Hyperlocal.Targets.XiPacket.routeA_G s)) (1 - s.ρ)
-          + (Hyperlocal.Targets.XiPacket.JetQuotOp.σ2 s) *
-              deriv (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ)
-          - (Hyperlocal.Targets.XiPacket.JetQuotOp.σ3 s) *
-              (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ) = 0) :
+    [Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
+    [Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
+    [Hyperlocal.Targets.XiWp5Row0ZeroOnResonantBranchProvider] :
     NoOffSeed Hyperlocal.zeta := by
-  have hlock : Hyperlocal.Transport.OffSeedPhaseLock (H := Hyperlocal.Targets.Xi) := by
-    simpa [Hyperlocal.Targets.Xi, Hyperlocal.Targets.XiPacket.Xi] using
-      (Hyperlocal.Targets.offSeedPhaseLock_Xi (hroute := hroute))
+  exact Hyperlocal.Targets.noOffSeed_Zeta_from_wp5_provider
 
-  have hxi : NoOffSeed Hyperlocal.Targets.Xi := by
-    exact Hyperlocal.Targets.noOffSeed_xi_of_phaseLock (hlock := hlock)
-
-  have hxi' : NoOffSeed Hyperlocal.Targets.ZetaTransfer.Xi := by
-    simpa [Hyperlocal.Targets.Xi, Hyperlocal.Targets.ZetaTransfer.Xi] using hxi
-
-  simpa [Hyperlocal.Targets.ZetaTransfer.Zeta] using
-    (Hyperlocal.Targets.ZetaTransfer.noOffSeed_zeta_of_noOffSeed_xi (hxi := hxi'))
-
-/-- Final RH-facing pointwise export for ζ. -/
+/-- Current public RH-facing endpoint on the same seam. -/
 theorem criticalzero_zeta
     [Hyperlocal.Targets.XiPacket.XiJetQuotRec2AtOrderTrueAnalytic]
-    [_root_.Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
-    [_root_.Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
-    (hroute :
-      ∀ s : Hyperlocal.OffSeed Hyperlocal.Targets.XiPacket.Xi,
-        (-2 : ℂ) * deriv (deriv (Hyperlocal.Targets.XiPacket.routeA_G s)) (1 - s.ρ)
-          + (Hyperlocal.Targets.XiPacket.JetQuotOp.σ2 s) *
-              deriv (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ)
-          - (Hyperlocal.Targets.XiPacket.JetQuotOp.σ3 s) *
-              (Hyperlocal.Targets.XiPacket.routeA_G s) (1 - s.ρ) = 0)
+    [Hyperlocal.Targets.XiPacket.TAC.XiJetWindowEqAtOrderQuotProvider]
+    [Hyperlocal.Targets.XiPacket.RouteAWcScalarProvider]
+    [Hyperlocal.Targets.XiWp5Row0ZeroOnResonantBranchProvider]
     {ρ : ℂ}
-    (hζ : Hyperlocal.zeta ρ = 0) (hIm : ρ.im ≠ 0) :
+    (hζ : Hyperlocal.zeta ρ = 0)
+    (hIm : ρ.im ≠ 0) :
     ρ.re = (1 / 2 : ℝ) := by
-  by_contra hcrit
-  have hz_off : Hyperlocal.OffSeed Hyperlocal.zeta :=
-    { ρ := ρ
-      hρ := hζ
-      hσ := hcrit
-      ht := hIm }
-  exact (noOffSeed_Zeta (hroute := hroute)) ⟨hz_off⟩
+  exact Hyperlocal.Targets.criticalzero_zeta_from_wp5_provider
+    (hζ := hζ)
+    (hIm := hIm)
+
+#print axioms noOffSeed_Zeta
+#print axioms criticalzero_zeta
 
 end Targets
 end Hyperlocal
