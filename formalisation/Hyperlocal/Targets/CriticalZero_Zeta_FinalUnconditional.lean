@@ -1,4 +1,4 @@
-import Hyperlocal.Targets.CriticalZero_Zeta_FinalFromResonant32PrimeViaRec2ScalarRoots
+import Hyperlocal.Targets.CriticalZero_Zeta_FinalFromResonant32PrimeTheorem
 import Hyperlocal.Targets.XiPacket.XiToeplitzRecurrenceJetQuotientSequenceAtOrderTrueAnalyticPrimeOnResonant32Closed
 import Mathlib.Tactic
 
@@ -17,25 +17,22 @@ open Hyperlocal.Conclusion.OffSeedToTAC
 open Hyperlocal.Targets.XiPacket
 open scoped Real
 
-/--
-Unconditional Xi-side finish once the resonant32 generic-prime root is closed.
--/
 theorem noOffSeed_Xi_final_unconditional
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarNormalizationProvider]
     [XiJetQuotRec2AtOrderTrueAnalytic] :
     NoOffSeed Xi := by
-  exact noOffSeed_Xi_final_of_resonant32_prime_via_rec2_scalar_roots
+  exact noOffSeed_Xi_final_of_resonant32_prime_theorem
+    (hres32 := Hyperlocal.Targets.XiPacket.rec2_wpAt_on_resonant32_closed)
 
-/-- Unconditional ζ-side finish. -/
 theorem noOffSeed_Zeta_final_unconditional
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarNormalizationProvider]
     [XiJetQuotRec2AtOrderTrueAnalytic] :
     NoOffSeed Hyperlocal.zeta := by
-  exact noOffSeed_Zeta_final_of_resonant32_prime_via_rec2_scalar_roots
+  exact noOffSeed_Zeta_final_of_resonant32_prime_theorem
+    (hres32 := Hyperlocal.Targets.XiPacket.rec2_wpAt_on_resonant32_closed)
 
-/-- Unconditional RH-facing finish. -/
 theorem criticalzero_zeta_final_unconditional
     [TAC.XiJetWindowEqAtOrderQuotProvider]
     [RouteAWcScalarNormalizationProvider]
@@ -44,9 +41,14 @@ theorem criticalzero_zeta_final_unconditional
     (hζ : Hyperlocal.zeta ρ = 0)
     (hIm : ρ.im ≠ 0) :
     ρ.re = (1 / 2 : ℝ) := by
-  exact criticalzero_zeta_final_of_resonant32_prime_via_rec2_scalar_roots
+  exact criticalzero_zeta_final_of_resonant32_prime_theorem
+    (hres32 := Hyperlocal.Targets.XiPacket.rec2_wpAt_on_resonant32_closed)
     (hζ := hζ)
     (hIm := hIm)
+
+#print axioms noOffSeed_Xi_final_unconditional
+#print axioms noOffSeed_Zeta_final_unconditional
+#print axioms criticalzero_zeta_final_unconditional
 
 end Targets
 end Hyperlocal
