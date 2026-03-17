@@ -1,8 +1,6 @@
 /-
   Hyperlocal/Targets/XiPacket/XiToeplitzRecurrenceOperatorToRow.lean
 
-  Patch: remove the last `sorry` in `toeplitzRow3_of_jetQuotOp_eq_zero`.
-
   Key point:
   * use the existing coordinate-expansion lemma `toeplitzL_two_apply_fin0`
     (from `...ToeplitzLToRow3`) instead of expanding `toeplitzL` via shifts here.

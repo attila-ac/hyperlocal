@@ -4,11 +4,6 @@
   Phase 3: Toeplitz/recurrence layer becomes theorematic once the minimal
   “recurrence injection” is provided.
 
-  In this aggressive version:
-    * NO `sorry` here.
-    * The ONLY open semantics are the two axioms living in:
-        XiToeplitzRecurrenceInject.lean
-
   2026-03-13 honest post-axiom state:
   * the recurrence injection boundary is now theorem-gated
   * therefore the downstream semantics endpoint can no longer remain assumption-free
